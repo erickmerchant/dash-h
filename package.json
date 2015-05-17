@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://erickmerchant@github.com/erickmerchant/dash-h.git"
+    "url": "git+https://erickmerchant@github.com/erickmerchant/sergeant.git"
   },
   "author": "Erick Merchant <erickmerchant@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/erickmerchant/dash-h/issues"
+    "url": "https://github.com/erickmerchant/sergeant/issues"
   },
-  "homepage": "https://github.com/erickmerchant/dash-h#README",
+  "homepage": "https://github.com/erickmerchant/sergeant#README",
   "devDependencies": {
     "istanbul": "^0.3.13",
     "mocha": "^2.0.0",

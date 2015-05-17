@@ -1,13 +1,13 @@
 var assert = require('assert')
 var describe = require('mocha').describe
 var it = require('mocha').it
-var dash = require('./index.js')
+var sergeant = require('./index.js')
 var chalk = require('chalk')
 var rewire = require('rewire')
 
 describe('module', function () {
   it('should run commands', function (done) {
-    var app = dash('a test app', ['test'])
+    var app = sergeant('a test app', ['test'])
 
     app.command('test', '', {}, function (d) {
       assert.ok(true)
@@ -19,7 +19,7 @@ describe('module', function () {
   })
 
   it('accept arguments', function (done) {
-    var app = dash('a test app', ['test', '"testing arguments"'])
+    var app = sergeant('a test app', ['test', '"testing arguments"'])
 
     app.command('test <arg>', '', {}, function (d) {
       assert.equal(this.arg, 'testing arguments')
@@ -31,7 +31,7 @@ describe('module', function () {
   })
 
   it('accept options', function (done) {
-    var app = dash('a test app', ['test', '--one="testing"'])
+    var app = sergeant('a test app', ['test', '--one="testing"'])
 
     app.command('test', '', {}, function (d) {
       assert.equal(this.options.one, 'testing')
@@ -43,7 +43,7 @@ describe('module', function () {
   })
 
   it('accept true options', function (done) {
-    var app = dash('a test app', ['test', '--one'])
+    var app = sergeant('a test app', ['test', '--one'])
 
     app.command('test', '', {}, function (d) {
       assert.equal(this.options.one, true)
@@ -55,7 +55,7 @@ describe('module', function () {
   })
 
   it('accept false options', function (done) {
-    var app = dash('a test app', ['test', '--no-one'])
+    var app = sergeant('a test app', ['test', '--no-one'])
 
     app.command('test', '', {}, function (d) {
       assert.equal(this.options.one, false)
@@ -67,7 +67,7 @@ describe('module', function () {
   })
 
   it('throws an error when command is not selected', function (done) {
-    var app = dash('a test app', [])
+    var app = sergeant('a test app', [])
     var errors = []
     var origError = console.error
 
@@ -91,7 +91,7 @@ describe('module', function () {
   })
 
   it('throws an error when command is not selected', function (done) {
-    var app = dash('a test app', ['not-defined'])
+    var app = sergeant('a test app', ['not-defined'])
     var errors = []
     var origError = console.error
 
@@ -115,7 +115,7 @@ describe('module', function () {
   })
 
   it('throws an error when you set a value to a negated option', function (done) {
-    var app = dash('a test app', ['--no-key=value'])
+    var app = sergeant('a test app', ['--no-key=value'])
     var errors = []
     var origError = console.error
 
@@ -139,10 +139,10 @@ describe('module', function () {
   })
 
   it('provides help for the whole app', function (done) {
-    var dash = rewire('./index.js')
+    var sergeant = rewire('./index.js')
     var lines = []
 
-    dash.__set__({
+    sergeant.__set__({
       console: {
         log: function (x) {
           lines.push(x)
@@ -153,7 +153,7 @@ describe('module', function () {
       }
     })
 
-    var app = dash('a test app', ['--help'])
+    var app = sergeant('a test app', ['--help'])
 
     app.command('test <arg>', 'test command', {'--option': 'an option'}, function (d) {
       d()
@@ -172,10 +172,10 @@ describe('module', function () {
   })
 
   it('provides help for each command', function (done) {
-    var dash = rewire('./index.js')
+    var sergeant = rewire('./index.js')
     var lines = []
 
-    dash.__set__({
+    sergeant.__set__({
       console: {
         log: function (x) {
           lines.push(x)
@@ -186,7 +186,7 @@ describe('module', function () {
       }
     })
 
-    var app = dash('a test app', ['test', '--help'])
+    var app = sergeant('a test app', ['test', '--help'])
 
     app.command('test <arg>', 'test command', {'--option': 'an option'}, function (d) {
       d()
@@ -205,10 +205,10 @@ describe('module', function () {
   })
 
   it('console.errors errors from commands', function (done) {
-    var dash = rewire('./index.js')
+    var sergeant = rewire('./index.js')
     var errs = []
 
-    dash.__set__({
+    sergeant.__set__({
       console: {
         error: function (x) {
           errs.push(x)
@@ -219,7 +219,7 @@ describe('module', function () {
       }
     })
 
-    var app = dash('a test app', ['test'])
+    var app = sergeant('a test app', ['test'])
 
     app.command('test <arg>', 'test command', {'--option': 'an option'}, function (d) {
       d(new Error('nothing bad happened'))
