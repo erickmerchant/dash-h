@@ -1,0 +1,32 @@
+{
+  "name": "dash-h",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && mocha",
+    "cover": "istanbul cover node_modules/.bin/_mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://erickmerchant@github.com/erickmerchant/dash-h.git"
+  },
+  "author": "Erick Merchant <erickmerchant@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/erickmerchant/dash-h/issues"
+  },
+  "homepage": "https://github.com/erickmerchant/dash-h#README",
+  "devDependencies": {
+    "istanbul": "^0.3.13",
+    "mocha": "^2.0.0",
+    "rewire": "^2.3.3",
+    "standard": "^3.5.0"
+  },
+  "dependencies": {
+    "async-done": "^1.0.0",
+    "chalk": "^1.0.0",
+    "repeat-string": "^1.5.2",
+    "unquote": "^1.1.0"
+  }
+}
