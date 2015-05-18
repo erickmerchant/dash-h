@@ -31,6 +31,8 @@ class App {
 
   run (callback) {
 
+    callback = callback || function () {}
+
     let context = { options: {} }
     let command
 
