@@ -85,7 +85,9 @@ class App {
         if (!command) {
           console.log(chalk.magenta('Usage:') + ' [options] <command>')
           console.log(this.description)
-          console.log(chalk.magenta('Commands:'))
+          if (Object.keys(this.commands).length) {
+            console.log(chalk.magenta('Commands:'))
+          }
 
           for (let c in this.commands) {
             c = this.commands[c]
@@ -99,7 +101,9 @@ class App {
         } else {
           console.log(chalk.magenta('Usage:') + ' [options] ' + command.usage)
           console.log(command.description)
-          console.log(chalk.magenta('Options:'))
+          if (Object.keys(command.options).length) {
+            console.log(chalk.magenta('Options:'))
+          }
 
           for (let o in command.options) {
             if (o.length > longest) {
