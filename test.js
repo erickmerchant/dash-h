@@ -21,10 +21,26 @@ describe('module', function () {
     })
   })
 
+  it('should run commands that only take a callback', function (done) {
+    var app = sergeant('a test app', ['test', {}])
+
+    app.command('test', '', {}, function (d) {
+      d(null, 'ran test')
+    })
+
+    app.run(function (err, result) {
+      assert.ifError(err)
+
+      assert.equal(result, 'ran test')
+
+      done()
+    })
+  })
+
   it('accept arguments', function (done) {
     var app = sergeant('a test app', ['test', 'testing arguments', {}])
 
-    app.command('test <arg>', '', {}, function (arg, options, d) {
+    app.command('test', '', {}, function (arg, options, d) {
       assert.equal(arg, 'testing arguments')
 
       d()
@@ -76,16 +92,15 @@ describe('module', function () {
   it('provides help for the whole app', function (done) {
     var app = sergeant('a test app', [{ help: true }])
 
-    app.command('test <arg>', 'test command', {'--option': 'an option'}, function () { })
+    app.command('test', 'test command', {'--option': 'an option'}, function (arg, options, d) { })
 
     app.run(function (err, result) {
       assert.ifError(err)
 
       assert.deepEqual(result, [
-        chalk.magenta('Usage:') + ' [options] <command>',
         'a test app',
         chalk.magenta('Commands:'),
-        ' ' + chalk.cyan('test <arg>') + '  test command'
+        ' ' + chalk.cyan('[options] test <arg>') + '  test command'
       ].join('\n'))
 
       done()
@@ -95,7 +110,7 @@ describe('module', function () {
   it('provides help for each command', function (done) {
     var app = sergeant('a test app', ['test', { help: true } ])
 
-    app.command('test <arg>', 'test command', {'--option': 'an option'}, function () { })
+    app.command('test', 'test command', {'--option': 'an option'}, function (arg, options, d) { })
 
     app.run(function (err, result) {
       assert.ifError(err)
@@ -111,15 +126,29 @@ describe('module', function () {
     })
   })
 
-  it('errors with the incorrect number of arguments', function (done) {
-    var app = sergeant('a test app', ['test', {}])
+  it('errors with too many arguments', function (done) {
+    var app = sergeant('a test app', ['test', '1', '2', {}])
 
-    app.command('test <arg>', 'test command', {'--option': 'an option'}, function (arg, options, d) {
+    app.command('test', 'test command', {'--option': 'an option'}, function (arg, options, d) {
       d(new Error('nothing bad happened'))
     })
 
     app.run(function (err) {
-      assert.equal(err.message, 'incorrect usage of test')
+      assert.equal(err.message, 'too many arguments for test')
+
+      done()
+    })
+  })
+
+  it('errors with too few arguments', function (done) {
+    var app = sergeant('a test app', ['test', '1', {}])
+
+    app.command('test', 'test command', {'--option': 'an option'}, function (arg1, arg2, options, d) {
+      d(new Error('nothing bad happened'))
+    })
+
+    app.run(function (err) {
+      assert.equal(err.message, 'missing argument (arg2) for test')
 
       done()
     })
@@ -128,7 +157,7 @@ describe('module', function () {
   it('gathers errors from commands', function (done) {
     var app = sergeant('a test app', ['test', 'testing', {}])
 
-    app.command('test <arg>', 'test command', {'--option': 'an option'}, function (arg, options, d) {
+    app.command('test', 'test command', {'--option': 'an option'}, function (arg, options, d) {
       d(new Error('nothing bad happened'))
     })
 

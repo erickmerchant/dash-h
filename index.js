@@ -4,6 +4,7 @@ const asyncDone = require('async-done')
 const chalk = require('chalk')
 const unquote = require('unquote')
 const repeat = require('repeat-string')
+const getParams = require('get-params')
 const ap = require('ap')
 
 class App {
@@ -15,38 +16,36 @@ class App {
     this.commands = {}
   }
 
-  command (usage, description, options, action) {
-    const parts = usage.split(' ')
-    const name = parts[0]
-    const args = parts.slice(1).map(function (v) {
-      return v.substr(1, v.length - 2)
-    })
+  command (name, description, options, action) {
 
     this.commands[name] = {
-      usage: usage,
       description: description,
       options: options,
-      args: args,
       action: action
     }
   }
 
   run (callback) {
-    callback = callback || function (err, result) {
-      if (err) {
-        console.error(chalk.red(err))
-      } else {
-        if (result) {
-          console.log(result)
-        }
-      }
-    }
+    var context_first = this.context.length > 1 ? this.context[0] : false
+    var options = this.context[this.context.length - 1]
     var command
     var results = []
     var cols = []
     var longest = 0
-    var context_first = this.context.length > 1 ? this.context[0] : false
-    var options = this.context[this.context.length - 1]
+    var usage
+    var params
+    var missing
+    var action
+
+    callback = callback || function (err, result) {
+      if (err) {
+        console.error(chalk.red(err))
+      } else {
+        if (typeof result === 'string') {
+          console.log(chalk.green(result))
+        }
+      }
+    }
 
     try {
       if (context_first) {
@@ -57,7 +56,9 @@ class App {
         command = this.commands[context_first]
 
         if (options.help) {
-          results.push(chalk.magenta('Usage:') + ' [options] ' + command.usage)
+          usage = getParams(command.action).slice(0, -2).map(function (v) { return '<' + v + '>' }).join(' ')
+
+          results.push(chalk.magenta('Usage:') + ' [options] ' + context_first + ' ' + usage)
           results.push(command.description)
           if (Object.keys(command.options).length) {
             results.push(chalk.magenta('Options:'))
@@ -73,20 +74,19 @@ class App {
         }
       } else if (options.help) {
         if (!command) {
-          results.push(chalk.magenta('Usage:') + ' [options] <command>')
           results.push(this.description)
           if (Object.keys(this.commands).length) {
             results.push(chalk.magenta('Commands:'))
           }
 
           for (let c in this.commands) {
-            c = this.commands[c]
+            usage = '[options] ' + c + ' ' + getParams(this.commands[c].action).map(function (v) { return '<' + v + '>' }).slice(0, -2).join(' ')
 
-            if (c.usage.length > longest) {
-              longest = c.usage.length
+            if (usage.length > longest) {
+              longest = usage.length
             }
 
-            cols.push([c.usage, c.description])
+            cols.push([usage, this.commands[c].description])
           }
         }
       } else {
@@ -102,13 +102,25 @@ class App {
 
         callback(null, results.join('\n'))
       } else if (command) {
-        if (this.context.length - 2 !== command.args.length) {
-          throw new Error('incorrect usage of ' + context_first)
+        this.context.shift()
+        action = command.action
+        params = getParams(action)
+
+        if (params.length > 1) {
+          if (this.context.length < params.length - 1) {
+            missing = params.slice(this.context.length - 1, -2)
+
+            throw new Error('missing argument' + (missing.length > 1 ? 's' : '') + ' (' + missing.join(', ') + ') for ' + context_first)
+          }
+
+          if (this.context.length > params.length - 1) {
+            throw new Error('too many arguments for ' + context_first)
+          }
+
+          action = ap(this.context, action)
         }
 
-        this.context.shift()
-
-        asyncDone(ap(this.context, command.action), callback)
+        asyncDone(action, callback)
       }
     } catch (error) {
       callback(error)
@@ -125,13 +137,14 @@ sergeant.parse = function (argv) {
 
   var context = []
   var options = {}
+  let parts
 
   argv.forEach(function (val, key) {
     if (val.startsWith('--')) {
       val = val.substr(2)
 
       if (val) {
-        let parts = val.split('=')
+        parts = val.split('=')
 
         if (val.startsWith('no-')) {
           if (parts.length === 1) {
