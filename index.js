@@ -42,7 +42,7 @@ class App {
         console.error(chalk.red(err))
       } else {
         if (typeof result === 'string') {
-          console.log(chalk.green(result))
+          console.log(result)
         }
       }
     }
