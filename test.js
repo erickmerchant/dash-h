@@ -6,69 +6,79 @@ var chalk = require('chalk')
 
 describe('module', function () {
   it('should run commands', function (done) {
-    var app = sergeant('a test app', { args: ['test'], options: {} }, function (err, result) {
+    var app = sergeant('a test app', ['test', {}])
+
+    app.command('test', '', {}, function (options, d) {
+      d(null, 'ran test')
+    })
+
+    app.run(function (err, result) {
       assert.ifError(err)
 
       assert.equal(result, 'ran test')
 
       done()
     })
-
-    app.command('test', '', {}, function (d) {
-      d(null, 'ran test')
-    })
   })
 
   it('accept arguments', function (done) {
-    var app = sergeant('a test app', { args: ['test', 'testing arguments'], options: {} }, function (err) {
+    var app = sergeant('a test app', ['test', 'testing arguments', {}])
+
+    app.command('test <arg>', '', {}, function (arg, options, d) {
+      assert.equal(arg, 'testing arguments')
+
+      d()
+    })
+
+    app.run(function (err) {
       assert.ifError(err)
 
       done()
-    })
-
-    app.command('test <arg>', '', {}, function (d) {
-      assert.equal(this.arg, 'testing arguments')
-
-      d()
     })
   })
 
   it('accept options', function (done) {
-    var app = sergeant('a test app', { args: ['test'], options: { one: 'testing' } }, function (err) {
+    var app = sergeant('a test app', ['test', { one: 'testing' }])
+
+    app.command('test', '', {}, function (options, d) {
+      assert.equal(options.one, 'testing')
+
+      d()
+    })
+
+    app.run(function (err) {
       assert.ifError(err)
 
       done()
     })
-
-    app.command('test', '', {}, function (d) {
-      assert.equal(this.options.one, 'testing')
-
-      d()
-    })
   })
 
   it('throws an error when command is not selected', function (done) {
-    var app = sergeant('a test app', {}, function (err) {
+    var app = sergeant('a test app', [{}])
+
+    app.run(function (err) {
       assert.equal(err.message, 'run with --help to get a list of commands')
 
       done()
     })
-
-    app.end()
   })
 
   it('throws an error when command is not selected', function (done) {
-    var app = sergeant('a test app', { args: ['not-defined'] }, function (err) {
+    var app = sergeant('a test app', ['not-defined', {}])
+
+    app.run(function (err) {
       assert.equal(err.message, 'not-defined not found')
 
       done()
     })
-
-    app.end()
   })
 
   it('provides help for the whole app', function (done) {
-    var app = sergeant('a test app', { options: { help: true} }, function (err, result) {
+    var app = sergeant('a test app', [{ help: true }])
+
+    app.command('test <arg>', 'test command', {'--option': 'an option'}, function () { })
+
+    app.run(function (err, result) {
       assert.ifError(err)
 
       assert.deepEqual(result, [
@@ -80,14 +90,14 @@ describe('module', function () {
 
       done()
     })
-
-    app.command('test <arg>', 'test command', {'--option': 'an option'}, function () { })
-
-    app.end()
   })
 
   it('provides help for each command', function (done) {
-    var app = sergeant('a test app', { args: ['test'], options: { help: true } }, function (err, result) {
+    var app = sergeant('a test app', ['test', { help: true } ])
+
+    app.command('test <arg>', 'test command', {'--option': 'an option'}, function () { })
+
+    app.run(function (err, result) {
       assert.ifError(err)
 
       assert.deepEqual(result, [
@@ -99,40 +109,48 @@ describe('module', function () {
 
       done()
     })
-
-    app.command('test <arg>', 'test command', {'--option': 'an option'}, function (d) {
-      d()
-    })
-
-    app.end()
   })
 
-  it('gathers errors from commands', function (done) {
-    var app = sergeant('a test app', { args: ['test'] }, function (err) {
-      assert.equal(err.message, 'nothing bad happened')
+  it('errors with the incorrect number of arguments', function (done) {
+    var app = sergeant('a test app', ['test', {}])
+
+    app.command('test <arg>', 'test command', {'--option': 'an option'}, function (arg, options, d) {
+      d(new Error('nothing bad happened'))
+    })
+
+    app.run(function (err) {
+      assert.equal(err.message, 'incorrect usage of test')
 
       done()
     })
+  })
 
-    app.command('test <arg>', 'test command', {'--option': 'an option'}, function (d) {
+  it('gathers errors from commands', function (done) {
+    var app = sergeant('a test app', ['test', 'testing', {}])
+
+    app.command('test <arg>', 'test command', {'--option': 'an option'}, function (arg, options, d) {
       d(new Error('nothing bad happened'))
+    })
+
+    app.run(function (err) {
+      assert.equal(err.message, 'nothing bad happened')
+
+      done()
     })
   })
 })
 
 describe('module.parse', function () {
   it('should parse', function (done) {
-    var argv = {
-      args: ['one', 'two'],
-      options: {
+    var context = ['one', 'two', {
         a: true,
         b: false,
         c: 'ccc',
         'no-d': 'ddd'
       }
-    }
+    ]
 
-    assert.deepEqual(sergeant.parse(['one', 'two', '--a', '--no-b', '--c=ccc', '--no-d=ddd']), argv)
+    assert.deepEqual(sergeant.parse(['one', 'two', '--a', '--no-b', '--c=ccc', '--no-d=ddd']), context)
 
     done()
   })

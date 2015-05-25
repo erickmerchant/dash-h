@@ -23,9 +23,9 @@
     "standard": "^3.5.0"
   },
   "dependencies": {
+    "ap": "^0.2.0",
     "async-done": "^1.0.0",
     "chalk": "^1.0.0",
-    "lodash.zipobject": "^3.0.0",
     "repeat-string": "^1.5.2",
     "unquote": "^1.1.0"
   }

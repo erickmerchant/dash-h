@@ -4,25 +4,15 @@ const asyncDone = require('async-done')
 const chalk = require('chalk')
 const unquote = require('unquote')
 const repeat = require('repeat-string')
-const zipObject = require('lodash.zipobject')
+const ap = require('ap')
 
 class App {
-  constructor (description, argv, callback) {
-    argv = argv || sergeant.parse(process.argv.slice(2))
+  constructor (description, context) {
 
     this.description = description
-    this.callback = callback || function (err, result) {
-      if (err) {
-        console.error(chalk.red(err))
-      } else {
-        console.log(result)
-      }
-    }
-    this.commands = {}
-    this.argv = {}
+    this.context = context || sergeant.parse()
 
-    this.argv.args = argv.args || []
-    this.argv.options = argv.options || {}
+    this.commands = {}
   }
 
   command (usage, description, options, action) {
@@ -39,30 +29,34 @@ class App {
       args: args,
       action: action
     }
-
-    if (!this.argv.options.help && this.argv.args.length && this.argv.args[0] === name) {
-      this.argv.args.unshift()
-
-      let context = zipObject(args, this.argv.args.slice(1))
-
-      context.options = this.argv.options
-
-      asyncDone(action.bind(context), this.callback)
-    }
   }
 
-  end () {
-    var error
+  run (callback) {
+    callback = callback || function (err, result) {
+      if (err) {
+        console.error(chalk.red(err))
+      } else {
+        if (result) {
+          console.log(result)
+        }
+      }
+    }
     var command
     var results = []
     var cols = []
     var longest = 0
+    var context_first = this.context.length > 1 ? this.context[0] : false
+    var options = this.context[this.context.length - 1]
 
-    if (this.argv.args.length) {
-      if (this.commands[this.argv.args[0]]) {
-        command = this.commands[this.argv.args[0]]
+    try {
+      if (context_first) {
+        if (!this.commands[context_first]) {
+          throw new Error(context_first + ' not found')
+        }
 
-        if (this.argv.options.help) {
+        command = this.commands[context_first]
+
+        if (options.help) {
           results.push(chalk.magenta('Usage:') + ' [options] ' + command.usage)
           results.push(command.description)
           if (Object.keys(command.options).length) {
@@ -77,49 +71,59 @@ class App {
             cols.push([o, command.options[o]])
           }
         }
-      } else {
-        error = new Error(this.argv.args[0] + ' not found')
-      }
-    } else if (this.argv.options.help) {
-      if (!command && !error) {
-        results.push(chalk.magenta('Usage:') + ' [options] <command>')
-        results.push(this.description)
-        if (Object.keys(this.commands).length) {
-          results.push(chalk.magenta('Commands:'))
-        }
-
-        for (let c in this.commands) {
-          c = this.commands[c]
-
-          if (c.usage.length > longest) {
-            longest = c.usage.length
+      } else if (options.help) {
+        if (!command) {
+          results.push(chalk.magenta('Usage:') + ' [options] <command>')
+          results.push(this.description)
+          if (Object.keys(this.commands).length) {
+            results.push(chalk.magenta('Commands:'))
           }
 
-          cols.push([c.usage, c.description])
+          for (let c in this.commands) {
+            c = this.commands[c]
+
+            if (c.usage.length > longest) {
+              longest = c.usage.length
+            }
+
+            cols.push([c.usage, c.description])
+          }
         }
+      } else {
+        throw new Error('run with --help to get a list of commands')
       }
+
+      if (options.help) {
+        longest += 2
+
+        cols.forEach(function (v) {
+          results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+        })
+
+        callback(null, results.join('\n'))
+      } else if (command) {
+        if (this.context.length - 2 !== command.args.length) {
+          throw new Error('incorrect usage of ' + context_first)
+        }
+
+        this.context.shift()
+
+        asyncDone(ap(this.context, command.action), callback)
+      }
+    } catch (error) {
+      callback(error)
     }
-
-    longest += 2
-
-    cols.forEach(function (v) {
-      results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-    })
-
-    if (!this.argv.args.length && !this.argv.options.help && !error) {
-      error = new Error('run with --help to get a list of commands')
-    }
-
-    this.callback(error, results.join('\n'))
   }
 }
 
-function sergeant (description, argv, callback) {
-  return new App(description, argv, callback)
+function sergeant (description, argv) {
+  return new App(description, argv)
 }
 
 sergeant.parse = function (argv) {
-  var args = []
+  argv = argv || process.argv.slice(2)
+
+  var context = []
   var options = {}
 
   argv.forEach(function (val, key) {
@@ -144,11 +148,13 @@ sergeant.parse = function (argv) {
         }
       }
     } else {
-      args.push(unquote(val))
+      context.push(unquote(val))
     }
   })
 
-  return { args: args, options: options }
+  context.push(options)
+
+  return context
 }
 
 module.exports = sergeant
