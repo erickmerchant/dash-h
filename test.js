@@ -8,7 +8,7 @@ describe('module', function () {
   it('should run commands', function (done) {
     var app = sergeant('a test app', ['test', {}])
 
-    app.command('test', '', {}, function (options, d) {
+    app.command('test', function (options, d) {
       d(null, 'ran test')
     })
 
@@ -24,7 +24,7 @@ describe('module', function () {
   it('should run commands that only take a callback', function (done) {
     var app = sergeant('a test app', ['test', {}])
 
-    app.command('test', '', {}, function (d) {
+    app.command('test', function (d) {
       d(null, 'ran test')
     })
 
@@ -40,7 +40,7 @@ describe('module', function () {
   it('accept arguments', function (done) {
     var app = sergeant('a test app', ['test', 'testing arguments', {}])
 
-    app.command('test', '', {}, function (arg, options, d) {
+    app.command('test', function (arg, options, d) {
       assert.equal(arg, 'testing arguments')
 
       d()
@@ -56,7 +56,7 @@ describe('module', function () {
   it('accept options', function (done) {
     var app = sergeant('a test app', ['test', { one: 'testing' }])
 
-    app.command('test', '', {}, function (options, d) {
+    app.command('test', function (options, d) {
       assert.equal(options.one, 'testing')
 
       d()
@@ -92,7 +92,10 @@ describe('module', function () {
   it('provides help for the whole app', function (done) {
     var app = sergeant('a test app', [{ help: true }])
 
-    app.command('test', 'test command', {'--option': 'an option'}, function (arg, options, d) { })
+    app.command('test', {
+      description: 'test command',
+      options: {'--option': 'an option'}
+    }, function (arg, options, d) { })
 
     app.run(function (err, result) {
       assert.ifError(err)
@@ -110,7 +113,10 @@ describe('module', function () {
   it('provides help for each command', function (done) {
     var app = sergeant('a test app', ['test', { help: true } ])
 
-    app.command('test', 'test command', {'--option': 'an option'}, function (arg, options, d) { })
+    app.command('test', {
+      description: 'test command',
+      options: {'--option': 'an option'}
+    }, function (arg, options, d) { })
 
     app.run(function (err, result) {
       assert.ifError(err)
@@ -129,7 +135,10 @@ describe('module', function () {
   it('errors with too many arguments', function (done) {
     var app = sergeant('a test app', ['test', '1', '2', {}])
 
-    app.command('test', 'test command', {'--option': 'an option'}, function (arg, options, d) {
+    app.command('test', {
+      description: 'test command',
+      options: {'--option': 'an option'}
+    }, function (arg, options, d) {
       d(new Error('nothing bad happened'))
     })
 
@@ -143,7 +152,10 @@ describe('module', function () {
   it('errors with too few arguments', function (done) {
     var app = sergeant('a test app', ['test', '1', {}])
 
-    app.command('test', 'test command', {'--option': 'an option'}, function (arg1, arg2, options, d) {
+    app.command('test', {
+      description: 'test command',
+      options: {'--option': 'an option'}
+    }, function (arg1, arg2, options, d) {
       d(new Error('nothing bad happened'))
     })
 
@@ -157,7 +169,10 @@ describe('module', function () {
   it('gathers errors from commands', function (done) {
     var app = sergeant('a test app', ['test', 'testing', {}])
 
-    app.command('test', 'test command', {'--option': 'an option'}, function (arg, options, d) {
+    app.command('test', {
+      description: 'test command',
+      options: {'--option': 'an option'}
+    }, function (arg, options, d) {
       d(new Error('nothing bad happened'))
     })
 
@@ -172,14 +187,15 @@ describe('module', function () {
 describe('module.parse', function () {
   it('should parse', function (done) {
     var context = ['one', 'two', {
-        a: true,
-        b: false,
-        c: 'ccc',
-        'no-d': 'ddd'
+        x: true,
+        y: true,
+        z: true,
+        aaa: true,
+        bbb: 'ccc'
       }
     ]
 
-    assert.deepEqual(sergeant.parse(['one', 'two', '--a', '--no-b', '--c=ccc', '--no-d=ddd']), context)
+    assert.deepEqual(sergeant.parse(['one', 'two', '-x', '-yz', '--aaa', '--bbb=ccc']), context)
 
     done()
   })
