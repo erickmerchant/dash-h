@@ -6,12 +6,11 @@ const unquote = require('unquote')
 const repeat = require('repeat-string')
 const getParams = require('get-params')
 const assign = require('object-assign')
+const last = require('lodash.last')
 const ap = require('ap')
 
 const base = {
   commands: {},
-
-  aliases: {},
 
   context: [],
 
@@ -34,14 +33,9 @@ const base = {
     }
   },
 
-  alias (name, context) {
-
-    this.aliases[name] = context
-  },
-
   run (callback) {
     let context_first = this.context.length > 1 ? this.context[0] : false
-    let options = this.context[this.context.length - 1]
+    let options = last(this.context)
     let command
     let params
     let missing
@@ -60,10 +54,7 @@ const base = {
     try {
 
       if (context_first) {
-        if (this.aliases[context_first]) {
-          this.context = assign(this.aliases[context_first], this.context)
-          return this.run(callback)
-        } else if (!this.commands[context_first]) {
+        if (!this.commands[context_first]) {
           throw new Error(context_first + ' not found')
         }
 
@@ -122,11 +113,11 @@ const base = {
         action = command.action
         params = getParams(action)
 
-        for (let s in command.aliases) {
+        for (let s in command.settings.aliases) {
           if (options[s]) {
             delete options[s]
 
-            options = assign(options, command.aliases[s])
+            options = assign(options, command.settings.aliases[s])
           }
         }
 
@@ -160,6 +151,7 @@ const base = {
 function sergeant (description, context) {
   let obj = Object.create(base)
 
+  obj.commands = {}
   obj.description = description
   obj.context = context || sergeant.parse()
 

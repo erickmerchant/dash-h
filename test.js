@@ -69,6 +69,46 @@ describe('module', function () {
     })
   })
 
+  it('accept aliases', function (done) {
+    var app = sergeant('a test app', ['test', { a: true }])
+
+    app.command('test', { aliases: { a: { b: 'bb', c: 'cc' }}}, function (options, d) {
+      assert.equal(options.a, undefined)
+
+      assert.equal(options.b, 'bb')
+
+      assert.equal(options.c, 'cc')
+
+      d()
+    })
+
+    app.run(function (err) {
+      assert.ifError(err)
+
+      done()
+    })
+  })
+
+  it('accept aliases', function (done) {
+    var app = sergeant('a test app', ['test', { a: true }])
+
+    app.command('test', { aliases: { x: { b: 'bb', c: 'cc' }}}, function (options, d) {
+      assert.equal(options.a, true)
+
+      assert.equal(options.b, undefined)
+
+      assert.equal(options.c, undefined)
+
+      d()
+    })
+
+    app.run(function (err) {
+      assert.ifError(err)
+
+      done()
+    })
+  })
+
   it('throws an error when command is not selected', function (done) {
     var app = sergeant('a test app', [{}])
 
@@ -110,8 +150,13 @@ describe('module', function () {
     })
   })
 
-  it('provides help for each command', function (done) {
-    var app = sergeant('a test app', ['test', { help: true } ])
+  it('provides help for the whole app', function (done) {
+    var app = sergeant('a test app', [{ help: true }])
+
+    app.command('test-2', {
+      description: 'test command',
+      options: {'--option': 'an option'}
+    }, function (arg, options, d) { })
 
     app.command('test', {
       description: 'test command',
@@ -122,10 +167,69 @@ describe('module', function () {
       assert.ifError(err)
 
       assert.deepEqual(result, [
+        'a test app',
+        chalk.magenta('Commands:'),
+        ' ' + chalk.cyan('[options] test-2 <arg>') + '  test command',
+        ' ' + chalk.cyan('[options] test <arg>') + '    test command'
+      ].join('\n'))
+
+      done()
+    })
+  })
+
+  it('provides help for the whole app', function (done) {
+    var app = sergeant('a test app', [{ help: true }])
+
+    app.run(function (err, result) {
+      assert.ifError(err)
+
+      assert.deepEqual(result, [
+        'a test app'
+      ].join('\n'))
+
+      done()
+    })
+  })
+
+  it('provides help for each command', function (done) {
+    var app = sergeant('a test app', ['test', { help: true } ])
+
+    app.command('test', {
+      description: 'test command',
+      options: {
+        '--option': 'an option',
+        '--opt2': 'an option'
+      }
+    }, function (arg, options, d) { })
+
+    app.run(function (err, result) {
+      assert.ifError(err)
+
+      assert.deepEqual(result, [
         chalk.magenta('Usage:') + ' [options] test <arg>',
         'test command',
         chalk.magenta('Options:'),
-        ' ' + chalk.cyan('--option') + '  an option'
+        ' ' + chalk.cyan('--option') + '  an option',
+        ' ' + chalk.cyan('--opt2') + '    an option'
+      ].join('\n'))
+
+      done()
+    })
+  })
+
+  it('provides help for each command', function (done) {
+    var app = sergeant('a test app', ['test', { help: true } ])
+
+    app.command('test', {
+      description: 'test command'
+    }, function (arg, options, d) { })
+
+    app.run(function (err, result) {
+      assert.ifError(err)
+
+      assert.deepEqual(result, [
+        chalk.magenta('Usage:') + ' [options] test <arg>',
+        'test command'
       ].join('\n'))
 
       done()
@@ -161,6 +265,23 @@ describe('module', function () {
 
     app.run(function (err) {
       assert.equal(err.message, 'missing argument (arg2) for test')
+
+      done()
+    })
+  })
+
+  it('errors with too few arguments', function (done) {
+    var app = sergeant('a test app', ['test', {}])
+
+    app.command('test', {
+      description: 'test command',
+      options: {'--option': 'an option'}
+    }, function (arg1, arg2, options, d) {
+      d(new Error('nothing bad happened'))
+    })
+
+    app.run(function (err) {
+      assert.equal(err.message, 'missing arguments (arg1, arg2) for test')
 
       done()
     })
