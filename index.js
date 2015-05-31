@@ -9,15 +9,17 @@ const assign = require('object-assign')
 const last = require('lodash.last')
 const ap = require('ap')
 
-const base = {
-  commands: {},
+class CommandLineApplication {
 
-  context: [],
+  constructor (description, context) {
+    this.context = context
 
-  description: '',
+    this.description = description
+
+    this.commands = {}
+  }
 
   command (name, settings, action) {
-
     if (arguments.length < 3) {
       action = settings
       settings = {}
@@ -31,7 +33,7 @@ const base = {
       }, settings),
       action: action
     }
-  },
+  }
 
   run (callback) {
     let context_first = this.context.length > 1 ? this.context[0] : false
@@ -64,6 +66,7 @@ const base = {
       if (options.help) {
         let results = []
         let cols = []
+        let alias = []
         let longest = 0
         let usage
 
@@ -101,8 +104,6 @@ const base = {
             if (o.length > longest) {
               longest = o.length
             }
-
-            let alias = []
 
             for (let k in command.settings.aliases[o]) {
               if (command.settings.aliases[o][k] === true) {
@@ -186,13 +187,7 @@ const base = {
 }
 
 function sergeant (description, context) {
-  let obj = Object.create(base)
-
-  obj.commands = {}
-  obj.description = description
-  obj.context = context || sergeant.parse()
-
-  return obj
+  return new CommandLineApplication(description, context || sergeant.parse())
 }
 
 sergeant.parse = function (argv) {
