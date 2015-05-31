@@ -83,6 +83,43 @@ const base = {
 
             cols.push([o, command.settings.options[o]])
           }
+
+          longest += 2
+
+          cols.forEach(function (v) {
+            results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+          })
+
+          longest = 0
+          cols = []
+
+          if (Object.keys(command.settings.aliases).length) {
+            results.push(chalk.magenta('Aliases:'))
+          }
+
+          for (let o in command.settings.aliases) {
+            if (o.length > longest) {
+              longest = o.length
+            }
+
+            let alias = []
+
+            for (let k in command.settings.aliases[o]) {
+              if (command.settings.aliases[o][k] === true) {
+                alias.push('--' + k)
+              } else {
+                alias.push('--' + k + '=' + command.settings.aliases[o][k])
+              }
+            }
+
+            cols.push([o, alias.join(' ')])
+          }
+
+          longest += 2
+
+          cols.forEach(function (v) {
+            results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+          })
         } else {
           results.push(this.description)
           if (Object.keys(this.commands).length) {
@@ -98,13 +135,13 @@ const base = {
 
             cols.push([usage, this.commands[c].settings.description])
           }
+
+          longest += 2
+
+          cols.forEach(function (v) {
+            results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+          })
         }
-
-        longest += 2
-
-        cols.forEach(function (v) {
-          results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-        })
 
         callback(null, results.join('\n'))
       } else if (command) {

@@ -199,6 +199,11 @@ describe('module', function () {
       options: {
         '--option': 'an option',
         '--opt2': 'an option'
+      },
+      aliases: {
+        'b': {
+          option: true
+        }
       }
     }, function (arg, options, d) { })
 
@@ -210,7 +215,9 @@ describe('module', function () {
         'test command',
         chalk.magenta('Options:'),
         ' ' + chalk.cyan('--option') + '  an option',
-        ' ' + chalk.cyan('--opt2') + '    an option'
+        ' ' + chalk.cyan('--opt2') + '    an option',
+        chalk.magenta('Aliases:'),
+        ' ' + chalk.cyan('b') + '  ' + '--option'
       ].join('\n'))
 
       done()
