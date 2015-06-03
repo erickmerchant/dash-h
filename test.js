@@ -141,7 +141,7 @@ describe('module', function () {
       assert.ifError(err)
 
       assert.deepEqual(result, [
-        'a test app',
+        chalk.magenta('Description:') + ' a test app',
         chalk.magenta('Commands:'),
         ' ' + chalk.cyan('[options] test <arg>') + '  test command'
       ].join('\n'))
@@ -167,7 +167,7 @@ describe('module', function () {
       assert.ifError(err)
 
       assert.deepEqual(result, [
-        'a test app',
+        chalk.magenta('Description:') + ' a test app',
         chalk.magenta('Commands:'),
         ' ' + chalk.cyan('[options] test-2 <arg>') + '  test command',
         ' ' + chalk.cyan('[options] test <arg>') + '    test command'
@@ -184,7 +184,7 @@ describe('module', function () {
       assert.ifError(err)
 
       assert.deepEqual(result, [
-        'a test app'
+        chalk.magenta('Description:') + ' a test app'
       ].join('\n'))
 
       done()
@@ -211,8 +211,8 @@ describe('module', function () {
       assert.ifError(err)
 
       assert.deepEqual(result, [
+        chalk.magenta('Description:') + ' test command',
         chalk.magenta('Usage:') + ' [options] test <arg>',
-        'test command',
         chalk.magenta('Options:'),
         ' ' + chalk.cyan('--option') + '  an option',
         ' ' + chalk.cyan('--opt2') + '    an option',
@@ -235,8 +235,8 @@ describe('module', function () {
       assert.ifError(err)
 
       assert.deepEqual(result, [
-        chalk.magenta('Usage:') + ' [options] test <arg>',
-        'test command'
+        chalk.magenta('Description:') + ' test command',
+        chalk.magenta('Usage:') + ' [options] test <arg>'
       ].join('\n'))
 
       done()

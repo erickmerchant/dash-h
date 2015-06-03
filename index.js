@@ -73,8 +73,8 @@ class CommandLineApplication {
         if (command) {
           usage = getParams(command.action).slice(0, -2).map(function (v) { return '<' + v + '>' }).join(' ')
 
+          results.push(chalk.magenta('Description:') + ' ' + command.settings.description)
           results.push(chalk.magenta('Usage:') + ' [options] ' + context_first + ' ' + usage)
-          results.push(command.settings.description)
           if (Object.keys(command.settings.options).length) {
             results.push(chalk.magenta('Options:'))
           }
@@ -122,7 +122,7 @@ class CommandLineApplication {
             results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
           })
         } else {
-          results.push(this.description)
+          results.push(chalk.magenta('Description:') + ' ' + this.description)
           if (Object.keys(this.commands).length) {
             results.push(chalk.magenta('Commands:'))
           }
@@ -196,14 +196,14 @@ sergeant.parse = function (argv) {
   let context = []
   let options = {}
 
-  argv.forEach(function (val, key) {
+  argv.forEach(function (arg) {
     let parts
 
-    if (val.startsWith('--')) {
-      val = val.substr(2)
+    if (arg.startsWith('--')) {
+      arg = arg.substr(2)
 
-      if (val) {
-        parts = val.split('=')
+      if (arg) {
+        parts = arg.split('=')
 
         if (parts.length === 1) {
           options[parts[0]] = true
@@ -211,12 +211,12 @@ sergeant.parse = function (argv) {
           options[parts[0]] = unquote(parts.slice(1).join('='))
         }
       }
-    } else if (val.startsWith('-')) {
-      val.substr(1).split('').forEach(function (v) {
+    } else if (arg.startsWith('-')) {
+      arg.substr(1).split('').forEach(function (v) {
         options[v] = true
       })
     } else {
-      context.push(unquote(val))
+      context.push(unquote(arg))
     }
   })
 
