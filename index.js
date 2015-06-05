@@ -7,6 +7,7 @@ const getParams = require('get-params')
 const assign = require('object-assign')
 const last = require('lodash.last')
 const ap = require('ap')
+const parseMap = new Map([['true', true], ['false', false], ['null', null]])
 
 class CommandLineApplication {
 
@@ -197,6 +198,7 @@ sergeant.parse = function (argv) {
 
   argv.forEach(function (arg) {
     let parts
+    let val
 
     if (arg.startsWith('--')) {
       arg = arg.substr(2)
@@ -205,23 +207,40 @@ sergeant.parse = function (argv) {
         parts = arg.split('=')
 
         if (parts.length === 1) {
-          options[parts[0]] = true
+          val = true
         } else {
-          options[parts[0]] = unquote(parts.slice(1).join('='))
+          val = parseVal(parts.slice(1).join('='))
         }
+
+        options[parts[0]] = val
       }
     } else if (arg.startsWith('-')) {
       arg.substr(1).split('').forEach(function (v) {
         options[v] = true
       })
     } else {
-      context.push(unquote(arg))
+      val = parseVal(arg)
+
+      context.push(val)
     }
   })
 
   context.push(options)
 
   return context
+}
+
+function parseVal (val) {
+
+  if (parseMap.has(val)) {
+    return parseMap.get(val)
+  }
+
+  if (val !== '' && +val === +val) {
+    return +val
+  }
+
+  return val
 }
 
 module.exports = sergeant
