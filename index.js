@@ -2,7 +2,6 @@
 
 const asyncDone = require('async-done')
 const chalk = require('chalk')
-const unquote = require('unquote')
 const repeat = require('repeat-string')
 const getParams = require('get-params')
 const assign = require('object-assign')
