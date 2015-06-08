@@ -2,7 +2,7 @@
   "name": "sergeant",
   "version": "4.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "code/main.js",
   "scripts": {
     "test": "standard && mocha",
     "cover": "istanbul cover node_modules/.bin/_mocha"

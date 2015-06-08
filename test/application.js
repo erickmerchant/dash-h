@@ -1,12 +1,12 @@
 var assert = require('assert')
 var describe = require('mocha').describe
 var it = require('mocha').it
-var sergeant = require('./index.js')
+var Application = require('../code/application.js')
 var chalk = require('chalk')
 
-describe('module', function () {
+describe('application', function () {
   it('should run commands', function (done) {
-    var app = sergeant('a test app', ['test', {}])
+    var app = new Application({description: 'a test app'}, ['test', {}])
 
     app.command('test', function (options, d) {
       d(null, 'ran test')
@@ -22,7 +22,7 @@ describe('module', function () {
   })
 
   it('should run commands that only take a callback', function (done) {
-    var app = sergeant('a test app', ['test', {}])
+    var app = new Application({description: 'a test app'}, ['test', {}])
 
     app.command('test', function (d) {
       d(null, 'ran test')
@@ -38,7 +38,7 @@ describe('module', function () {
   })
 
   it('accept arguments', function (done) {
-    var app = sergeant('a test app', ['test', 'testing arguments', {}])
+    var app = new Application({description: 'a test app'}, ['test', 'testing arguments', {}])
 
     app.command('test', function (arg, options, d) {
       assert.equal(arg, 'testing arguments')
@@ -54,7 +54,7 @@ describe('module', function () {
   })
 
   it('accept options', function (done) {
-    var app = sergeant('a test app', ['test', { one: 'testing' }])
+    var app = new Application({description: 'a test app'}, ['test', { one: 'testing' }])
 
     app.command('test', function (options, d) {
       assert.equal(options.one, 'testing')
@@ -70,34 +70,16 @@ describe('module', function () {
   })
 
   it('accept aliases', function (done) {
-    var app = sergeant('a test app', ['test', { a: true }])
+    var app = new Application({description: 'a test app'}, ['test', { a: true }])
 
-    app.command('test', { aliases: { a: { b: 'bb', c: 'cc' }}}, function (options, d) {
+    app.command('test', { aliases: { a: { b: 'bb', c: 'cc' }, x: { y: 'yy' }}}, function (options, d) {
       assert.equal(options.a, undefined)
 
       assert.equal(options.b, 'bb')
 
       assert.equal(options.c, 'cc')
 
-      d()
-    })
-
-    app.run(function (err) {
-      assert.ifError(err)
-
-      done()
-    })
-  })
-
-  it('accept aliases', function (done) {
-    var app = sergeant('a test app', ['test', { a: true }])
-
-    app.command('test', { aliases: { x: { b: 'bb', c: 'cc' }}}, function (options, d) {
-      assert.equal(options.a, true)
-
-      assert.equal(options.b, undefined)
-
-      assert.equal(options.c, undefined)
+      assert.equal(options.y, undefined)
 
       d()
     })
@@ -110,7 +92,7 @@ describe('module', function () {
   })
 
   it('throws an error when command is not selected', function (done) {
-    var app = sergeant('a test app', [{}])
+    var app = new Application({description: 'a test app'}, [{}])
 
     app.run(function (err) {
       assert.equal(err.message, 'run with --help to get a list of commands')
@@ -119,8 +101,8 @@ describe('module', function () {
     })
   })
 
-  it('throws an error when command is not selected', function (done) {
-    var app = sergeant('a test app', ['not-defined', {}])
+  it('throws an error when command is not defined', function (done) {
+    var app = new Application({description: 'a test app'}, ['not-defined', {}])
 
     app.run(function (err) {
       assert.equal(err.message, 'not-defined not found')
@@ -129,29 +111,8 @@ describe('module', function () {
     })
   })
 
-  it('provides help for the whole app', function (done) {
-    var app = sergeant('a test app', [{ help: true }])
-
-    app.command('test', {
-      description: 'test command',
-      options: {'--option': 'an option'}
-    }, function (arg, options, d) { })
-
-    app.run(function (err, result) {
-      assert.ifError(err)
-
-      assert.deepEqual(result, [
-        chalk.magenta('Description:') + ' a test app',
-        chalk.magenta('Commands:'),
-        ' ' + chalk.cyan('[options] test <arg>') + '  test command'
-      ].join('\n'))
-
-      done()
-    })
-  })
-
-  it('provides help for the whole app', function (done) {
-    var app = sergeant('a test app', [{ help: true }])
+  it('provides help for the whole app (description, commands)', function (done) {
+    var app = new Application({description: 'a test app'}, [{ help: true }])
 
     app.command('test-2', {
       description: 'test command',
@@ -177,8 +138,8 @@ describe('module', function () {
     })
   })
 
-  it('provides help for the whole app', function (done) {
-    var app = sergeant('a test app', [{ help: true }])
+  it('provides help for the whole app (description)', function (done) {
+    var app = new Application({description: 'a test app'}, [{ help: true }])
 
     app.run(function (err, result) {
       assert.ifError(err)
@@ -191,8 +152,8 @@ describe('module', function () {
     })
   })
 
-  it('provides help for each command', function (done) {
-    var app = sergeant('a test app', ['test', { help: true } ])
+  it('provides help for each command (description, usage, options, aliases)', function (done) {
+    var app = new Application({description: 'a test app'}, ['test', { help: true } ])
 
     app.command('test', {
       description: 'test command',
@@ -201,6 +162,9 @@ describe('module', function () {
         '--opt2': 'an option'
       },
       aliases: {
+        'bb': {
+          option: 'a val'
+        },
         'b': {
           option: true
         }
@@ -217,15 +181,16 @@ describe('module', function () {
         ' ' + chalk.cyan('--option') + '  an option',
         ' ' + chalk.cyan('--opt2') + '    an option',
         chalk.magenta('Aliases:'),
-        ' ' + chalk.cyan('b') + '  ' + '--option'
+        ' ' + chalk.cyan('bb') + '  --option="a val"',
+        ' ' + chalk.cyan('b') + '   --option'
       ].join('\n'))
 
       done()
     })
   })
 
-  it('provides help for each command', function (done) {
-    var app = sergeant('a test app', ['test', { help: true } ])
+  it('provides help for each command (description, usage)', function (done) {
+    var app = new Application({description: 'a test app'}, ['test', { help: true } ])
 
     app.command('test', {
       description: 'test command'
@@ -244,7 +209,7 @@ describe('module', function () {
   })
 
   it('errors with too many arguments', function (done) {
-    var app = sergeant('a test app', ['test', '1', '2', {}])
+    var app = new Application({description: 'a test app'}, ['test', '1', '2', {}])
 
     app.command('test', {
       description: 'test command',
@@ -260,8 +225,8 @@ describe('module', function () {
     })
   })
 
-  it('errors with too few arguments', function (done) {
-    var app = sergeant('a test app', ['test', '1', {}])
+  it('errors with too few arguments (singular)', function (done) {
+    var app = new Application({description: 'a test app'}, ['test', '1', {}])
 
     app.command('test', {
       description: 'test command',
@@ -277,8 +242,8 @@ describe('module', function () {
     })
   })
 
-  it('errors with too few arguments', function (done) {
-    var app = sergeant('a test app', ['test', {}])
+  it('errors with too few arguments (plural)', function (done) {
+    var app = new Application({description: 'a test app'}, ['test', {}])
 
     app.command('test', {
       description: 'test command',
@@ -295,7 +260,7 @@ describe('module', function () {
   })
 
   it('gathers errors from commands', function (done) {
-    var app = sergeant('a test app', ['test', 'testing', {}])
+    var app = new Application({description: 'a test app'}, ['test', 'testing', {}])
 
     app.command('test', {
       description: 'test command',
@@ -309,22 +274,5 @@ describe('module', function () {
 
       done()
     })
-  })
-})
-
-describe('module.parse', function () {
-  it('should parse', function (done) {
-    var context = ['one', 'two', {
-        x: true,
-        y: true,
-        z: true,
-        aaa: true,
-        bbb: 'ccc'
-      }
-    ]
-
-    assert.deepEqual(sergeant.parse(['one', 'two', '-x', '-yz', '--aaa', '--bbb=ccc']), context)
-
-    done()
   })
 })
