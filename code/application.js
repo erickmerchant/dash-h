@@ -44,7 +44,7 @@ module.exports = class {
 
     try {
 
-      if (context_first) {
+      if (context_first && context_first !== 'help') {
         if (!this.commands[context_first]) {
           throw new Error(context_first + ' not found')
         }
@@ -52,7 +52,7 @@ module.exports = class {
         command = this.commands[context_first]
       }
 
-      if (options.help) {
+      if (options.help || context_first === 'help') {
 
         this.help(callback, command)
       } else if (command) {
