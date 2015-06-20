@@ -7,6 +7,7 @@ const last = require('lodash.last')
 const ap = require('ap')
 const chalk = require('chalk')
 const repeat = require('repeat-string')
+const output = require('./output.js')
 
 module.exports = class {
 
@@ -35,6 +36,8 @@ module.exports = class {
   }
 
   run (callback) {
+    callback = callback || function () {}
+
     let context_first = this.context.length > 1 ? this.context[0] : false
     let options = last(this.context)
     let command
@@ -86,18 +89,27 @@ module.exports = class {
           action = ap(this.context, action)
         }
 
-        asyncDone(action, callback)
+        asyncDone(action, function (err) {
+          if (err) {
+            output.error(chalk.red(err))
+
+            callback(err)
+          } else {
+            callback()
+          }
+        })
       } else {
         throw new Error('run with --help to get a list of commands')
       }
     } catch (error) {
+      output.error(chalk.red(error))
+
       callback(error)
     }
   }
 
   help (callback, command) {
     let context_first = this.context.length > 1 ? this.context[0] : false
-    let results = []
     let cols = []
     let longest = 0
     let usage
@@ -105,10 +117,10 @@ module.exports = class {
     if (command) {
       usage = getParams(command.action).slice(0, -2).map(function (v) { return '<' + v + '>' }).join(' ')
 
-      results.push(chalk.magenta('Description:') + ' ' + command.settings.description)
-      results.push(chalk.magenta('Usage:') + ' [options] ' + context_first + ' ' + usage)
+      output.log(chalk.magenta('Description:') + ' ' + command.settings.description)
+      output.log(chalk.magenta('Usage:') + ' [options] ' + context_first + ' ' + usage)
       if (Object.keys(command.settings.options).length) {
-        results.push(chalk.magenta('Options:'))
+        output.log(chalk.magenta('Options:'))
       }
 
       for (let o in command.settings.options) {
@@ -122,14 +134,14 @@ module.exports = class {
       longest += 2
 
       cols.forEach(function (v) {
-        results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+        output.log(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
       })
 
       longest = 0
       cols = []
 
       if (Object.keys(command.settings.aliases).length) {
-        results.push(chalk.magenta('Aliases:'))
+        output.log(chalk.magenta('Aliases:'))
       }
 
       for (let o in command.settings.aliases) {
@@ -153,12 +165,12 @@ module.exports = class {
       longest += 2
 
       cols.forEach(function (v) {
-        results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+        output.log(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
       })
     } else {
-      results.push(chalk.magenta('Description:') + ' ' + this.settings.description)
+      output.log(chalk.magenta('Description:') + ' ' + this.settings.description)
       if (Object.keys(this.commands).length) {
-        results.push(chalk.magenta('Commands:'))
+        output.log(chalk.magenta('Commands:'))
       }
 
       for (let c in this.commands) {
@@ -174,10 +186,10 @@ module.exports = class {
       longest += 2
 
       cols.forEach(function (v) {
-        results.push(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+        output.log(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
       })
     }
 
-    callback(null, results.join('\n'))
+    callback()
   }
 }

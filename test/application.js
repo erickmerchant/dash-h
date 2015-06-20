@@ -1,21 +1,36 @@
 var assert = require('assert')
 var describe = require('mocha').describe
 var it = require('mocha').it
+var beforeEach = require('mocha').beforeEach
 var Application = require('../code/application.js')
+var output = require('../code/output.js')
 var chalk = require('chalk')
+var log
+var errorLog
+
+output.log = function (str) {
+  log.push(str)
+}
+
+output.error = function (str) {
+  errorLog.push(str)
+}
+
+beforeEach(function () {
+  log = []
+  errorLog = []
+})
 
 describe('application', function () {
   it('should run commands', function (done) {
     var app = new Application({description: 'a test app'}, ['test', {}])
 
     app.command('test', function (options, d) {
-      d(null, 'ran test')
+      d()
     })
 
-    app.run(function (err, result) {
+    app.run(function (err) {
       assert.ifError(err)
-
-      assert.equal(result, 'ran test')
 
       done()
     })
@@ -25,13 +40,11 @@ describe('application', function () {
     var app = new Application({description: 'a test app'}, ['test', {}])
 
     app.command('test', function (d) {
-      d(null, 'ran test')
+      d()
     })
 
-    app.run(function (err, result) {
+    app.run(function (err) {
       assert.ifError(err)
-
-      assert.equal(result, 'ran test')
 
       done()
     })
@@ -124,15 +137,15 @@ describe('application', function () {
       options: {'--option': 'an option'}
     }, function (arg, options, d) { })
 
-    app.run(function (err, result) {
+    app.run(function (err) {
       assert.ifError(err)
 
-      assert.deepEqual(result, [
+      assert.deepEqual(log, [
         chalk.magenta('Description:') + ' a test app',
         chalk.magenta('Commands:'),
         ' ' + chalk.cyan('[options] test-2 <arg>') + '  test command',
         ' ' + chalk.cyan('[options] test <arg>') + '    test command'
-      ].join('\n'))
+      ])
 
       done()
     })
@@ -151,15 +164,15 @@ describe('application', function () {
       options: {'--option': 'an option'}
     }, function (arg, options, d) { })
 
-    app.run(function (err, result) {
+    app.run(function (err) {
       assert.ifError(err)
 
-      assert.deepEqual(result, [
+      assert.deepEqual(log, [
         chalk.magenta('Description:') + ' a test app',
         chalk.magenta('Commands:'),
         ' ' + chalk.cyan('[options] test-2 <arg>') + '  test command',
         ' ' + chalk.cyan('[options] test <arg>') + '    test command'
-      ].join('\n'))
+      ])
 
       done()
     })
@@ -168,12 +181,12 @@ describe('application', function () {
   it('provides help for the whole app (description)', function (done) {
     var app = new Application({description: 'a test app'}, [{ help: true }])
 
-    app.run(function (err, result) {
+    app.run(function (err) {
       assert.ifError(err)
 
-      assert.deepEqual(result, [
+      assert.deepEqual(log, [
         chalk.magenta('Description:') + ' a test app'
-      ].join('\n'))
+      ])
 
       done()
     })
@@ -198,10 +211,10 @@ describe('application', function () {
       }
     }, function (arg, options, d) { })
 
-    app.run(function (err, result) {
+    app.run(function (err) {
       assert.ifError(err)
 
-      assert.deepEqual(result, [
+      assert.deepEqual(log, [
         chalk.magenta('Description:') + ' test command',
         chalk.magenta('Usage:') + ' [options] test <arg>',
         chalk.magenta('Options:'),
@@ -210,7 +223,7 @@ describe('application', function () {
         chalk.magenta('Aliases:'),
         ' ' + chalk.cyan('bb') + '  --option="a val"',
         ' ' + chalk.cyan('b') + '   --option'
-      ].join('\n'))
+      ])
 
       done()
     })
@@ -226,10 +239,10 @@ describe('application', function () {
     app.run(function (err, result) {
       assert.ifError(err)
 
-      assert.deepEqual(result, [
+      assert.deepEqual(log, [
         chalk.magenta('Description:') + ' test command',
         chalk.magenta('Usage:') + ' [options] test <arg>'
-      ].join('\n'))
+      ])
 
       done()
     })
