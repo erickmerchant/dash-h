@@ -108,6 +108,8 @@ describe('application', function () {
     var app = new Application({description: 'a test app'}, [{}])
 
     app.run(function (err) {
+      assert.deepEqual(errorLog, [ chalk.red('Error: run with --help to get a list of commands') ])
+
       assert.equal(err.message, 'run with --help to get a list of commands')
 
       done()
@@ -118,6 +120,8 @@ describe('application', function () {
     var app = new Application({description: 'a test app'}, ['not-defined', {}])
 
     app.run(function (err) {
+      assert.deepEqual(errorLog, [ chalk.red('Error: not-defined not found') ])
+
       assert.equal(err.message, 'not-defined not found')
 
       done()
@@ -259,6 +263,8 @@ describe('application', function () {
     })
 
     app.run(function (err) {
+      assert.deepEqual(errorLog, [ chalk.red('Error: too many arguments for test') ])
+
       assert.equal(err.message, 'too many arguments for test')
 
       done()
@@ -276,6 +282,8 @@ describe('application', function () {
     })
 
     app.run(function (err) {
+      assert.deepEqual(errorLog, [ chalk.red('Error: missing argument (arg2) for test') ])
+
       assert.equal(err.message, 'missing argument (arg2) for test')
 
       done()
@@ -293,6 +301,8 @@ describe('application', function () {
     })
 
     app.run(function (err) {
+      assert.deepEqual(errorLog, [ chalk.red('Error: missing arguments (arg1, arg2) for test') ])
+
       assert.equal(err.message, 'missing arguments (arg1, arg2) for test')
 
       done()
@@ -310,6 +320,8 @@ describe('application', function () {
     })
 
     app.run(function (err) {
+      assert.deepEqual(errorLog, [ chalk.red('Error: nothing bad happened') ])
+
       assert.equal(err.message, 'nothing bad happened')
 
       done()
