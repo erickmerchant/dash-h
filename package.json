@@ -23,6 +23,7 @@
     "standard": "^4.0.0"
   },
   "dependencies": {
+    "abbrev": "^1.0.7",
     "ap": "^0.2.0",
     "async-done": "^1.0.0",
     "chalk": "^1.0.0",

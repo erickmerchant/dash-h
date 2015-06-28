@@ -6,6 +6,7 @@ const assign = require('object-assign')
 const last = require('lodash.last')
 const ap = require('ap')
 const chalk = require('chalk')
+const abbrev = require('abbrev')
 const repeat = require('repeat-string')
 const output = require('./output.js')
 
@@ -44,15 +45,16 @@ module.exports = class {
     let params
     let missing
     let action
+    let abbrevs = abbrev(Object.keys(this.commands))
 
     try {
 
       if (context_first && context_first !== 'help') {
-        if (!this.commands[context_first]) {
+        if (!abbrevs[context_first] || !this.commands[abbrevs[context_first]]) {
           throw new Error(context_first + ' not found')
         }
 
-        command = this.commands[context_first]
+        command = this.commands[abbrevs[context_first]]
       }
 
       if (options.help || context_first === 'help') {
