@@ -11,6 +11,20 @@ describe('get-value', function () {
     done()
   })
 
+  it('should return "\'true\'" as \'true\'', function (done) {
+
+    assert.equal(getValue("'true'"), 'true')
+
+    done()
+  })
+
+  it('should return \'"true"\' as \'true\'', function (done) {
+
+    assert.equal(getValue('"true"'), 'true')
+
+    done()
+  })
+
   it('should return "false" as false', function (done) {
 
     assert.equal(getValue('false'), false)

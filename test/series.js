@@ -1,5 +1,7 @@
-var assert = require('assert')
+require('../mocks/output.js')
+
 var describe = require('mocha').describe
+var assert = require('assert')
 var it = require('mocha').it
 var series = require('../code/series.js')
 

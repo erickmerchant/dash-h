@@ -10,5 +10,5 @@ module.exports = function (val) {
     return +val
   }
 
-  return val
+  return val.replace(/^'(.*)'|"(.*)"$/, '$1$2')
 }

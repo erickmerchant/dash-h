@@ -1,5 +1,7 @@
-var assert = require('assert')
+require('../mocks/output.js')
+
 var describe = require('mocha').describe
+var assert = require('assert')
 var it = require('mocha').it
 var parallel = require('../code/parallel.js')
 
@@ -12,14 +14,14 @@ describe('parallel', function () {
         order.push(1)
 
         done(null, 1)
-      }, 3)
+      }, 5)
     },
     function (options, done) {
       setTimeout(function () {
         order.push(2)
 
         done(null, 2)
-      }, 2)
+      }, 3)
     },
     function (options, done) {
       setTimeout(function () {

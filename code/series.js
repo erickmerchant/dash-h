@@ -1,9 +1,10 @@
+
+const output = require('./output.js')
 const asyncDone = require('async-done')
 const ap = require('ap')
 const chalk = require('chalk')
 const pretty = require('pretty-hrtime')
 const getParams = require('get-params')
-const output = require('./output.js')
 
 module.exports = function () {
   var funcs = [].slice.call(arguments)

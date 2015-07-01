@@ -1,8 +1,7 @@
 'use strict'
 
-const Application = require('./application.js')
+const Application = require('./application-with-help.js')
 const parse = require('./parse.js')
-const output = require('./output.js')
 const defaultArgv = process.argv.slice(2)
 
 function sergeant (settings, context) {
@@ -16,9 +15,5 @@ sergeant.parse = function (argv) {
 sergeant.series = require('./series.js')
 
 sergeant.parallel = require('./parallel.js')
-
-sergeant.log = output.log
-
-sergeant.error = output.error
 
 module.exports = sergeant
