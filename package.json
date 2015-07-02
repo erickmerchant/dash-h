@@ -4,8 +4,7 @@
   "description": "",
   "main": "code/main.js",
   "scripts": {
-    "test": "standard && mocha",
-    "cover": "istanbul cover node_modules/.bin/_mocha"
+    "test": "standard && mocha"
   },
   "repository": {
     "type": "git",
@@ -18,7 +17,6 @@
   },
   "homepage": "https://github.com/erickmerchant/sergeant#README",
   "devDependencies": {
-    "istanbul": "^0.3.13",
     "mocha": "^2.0.0",
     "mockery": "^1.4.0",
     "standard": "^4.0.0"
