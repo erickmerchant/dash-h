@@ -70,8 +70,7 @@ module.exports = class extends Application {
       let command = this.commands[abbrevs[context0]]
       let cols = []
       let longest = 0
-      let usage
-      usage = getParams(command.action).slice(0, -2).map(function (v) { return '<' + v + '>' }).join(' ')
+      let usage = getParams(command.action).slice(0, -2).map(function (v) { return '<' + v + '>' }).join(' ')
 
       output.log(chalk.magenta('Description:') + ' ' + command.settings.description)
       output.log(chalk.magenta('Usage:') + ' [options] ' + command.name + ' ' + usage)
