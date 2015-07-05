@@ -162,7 +162,27 @@ describe('application', function () {
     })
   })
 
-  it('gathers errors from commands', function (done) {
+  it('gathers errors from commands (thrown)', function (done) {
+    var output = require('../mock/output.js')()
+    var app = new Application({description: 'a test app'}, ['test', 'testing', {}])
+
+    app.command('test', {
+      description: 'test command',
+      options: {'--option': 'an option'}
+    }, function (arg, options, d) {
+      throw new Error('nothing bad happened')
+    })
+
+    app.run(function (err) {
+      assert.deepEqual(output.errors(), [ chalk.red('Error: nothing bad happened') ])
+
+      assert.equal(err.message, 'nothing bad happened')
+
+      done()
+    })
+  })
+
+  it('gathers errors from commands (callback)', function (done) {
     var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['test', 'testing', {}])
 
