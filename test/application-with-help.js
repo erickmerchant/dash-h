@@ -1,4 +1,4 @@
-require('../mocks/output.js')
+require('../mock/output.js')
 
 var describe = require('mocha').describe
 var assert = require('assert')
@@ -8,7 +8,7 @@ var Application = require('../code/application-with-help.js')
 
 describe('application-with-help', function () {
   it('throws an error when command is not selected', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, [{}])
 
     app.run(function (err) {
@@ -21,7 +21,7 @@ describe('application-with-help', function () {
   })
 
   it('provides help for the whole app (description, commands)', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['help', {}])
 
     app.command('test-2', {
@@ -50,7 +50,7 @@ describe('application-with-help', function () {
   })
 
   it('provides help for the whole app (description)', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['help', {}])
 
     app.run(function (err) {
@@ -67,7 +67,7 @@ describe('application-with-help', function () {
   })
 
   it('provides help for each command (description, usage, options, aliases)', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['test', { help: true } ])
 
     app.command('test', {
@@ -106,7 +106,7 @@ describe('application-with-help', function () {
   })
 
   it('provides help for each command (description, usage)', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['test', { help: true } ])
 
     app.command('test', {

@@ -1,4 +1,4 @@
-require('../mocks/output.js')
+require('../mock/output.js')
 
 var describe = require('mocha').describe
 var assert = require('assert')
@@ -90,7 +90,7 @@ describe('application', function () {
   })
 
   it('throws an error when command is not defined', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['not-defined', {}])
 
     app.run(function (err) {
@@ -103,7 +103,7 @@ describe('application', function () {
   })
 
   it('errors with too many arguments', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['test', '1', '2', {}])
 
     app.command('test', {
@@ -123,7 +123,7 @@ describe('application', function () {
   })
 
   it('errors with too few arguments (singular)', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['test', '1', {}])
 
     app.command('test', {
@@ -143,7 +143,7 @@ describe('application', function () {
   })
 
   it('errors with too few arguments (plural)', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['test', {}])
 
     app.command('test', {
@@ -163,7 +163,7 @@ describe('application', function () {
   })
 
   it('gathers errors from commands', function (done) {
-    var output = require('../mocks/output.js')()
+    var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['test', 'testing', {}])
 
     app.command('test', {

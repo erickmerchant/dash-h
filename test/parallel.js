@@ -1,4 +1,4 @@
-require('../mocks/output.js')
+require('../mock/output.js')
 
 var describe = require('mocha').describe
 var assert = require('assert')
