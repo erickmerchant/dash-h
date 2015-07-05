@@ -6,7 +6,7 @@ const assign = require('object-assign')
 const last = require('lodash.last')
 const chalk = require('chalk')
 const abbrev = require('abbrev')
-const repeat = require('repeat-string')
+const repeat = require('lodash.repeat')
 const options = { '--help': 'provide help for this command' }
 const Application = require('./application.js')
 
