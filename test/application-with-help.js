@@ -82,12 +82,15 @@ describe('application-with-help', function () {
     })
   })
 
-  it('provides help for each command (description, usage, options, aliases)', function (done) {
+  it('provides help for each command (description, usage, parameters, options, aliases)', function (done) {
     var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['test', { help: true } ])
 
     app.command('test', {
       description: 'test command',
+      parameters: {
+        'arg': 'an argument'
+      },
       options: {
         '--option': 'an option',
         '--opt2': 'an option'
@@ -108,6 +111,8 @@ describe('application-with-help', function () {
       assert.deepEqual(output.logs(), [
         chalk.magenta('Description:') + ' test command',
         chalk.magenta('Usage:') + ' [options] test <arg>',
+        chalk.magenta('Parameters:'),
+        ' ' + chalk.cyan('arg') + '  an argument',
         chalk.magenta('Options:'),
         ' ' + chalk.cyan('--help') + '    provide help for this command',
         ' ' + chalk.cyan('--option') + '  an option',

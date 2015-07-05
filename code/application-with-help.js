@@ -55,6 +55,8 @@ module.exports = class extends Application {
 
     var settings = this.commands[name].settings
 
+    settings.parameters = settings.parameters || {}
+
     settings.options = assign({}, options, settings.options || {})
   }
 
@@ -69,10 +71,36 @@ module.exports = class extends Application {
       let command = this.commands[abbrevs[context0]]
       let cols = []
       let longest = 0
-      let usage = getParams(command.action).slice(0, -2).map(function (v) { return '<' + v + '>' }).join(' ')
+      let params = getParams(command.action).slice(0, -2)
+      let usage = params.map(function (v) { return '<' + v + '>' }).join(' ')
 
       output.log(chalk.magenta('Description:') + ' ' + command.settings.description)
       output.log(chalk.magenta('Usage:') + ' [options] ' + abbrevs[context0] + ' ' + usage)
+
+      if (Object.keys(command.settings.parameters).length) {
+        output.log(chalk.magenta('Parameters:'))
+      }
+
+      params.forEach(function (p) {
+
+        if (command.settings.parameters[p]) {
+          if (p.length > longest) {
+            longest = p.length
+          }
+
+          cols.push([p, command.settings.parameters[p]])
+        }
+      })
+
+      longest += 2
+
+      cols.forEach(function (v) {
+        output.log(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+      })
+
+      longest = 0
+      cols = []
+
       if (Object.keys(command.settings.options).length) {
         output.log(chalk.magenta('Options:'))
       }
