@@ -66,6 +66,22 @@ describe('application-with-help', function () {
     })
   })
 
+  it('provides help for the whole app', function (done) {
+    var output = require('../mock/output.js')()
+    var app = new Application({}, ['help', {}])
+
+    app.run(function (err) {
+      assert.ifError(err)
+
+      assert.deepEqual(output.logs(), [
+        chalk.magenta('Commands:'),
+        ' ' + chalk.cyan('[options] help ') + '  provides help for the application'
+      ])
+
+      done()
+    })
+  })
+
   it('provides help for each command (description, usage, options, aliases)', function (done) {
     var output = require('../mock/output.js')()
     var app = new Application({description: 'a test app'}, ['test', { help: true } ])

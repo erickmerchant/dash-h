@@ -22,7 +22,10 @@ module.exports = class extends Application {
       let longest = 0
       let usage
 
-      output.log(chalk.magenta('Description:') + ' ' + self.settings.description)
+      if (self.settings.description) {
+        output.log(chalk.magenta('Description:') + ' ' + self.settings.description)
+      }
+
       if (Object.keys(self.commands).length) {
         output.log(chalk.magenta('Commands:'))
       }

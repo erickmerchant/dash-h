@@ -28,8 +28,6 @@ module.exports = class {
     this.commands[name] = {
       name: name,
       settings: assign({
-        description: '',
-        options: {},
         aliases: {}
       }, settings),
       action: action
