@@ -36,28 +36,21 @@ module.exports = class {
   run (callback) {
     callback = callback || function () {}
 
-    let context0 = this.context.length > 1 ? this.context[0] : false
-    let options = last(this.context)
-    let abbrevs = abbrev(Object.keys(this.commands))
-    let command
-    let params
-    let missing
-    let action
-    let err
+    var context0 = this.context.length > 1 ? this.context[0] : false
 
     if (context0) {
-      if (!abbrevs[context0]) {
-        err = new Error(context0 + ' not found')
+      let options = last(this.context)
+      let abbrevs = abbrev(Object.keys(this.commands))
 
-        output.error(chalk.red(err))
-
-        callback(err)
-      } else {
-        command = this.commands[abbrevs[context0]]
+      try {
+        if (!abbrevs[context0]) {
+          throw new Error(context0 + ' not found')
+        }
 
         this.context.shift()
-        action = command.action
-        params = getParams(action)
+        let command = this.commands[abbrevs[context0]]
+        let action = command.action
+        let params = getParams(action)
 
         for (let s in command.settings.aliases) {
           if (options[s] === true) {
@@ -72,38 +65,30 @@ module.exports = class {
 
         if (params.length > 1) {
           if (this.context.length < params.length - 1) {
-            missing = params.slice(this.context.length - 1, -2)
+            let missing = params.slice(this.context.length - 1, -2)
 
-            err = new Error('missing argument' + (missing.length > 1 ? 's' : '') + ' (' + missing.join(', ') + ') for ' + abbrevs[context0])
-
-            output.error(chalk.red(err))
-
-            callback(err)
+            throw new Error('missing argument' + (missing.length > 1 ? 's' : '') + ' (' + missing.join(', ') + ') for ' + abbrevs[context0])
           } else if (this.context.length > params.length - 1) {
-            err = new Error('too many arguments for ' + abbrevs[context0])
-
-            output.error(chalk.red(err))
-
-            callback(err)
+            throw new Error('too many arguments for ' + abbrevs[context0])
           }
 
           action = ap(this.context, action)
         }
 
-        if (!err) {
-          asyncDone(action, function (err) {
-            if (err) {
-              output.error(chalk.red(err))
+        asyncDone(action, function (err) {
+          if (err) {
+            output.error(chalk.red(err))
 
-              callback(err)
-            } else {
-              callback()
-            }
-          })
-        }
+            callback(err)
+          } else {
+            callback()
+          }
+        })
+      } catch (err) {
+        output.error(chalk.red(err))
+
+        callback(err)
       }
-    } else {
-      callback()
     }
   }
 }

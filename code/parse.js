@@ -3,12 +3,12 @@
 const getValue = require('./get-value.js')
 
 module.exports = function (argv) {
-  let context = []
-  let options = {}
+  var context = []
+  var options = {}
 
   argv.forEach(function (arg) {
-    let parts
-    let val
+    var parts
+    var val
 
     if (arg.startsWith('--')) {
       arg = arg.substr(2)

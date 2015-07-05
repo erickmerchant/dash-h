@@ -18,9 +18,9 @@ module.exports = class extends Application {
     const self = this
 
     this.command('help', { description: 'provides help for the application' }, function (options, done) {
-      let cols = []
-      let longest = 0
-      let usage
+      var cols = []
+      var longest = 0
+      var usage
 
       if (self.settings.description) {
         output.log(chalk.magenta('Description:') + ' ' + self.settings.description)
@@ -61,10 +61,9 @@ module.exports = class extends Application {
   run (callback) {
     callback = callback || function () {}
 
-    let context0 = this.context.length > 1 ? this.context[0] : false
-    let options = last(this.context)
-    let abbrevs = abbrev(Object.keys(this.commands))
-    var err
+    var context0 = this.context.length > 1 ? this.context[0] : false
+    var options = last(this.context)
+    var abbrevs = abbrev(Object.keys(this.commands))
 
     if (context0 && abbrevs[context0] && options.help) {
       let command = this.commands[abbrevs[context0]]
@@ -127,7 +126,7 @@ module.exports = class extends Application {
     } else if (context0) {
       super.run(callback)
     } else {
-      err = new Error('run help to get a list of commands')
+      let err = new Error('run help to get a list of commands')
 
       output.error(chalk.red(err))
 
