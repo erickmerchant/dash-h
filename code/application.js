@@ -26,7 +26,6 @@ module.exports = class {
     }
 
     this.commands[name] = {
-      name: name,
       settings: assign({
         aliases: {}
       }, settings),
@@ -75,13 +74,13 @@ module.exports = class {
           if (this.context.length < params.length - 1) {
             missing = params.slice(this.context.length - 1, -2)
 
-            err = new Error('missing argument' + (missing.length > 1 ? 's' : '') + ' (' + missing.join(', ') + ') for ' + command.name)
+            err = new Error('missing argument' + (missing.length > 1 ? 's' : '') + ' (' + missing.join(', ') + ') for ' + abbrevs[context0])
 
             output.error(chalk.red(err))
 
             callback(err)
           } else if (this.context.length > params.length - 1) {
-            err = new Error('too many arguments for ' + command.name)
+            err = new Error('too many arguments for ' + abbrevs[context0])
 
             output.error(chalk.red(err))
 

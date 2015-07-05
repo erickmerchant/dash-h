@@ -73,7 +73,7 @@ module.exports = class extends Application {
       let usage = getParams(command.action).slice(0, -2).map(function (v) { return '<' + v + '>' }).join(' ')
 
       output.log(chalk.magenta('Description:') + ' ' + command.settings.description)
-      output.log(chalk.magenta('Usage:') + ' [options] ' + command.name + ' ' + usage)
+      output.log(chalk.magenta('Usage:') + ' [options] ' + abbrevs[context0] + ' ' + usage)
       if (Object.keys(command.settings.options).length) {
         output.log(chalk.magenta('Options:'))
       }
