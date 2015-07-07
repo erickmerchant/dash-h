@@ -96,11 +96,20 @@ describe('application-with-help', function () {
         '--opt2': 'an option'
       },
       aliases: {
-        'bb': {
+        'string-alias': {
           option: 'a val'
         },
-        'b': {
+        'true-alias': {
           option: true
+        },
+        'false-alias': {
+          option: false
+        },
+        'null-alias': {
+          option: null
+        },
+        'number-alias': {
+          option: 123
         }
       }
     }, function (arg, options, d) { })
@@ -118,8 +127,11 @@ describe('application-with-help', function () {
         ' ' + chalk.cyan('--option') + '  an option',
         ' ' + chalk.cyan('--opt2') + '    an option',
         chalk.magenta('Aliases:'),
-        ' ' + chalk.cyan('bb') + '  --option="a val"',
-        ' ' + chalk.cyan('b') + '   --option'
+        ' ' + chalk.cyan('string-alias') + '  --option="a val"',
+        ' ' + chalk.cyan('true-alias') + '    --option',
+        ' ' + chalk.cyan('false-alias') + '   --option=false',
+        ' ' + chalk.cyan('null-alias') + '    --option=null',
+        ' ' + chalk.cyan('number-alias') + '  --option=123'
       ])
 
       done()

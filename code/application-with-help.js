@@ -136,8 +136,10 @@ module.exports = class extends Application {
         for (let k in command.settings.aliases[o]) {
           if (command.settings.aliases[o][k] === true) {
             alias.push('--' + k)
+          } else if (typeof command.settings.aliases[o][k] === 'string') {
+            alias.push('--' + k + '="' + command.settings.aliases[o][k] + '"')
           } else {
-            alias.push('--' + k + '="' + command.settings.aliases[o][k].replace('"', '\"') + '"')
+            alias.push('--' + k + '=' + command.settings.aliases[o][k])
           }
         }
 
