@@ -70,7 +70,7 @@ describe('application', function () {
   it('accept aliases', function (done) {
     var app = new Application({description: 'a test app'}, ['test', { a: true }])
 
-    app.command('test', { aliases: { a: { b: 'bb', c: 'cc' }, x: { y: 'yy' }}}, function (options, d) {
+    app.command('test', {aliases: {a: {b: 'bb', c: 'cc'}, x: {y: 'yy'}}}, function (options, d) {
       assert.equal(options.a, undefined)
 
       assert.equal(options.b, 'bb')

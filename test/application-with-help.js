@@ -84,7 +84,7 @@ describe('application-with-help', function () {
 
   it('provides help for each command (description, usage, parameters, options, aliases)', function (done) {
     var output = require('../mock/output.js')()
-    var app = new Application({description: 'a test app'}, ['test', { help: true } ])
+    var app = new Application({description: 'a test app'}, ['test', {help: true}])
 
     app.command('test', {
       description: 'test command',
@@ -140,7 +140,7 @@ describe('application-with-help', function () {
 
   it('provides help for each command (description, usage)', function (done) {
     var output = require('../mock/output.js')()
-    var app = new Application({description: 'a test app'}, ['test', { help: true } ])
+    var app = new Application({description: 'a test app'}, ['test', {help: true}])
 
     app.command('test', {
       description: 'test command'
