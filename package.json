@@ -27,9 +27,9 @@
     "async-done": "^1.0.0",
     "chalk": "^1.0.0",
     "get-params": "^0.1.2",
+    "lodash.assign": "^3.2.0",
     "lodash.last": "^3.0.0",
     "lodash.repeat": "^3.0.1",
-    "object-assign": "^3.0.0",
     "pretty-hrtime": "^1.0.0"
   }
 }

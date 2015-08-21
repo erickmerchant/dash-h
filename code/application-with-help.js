@@ -2,7 +2,7 @@
 
 const output = require('./output.js')
 const getParams = require('get-params')
-const assign = require('object-assign')
+const assign = require('lodash.assign')
 const last = require('lodash.last')
 const chalk = require('chalk')
 const abbrev = require('abbrev')
