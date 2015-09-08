@@ -1,9 +1,9 @@
 'use strict'
 
-const getValue = require('./get-value.js')
+const coerce = require('./coerce.js')
 
 module.exports = function (argv) {
-  var context = []
+  var args = []
   var options = {}
 
   argv.forEach(function (arg) {
@@ -18,7 +18,7 @@ module.exports = function (argv) {
       if (parts.length === 1) {
         val = true
       } else {
-        val = getValue(parts.slice(1).join('='))
+        val = coerce(parts.slice(1).join('='))
       }
 
       options[parts[0]] = val
@@ -27,13 +27,11 @@ module.exports = function (argv) {
         options[v] = true
       })
     } else {
-      val = getValue(arg)
+      val = coerce(arg)
 
-      context.push(val)
+      args.push(val)
     }
   })
 
-  context.push(options)
-
-  return context
+  return {args: args, options: options}
 }

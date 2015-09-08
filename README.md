@@ -1,56 +1,33 @@
 # sergeant
 
-A CLI solution inspired by [Commander.js](https://github.com/tj/commander.js) and [gulp](https://github.com/gulpjs/gulp).
-
-Essentially I was using gulp for all sorts of things, and got sick of having to either separate anything that had parameters out of the gulpfile, or just convert those parameters into options. Also I was not happy with any of the existing option parsers. And I wanted built in help with colors.
+A CLI solution inspired by [Commander.js](https://github.com/tj/commander.js).
 
 ## an example
 
 ```javascript
 var sergeant = require('sergeant')
-var app = sergeant({
-  description: 'an example application'
-})
+var app = sergeant()
 
-app.command('command1', {
-  // the settings object is optional
-  // description, parameters, and options are used for --help
-  description: 'an example command',
-  parameters: {
-    parameter1: 'an example parameter'
-  },
-  options: {
-    '--option1': 'an example option'
-  },
-  // aliases are converted to options
-  aliases: {
-    o: { option1: true }
-    'not-option1': { option1: false }
-  }
-}, function (parameter1, options, done) {
+app.describe('an example application')
 
-  // validate parameters and options by throwing exceptions
-  assert.ok(typeof parameter1 === 'string')
+app.command('command1')
+  .describe('an example command')
+  .parameter('parameter1', 'an example parameter', function (val) {
+    // validate parameters and options by throwing exceptions
+    assert.ok(typeof parameter1 === 'string')
 
-  // actions can have any number of parameters
-  // they can use the done callback, or use any of the other strategies of completion supported by async-done
+    return val + '...' // transform them
+  })
+  .option('option1', 'an example option')
+  .option('option2', 'another example option')
+  .alias('o', { option1: true, option2: false })
+  .alias('not-o', { option1: false, option2: true })
+  .action(function (args, options, done) {
 
-  done()
-})
+    // actions can have any number of parameters
+    // they can use the done callback, or a promise
 
-app.command('command2',
-  // parallel and series return a function that takes options and done. Options are passed along to all nested functions when run. Every function may use the done callback or anything supported by async-done
-  sergeant.parallel(
-  function (options, done) {
+    done()
+  })
 
-  },
-  sergeant.series(
-    function (options) {
-
-    },
-    function (options) {
-
-    }
-  )
-))
 ```
