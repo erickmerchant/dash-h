@@ -40,7 +40,7 @@ module.exports = class {
 
     var arg0 = this.context.args.length ? this.context.args[0] : false
     var command = false
-    var args, action, result, done
+    var args, action, result, done, aliases
 
     if (arg0 && this.commands[arg0]) {
       command = this.commands[arg0]
@@ -54,14 +54,17 @@ module.exports = class {
 
     if (command) {
       args = {}
+      aliases = command.get('aliases')
 
-      for (let s in command.get('aliases')) {
+      Object.keys(aliases).forEach(function (s) {
+        var alias = aliases[s]
+
         if (this.context.options[s] === true) {
           delete this.context.options[s]
 
-          this.context.options = assign(this.context.options, command.get('aliases')[s])
+          this.context.options = assign(this.context.options, alias)
         }
-      }
+      }, this)
 
       try {
         this.context.args.shift()
@@ -120,9 +123,7 @@ module.exports = class {
       output.log(chalk.magenta('Description:') + ' ' + this.description)
     }
 
-    if (Object.keys(this.commands).length) {
-      output.log(chalk.magenta('Commands:'))
-    }
+    output.log(chalk.magenta('Commands:'))
 
     for (let c in this.commands) {
       usage = '[options] ' + c + ' ' + Object.keys(this.commands[c].get('parameters')).map(function (v) { return '<' + v + '>' }).join(' ')
@@ -157,13 +158,11 @@ module.exports = class {
     }
 
     Object.keys(command.get('parameters')).forEach(function (p) {
-      if (command.get('parameters')[p]) {
-        if (p.length > longest) {
-          longest = p.length
-        }
-
-        cols.push([p, command.get('parameters')[p].description || ''])
+      if (p.length > longest) {
+        longest = p.length
       }
+
+      cols.push([p, command.get('parameters')[p].description || ''])
     })
 
     longest += 2
@@ -175,9 +174,7 @@ module.exports = class {
     longest = 0
     cols = []
 
-    if (Object.keys(command.get('options')).length) {
-      output.log(chalk.magenta('Options:'))
-    }
+    output.log(chalk.magenta('Options:'))
 
     for (let o in command.get('options')) {
       let oDashed = (o.length === 1 ? '-' : '--') + o

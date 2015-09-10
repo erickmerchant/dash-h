@@ -35,6 +35,20 @@ describe('application', function () {
     })
   })
 
+  it('should allow promises', function (done) {
+    var app = new Application({args: ['test'], options: {}})
+
+    app.command('test').action(function () {
+      return Promise.resolve()
+    })
+
+    app.run(function (err) {
+      assert.ifError(err)
+
+      done()
+    })
+  })
+
   it('accept arguments', function (done) {
     var app = new Application({args: ['test', 'testing arguments'], options: {}})
 
@@ -257,7 +271,8 @@ describe('application', function () {
     app.command('test')
       .describe('test command')
       .parameter('arg', 'an argument')
-      .option('option', 'an option')
+      .parameter('arg2', 'an argument')
+      .option('o', 'an option')
       .option('opt2', 'an option')
       .alias('string-alias', { option: 'a val' })
       .alias('true-alias', { option: true })
@@ -271,13 +286,14 @@ describe('application', function () {
 
       assert.deepEqual(output.logs(), [
         chalk.magenta('Description:') + ' test command',
-        chalk.magenta('Usage:') + ' [options] test <arg>',
+        chalk.magenta('Usage:') + ' [options] test <arg> <arg2>',
         chalk.magenta('Parameters:'),
-        ' ' + chalk.cyan('arg') + '  an argument',
+        ' ' + chalk.cyan('arg') + '   an argument',
+        ' ' + chalk.cyan('arg2') + '  an argument',
         chalk.magenta('Options:'),
-        ' ' + chalk.cyan('--help') + '    provide help for this command',
-        ' ' + chalk.cyan('--option') + '  an option',
-        ' ' + chalk.cyan('--opt2') + '    an option',
+        ' ' + chalk.cyan('--help') + '  provide help for this command',
+        ' ' + chalk.cyan('-o') + '      an option',
+        ' ' + chalk.cyan('--opt2') + '  an option',
         chalk.magenta('Aliases:'),
         ' ' + chalk.cyan('string-alias') + '  --option="a val"',
         ' ' + chalk.cyan('true-alias') + '    --option',
