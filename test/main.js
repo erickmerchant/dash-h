@@ -1,19 +1,15 @@
-var assert = require('assert')
-var describe = require('mocha').describe
-var it = require('mocha').it
+var tap = require('tap')
 var main = require('../code/main.js')
 var Application = require('../code/application.js')
 
-describe('main', function () {
-  it('should make applications', function (done) {
-    assert.ok(main([]) instanceof Application)
+tap.test('should make applications', function (t) {
+  t.ok(main([]) instanceof Application)
 
-    done()
-  })
+  t.end()
+})
 
-  it('should parse', function (done) {
-    assert.deepEqual(main.parse(), main.parse(process.argv.slice(2)))
+tap.test('should parse', function (t) {
+  t.deepEqual(main.parse(), main.parse(process.argv.slice(2)))
 
-    done()
-  })
+  t.end()
 })
