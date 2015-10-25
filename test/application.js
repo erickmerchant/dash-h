@@ -335,16 +335,16 @@ describe('application', function () {
       .alias('a', {b: 'bb', c: 'cc'})
       .alias('x', {y: 'yy'})
       .action(function (options, d) {
-      assert.equal(options.a, undefined)
+        assert.equal(options.a, undefined)
 
-      assert.equal(options.b, 'bb')
+        assert.equal(options.b, 'bb')
 
-      assert.equal(options.c, 'cc')
+        assert.equal(options.c, 'cc')
 
-      assert.equal(options.y, undefined)
+        assert.equal(options.y, undefined)
 
-      d()
-    })
+        d()
+      })
 
     app.run(function (err) {
       assert.ifError(err)
