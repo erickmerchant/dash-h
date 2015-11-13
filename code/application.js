@@ -98,7 +98,9 @@ module.exports = class {
         result = action()
 
         if (result && typeof result.then === 'function') {
-          result.then(done).catch(done)
+          result.then(function () {
+            callback()
+          }).catch(done)
         }
       } catch (err) {
         output.error(chalk.red(err))
