@@ -5,7 +5,7 @@ module.exports = class {
     this.settings = {
       description: '',
       options: {
-        'help': {
+        help: {
           description: 'provide help for this command'
         }
       },
