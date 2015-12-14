@@ -1,17 +1,17 @@
 'use strict'
 
-const output = require('./output.js')
 const Command = require('./command.js')
+const defaults = require('./defaults.js')
 const assign = require('lodash.assign')
 const repeat = require('lodash.repeat')
 const dezalgo = require('dezalgo')
 const once = require('once')
 const ap = require('ap')
-const chalk = require('chalk')
 
 module.exports = class {
-  constructor (context) {
-    this.context = context
+  constructor (settings) {
+    this.settings = assign(defaults, settings)
+
     this.commands = {}
     this.description = ''
 
@@ -38,7 +38,7 @@ module.exports = class {
   run (callback) {
     callback = callback || function () {}
 
-    var arg0 = this.context.args.length ? this.context.args[0] : false
+    var arg0 = this.settings.context.args.length ? this.settings.context.args[0] : false
     var command = false
     var args, action, result, done, aliases
 
@@ -46,8 +46,8 @@ module.exports = class {
       command = this.commands[arg0]
     }
 
-    if (command && this.context.options.help) {
-      this.context.args.unshift('')
+    if (command && this.settings.context.options.help) {
+      this.settings.context.args.unshift('')
 
       command = this.help
     }
@@ -59,41 +59,41 @@ module.exports = class {
       Object.keys(aliases).forEach(function (s) {
         var alias = aliases[s]
 
-        if (this.context.options[s] === true) {
-          delete this.context.options[s]
+        if (this.settings.context.options[s] === true) {
+          delete this.settings.context.options[s]
 
-          this.context.options = assign(this.context.options, alias)
+          this.settings.context.options = assign(this.settings.context.options, alias)
         }
       }, this)
 
       try {
-        this.context.args.shift()
+        this.settings.context.args.shift()
 
-        if (this.context.args.length < Object.keys(command.get('parameters')).length) {
-          let missing = Object.keys(command.get('parameters')).slice(this.context.args.length)
+        if (this.settings.context.args.length < Object.keys(command.get('parameters')).length) {
+          let missing = Object.keys(command.get('parameters')).slice(this.settings.context.args.length)
 
           throw new Error('missing argument' + (missing.length > 1 ? 's' : '') + ' (' + missing.join(', ') + ') for ' + arg0)
         }
 
-        if (this.context.args.length > Object.keys(command.get('parameters')).length) {
+        if (this.settings.context.args.length > Object.keys(command.get('parameters')).length) {
           throw new Error('too many arguments for ' + arg0)
         }
 
         done = once(dezalgo(function (err) {
           if (err) {
-            output.error(chalk.red(err))
+            this.settings.error(err)
 
             callback(err)
           } else {
             callback()
           }
-        }))
+        }.bind(this)))
 
         Object.keys(command.get('parameters')).forEach(function (param) {
-          args[param] = this.context.args.shift()
+          args[param] = this.settings.context.args.shift()
         }, this)
 
-        action = ap([args, this.context.options, done].slice(0 - command.get('action').length), command.get('action'))
+        action = ap([args, this.settings.context.options, done].slice(0 - command.get('action').length), command.get('action'))
 
         result = action()
 
@@ -103,14 +103,14 @@ module.exports = class {
           }).catch(done)
         }
       } catch (err) {
-        output.error(chalk.red(err))
+        this.settings.error(err)
 
         callback(err)
       }
     } else {
       let err = new Error('run help to get a list of commands')
 
-      output.error(chalk.red(err))
+      this.settings.error(err)
 
       callback(err)
     }
@@ -122,10 +122,10 @@ module.exports = class {
     var usage
 
     if (this.description) {
-      output.log(chalk.magenta('Description:') + ' ' + this.description)
+      this.settings.log(this.settings.primary('Description:') + ' ' + this.description)
     }
 
-    output.log(chalk.magenta('Commands:'))
+    this.settings.log(this.settings.primary('Commands:'))
 
     for (let c in this.commands) {
       usage = '[options] ' + c + ' ' + Object.keys(this.commands[c].get('parameters')).map(function (v) { return '<' + v + '>' }).join(' ')
@@ -140,8 +140,8 @@ module.exports = class {
     longest += 2
 
     cols.forEach(function (v) {
-      output.log(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-    })
+      this.settings.log(' ' + this.settings.secondary(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+    }.bind(this))
 
     done()
   }
@@ -152,11 +152,11 @@ module.exports = class {
     var longest = 0
     var usage = Object.keys(command.get('parameters')).map(function (v) { return '<' + v + '>' }).join(' ').trim()
 
-    output.log(chalk.magenta('Description:') + ' ' + command.get('description'))
-    output.log(chalk.magenta('Usage:') + ' [options] ' + args.command + (usage ? ' ' + usage : ''))
+    this.settings.log(this.settings.primary('Description:') + ' ' + command.get('description'))
+    this.settings.log(this.settings.primary('Usage:') + ' [options] ' + args.command + (usage ? ' ' + usage : ''))
 
     if (Object.keys(command.get('parameters')).length) {
-      output.log(chalk.magenta('Parameters:'))
+      this.settings.log(this.settings.primary('Parameters:'))
     }
 
     Object.keys(command.get('parameters')).forEach(function (p) {
@@ -170,13 +170,13 @@ module.exports = class {
     longest += 2
 
     cols.forEach(function (v) {
-      output.log(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-    })
+      this.settings.log(' ' + this.settings.secondary(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+    }.bind(this))
 
     longest = 0
     cols = []
 
-    output.log(chalk.magenta('Options:'))
+    this.settings.log(this.settings.primary('Options:'))
 
     for (let o in command.get('options')) {
       let oDashed = (o.length === 1 ? '-' : '--') + o
@@ -191,14 +191,14 @@ module.exports = class {
     longest += 2
 
     cols.forEach(function (v) {
-      output.log(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-    })
+      this.settings.log(' ' + this.settings.secondary(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+    }.bind(this))
 
     longest = 0
     cols = []
 
     if (Object.keys(command.get('aliases')).length) {
-      output.log(chalk.magenta('Aliases:'))
+      this.settings.log(this.settings.primary('Aliases:'))
     }
 
     for (let o in command.get('aliases')) {
@@ -224,8 +224,8 @@ module.exports = class {
     longest += 2
 
     cols.forEach(function (v) {
-      output.log(' ' + chalk.cyan(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-    })
+      this.settings.log(' ' + this.settings.secondary(v[0]) + repeat(' ', longest - v[0].length) + v[1])
+    }.bind(this))
 
     done()
   }
