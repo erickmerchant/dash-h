@@ -4,14 +4,12 @@ module.exports = class {
   constructor () {
     this.settings = {
       description: '',
-      options: {
-        help: {
-          description: 'provide help for this command'
-        }
-      },
-      parameters: {},
+      options: {},
+      parameters: [],
       aliases: {}
     }
+
+    this.option('help', 'provide help for this command')
   }
 
   alias (alias, options) {
@@ -26,11 +24,12 @@ module.exports = class {
     return this
   }
 
-  parameter (parameter, description, handler) {
-    this.settings.parameters[parameter] = {
+  parameter (name, description, handler) {
+    this.settings.parameters.push({
+      name: name,
       description: description,
-      handler: handler
-    }
+      handler: handler || function (param) { return param }
+    })
 
     return this
   }
@@ -38,7 +37,7 @@ module.exports = class {
   option (option, description, handler) {
     this.settings.options[option] = {
       description: description,
-      handler: handler
+      handler: handler || function (opt) { return opt }
     }
 
     return this

@@ -1,4 +1,5 @@
 var tap = require('tap')
+var assert = require('assert')
 var chalk = require('chalk')
 var Application = require('../code/application.js')
 
@@ -199,6 +200,58 @@ tap.test('gathers errors from commands (callback)', function (t) {
     t.deepEqual(errors, [ chalk.red('Error: nothing bad happened') ])
 
     t.equal(err.message, 'nothing bad happened')
+
+    t.end()
+  })
+})
+
+tap.test('gathers errors from option handlers', function (t) {
+  var errors = []
+  var app = new Application({
+    context: {args: ['test'], options: {test: 123}},
+    error: function (err) {
+      errors.push(chalk.red(err))
+    }
+  })
+
+  app.command('test')
+  .action(function (arg, options, d) { d() })
+  .option('test', '', function (str) {
+    assert.ok(typeof str === 'string', 'test must be a string')
+
+    return str
+  })
+
+  app.run(function (err) {
+    t.deepEqual(errors, [ chalk.red('AssertionError: test must be a string') ])
+
+    t.equal(err.message, 'test must be a string')
+
+    t.end()
+  })
+})
+
+tap.test('gathers errors from parameter handlers', function (t) {
+  var errors = []
+  var app = new Application({
+    context: {args: ['test', 123], options: {}},
+    error: function (err) {
+      errors.push(chalk.red(err))
+    }
+  })
+
+  app.command('test')
+  .action(function (arg, options, d) { d() })
+  .parameter('test', '', function (str) {
+    assert.ok(typeof str === 'string', 'test must be a string')
+
+    return str
+  })
+
+  app.run(function (err) {
+    t.deepEqual(errors, [ chalk.red('AssertionError: test must be a string') ])
+
+    t.equal(err.message, 'test must be a string')
 
     t.end()
   })

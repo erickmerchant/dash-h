@@ -40,7 +40,7 @@ module.exports = class {
 
     var arg0 = this.settings.context.args.length ? this.settings.context.args[0] : false
     var command = false
-    var args, action, result, done, aliases
+    var action, result, done
 
     if (arg0 && this.commands[arg0]) {
       command = this.commands[arg0]
@@ -53,11 +53,15 @@ module.exports = class {
     }
 
     if (command) {
-      args = {}
-      aliases = command.get('aliases')
+      let args = {}
+      let options = {}
+      let commandAliases = command.get('aliases')
+      let commandOptions = command.get('options')
+      let commandParameters = command.get('parameters')
+      let commandAction = command.get('action')
 
-      Object.keys(aliases).forEach(function (s) {
-        var alias = aliases[s]
+      Object.keys(commandAliases).forEach(function (s) {
+        var alias = commandAliases[s]
 
         if (this.settings.context.options[s] === true) {
           delete this.settings.context.options[s]
@@ -69,13 +73,13 @@ module.exports = class {
       try {
         this.settings.context.args.shift()
 
-        if (this.settings.context.args.length < Object.keys(command.get('parameters')).length) {
-          let missing = Object.keys(command.get('parameters')).slice(this.settings.context.args.length)
+        if (this.settings.context.args.length < commandParameters.length) {
+          let missing = commandParameters.slice(this.settings.context.args.length)
 
-          throw new Error('missing argument' + (missing.length > 1 ? 's' : '') + ' (' + missing.join(', ') + ') for ' + arg0)
+          throw new Error('missing argument' + (missing.length > 1 ? 's' : '') + ' (' + missing.map(function (m) { return m.name }).join(', ') + ') for ' + arg0)
         }
 
-        if (this.settings.context.args.length > Object.keys(command.get('parameters')).length) {
+        if (this.settings.context.args.length > commandParameters.length) {
           throw new Error('too many arguments for ' + arg0)
         }
 
@@ -89,11 +93,17 @@ module.exports = class {
           }
         }.bind(this)))
 
-        Object.keys(command.get('parameters')).forEach(function (param) {
-          args[param] = this.settings.context.args.shift()
+        commandParameters.forEach(function (param) {
+          if (this.settings.context.args.length) {
+            args[param.name] = param.handler(this.settings.context.args.shift())
+          }
         }, this)
 
-        action = ap([args, this.settings.context.options, done].slice(0 - command.get('action').length), command.get('action'))
+        Object.keys(this.settings.context.options).forEach(function (option) {
+          options[option] = commandOptions[option] ? commandOptions[option].handler(this.settings.context.options[option]) : this.settings.context.options[option]
+        }, this)
+
+        action = ap([args, options, done].slice(0 - commandAction.length), commandAction)
 
         result = action()
 
@@ -128,7 +138,7 @@ module.exports = class {
     this.settings.log(this.settings.primary('Commands:'))
 
     for (let c in this.commands) {
-      usage = '[options] ' + c + ' ' + Object.keys(this.commands[c].get('parameters')).map(function (v) { return '<' + v + '>' }).join(' ')
+      usage = '[options] ' + c + ' ' + this.commands[c].get('parameters').map(function (v) { return '<' + v.name + '>' }).join(' ')
 
       if (usage.length > longest) {
         longest = usage.length
@@ -148,23 +158,27 @@ module.exports = class {
 
   commandHelp (args, options, done) {
     var command = this.commands[args.command]
+    var commandAliases = command.get('aliases')
+    var commandOptions = command.get('options')
+    var commandParameters = command.get('parameters')
+    var commandDescription = command.get('description')
     var cols = []
     var longest = 0
-    var usage = Object.keys(command.get('parameters')).map(function (v) { return '<' + v + '>' }).join(' ').trim()
+    var usage = commandParameters.map(function (v) { return '<' + v.name + '>' }).join(' ').trim()
 
-    this.settings.log(this.settings.primary('Description:') + ' ' + command.get('description'))
+    this.settings.log(this.settings.primary('Description:') + ' ' + commandDescription)
     this.settings.log(this.settings.primary('Usage:') + ' [options] ' + args.command + (usage ? ' ' + usage : ''))
 
-    if (Object.keys(command.get('parameters')).length) {
+    if (commandParameters.length) {
       this.settings.log(this.settings.primary('Parameters:'))
     }
 
-    Object.keys(command.get('parameters')).forEach(function (p) {
-      if (p.length > longest) {
-        longest = p.length
+    commandParameters.forEach(function (p) {
+      if (p.name.length > longest) {
+        longest = p.name.length
       }
 
-      cols.push([p, command.get('parameters')[p].description || ''])
+      cols.push([p.name, p.description || ''])
     })
 
     longest += 2
@@ -178,14 +192,14 @@ module.exports = class {
 
     this.settings.log(this.settings.primary('Options:'))
 
-    for (let o in command.get('options')) {
+    for (let o in commandOptions) {
       let oDashed = (o.length === 1 ? '-' : '--') + o
 
       if (oDashed.length > longest) {
         longest = oDashed.length
       }
 
-      cols.push([oDashed, command.get('options')[o].description])
+      cols.push([oDashed, commandOptions[o].description])
     }
 
     longest += 2
@@ -197,24 +211,24 @@ module.exports = class {
     longest = 0
     cols = []
 
-    if (Object.keys(command.get('aliases')).length) {
+    if (Object.keys(commandAliases).length) {
       this.settings.log(this.settings.primary('Aliases:'))
     }
 
-    for (let o in command.get('aliases')) {
+    for (let o in commandAliases) {
       let alias = []
 
       if (o.length > longest) {
         longest = o.length
       }
 
-      for (let k in command.get('aliases')[o]) {
-        if (command.get('aliases')[o][k] === true) {
+      for (let k in commandAliases[o]) {
+        if (commandAliases[o][k] === true) {
           alias.push('--' + k)
-        } else if (typeof command.get('aliases')[o][k] === 'string') {
-          alias.push('--' + k + '="' + command.get('aliases')[o][k] + '"')
+        } else if (typeof commandAliases[o][k] === 'string') {
+          alias.push('--' + k + '="' + commandAliases[o][k] + '"')
         } else {
-          alias.push('--' + k + '=' + command.get('aliases')[o][k])
+          alias.push('--' + k + '=' + commandAliases[o][k])
         }
       }
 

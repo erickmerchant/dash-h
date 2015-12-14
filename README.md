@@ -18,7 +18,12 @@ app.command('command1')
 
     return val + '...' // transform them
   })
-  .option('option1', 'an example option')
+  .option('option1', 'an example option', function (val) {
+    // validate options and options by throwing exceptions
+    assert.ok(typeof parameter1 === 'string')
+
+    return val + '...' // transform them
+  })
   .option('option2', 'another example option')
   .alias('o', { option1: true, option2: false })
   .alias('not-o', { option1: false, option2: true })
