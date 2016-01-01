@@ -1,24 +1,122 @@
 'use strict'
 
-const Command = require('./command.js')
-const defaults = require('./defaults.js')
-const assign = require('lodash.assign')
-const repeat = require('lodash.repeat')
-const dezalgo = require('dezalgo')
-const once = require('once')
-const ap = require('ap')
+const Command = require('./command')
+const HelpError = require('./help-error')
+const log = require('./log')
+const chalk = require('chalk')
 
 module.exports = class {
-  constructor (settings) {
-    this.settings = assign(defaults, settings)
+  constructor (args) {
+    this.args = args
+    this.commands = new Map()
 
-    this.commands = {}
     this.description = ''
 
-    this.command('help').describe('provides help for the application').action(this.appHelp.bind(this))
+    this.command('help')
+    .describe('provide help for the application or a command')
+    .parameter('command', 'the command you need help with', (command) => {
+      if (command) {
+        if (!this.commands.has(command)) {
+          throw new HelpError()
+        }
 
-    this.help = new Command()
-    this.help.parameter('command').action(this.commandHelp.bind(this))
+        return command
+      }
+    })
+    .action((args) => {
+      var output = ''
+
+      if (args.get('command')) {
+        let command = this.commands.get(args.get('command'))
+        let argLongest = 0
+        let paramCount = 0
+        let optCount = 0
+
+        if (command.description) {
+          output += chalk.green('Description:') + ' ' + command.description + '\n\n'
+        }
+
+        output += chalk.green('Usage:') + ' ' + args.get('command')
+
+        if (command.args.size) {
+          command.args.forEach((arg, key) => {
+            let length = arg.key.length
+
+            if (Number.isInteger(key)) {
+              output += ' <' + arg.key + '>'
+
+              paramCount++
+            } else {
+              output += ' [--' + arg.key + ']'
+
+              length += 2
+
+              optCount++
+            }
+
+            argLongest = length > argLongest ? length : argLongest
+          })
+
+          output += '\n'
+
+          if (paramCount) {
+            output += '\n'
+            output += chalk.green('Parameters:')
+            output += '\n'
+
+            command.args.forEach((arg, key) => {
+              if (Number.isInteger(key)) {
+                output += '  ' + ' '.repeat(argLongest - arg.key.length) + chalk.bold.gray(arg.key) + '  ' + arg.description + '\n'
+              }
+            })
+          }
+
+          if (optCount) {
+            output += '\n'
+            output += chalk.green('Options:')
+            output += '\n'
+
+            command.args.forEach((arg, key) => {
+              if (!Number.isInteger(key)) {
+                output += '  ' + ' '.repeat(argLongest - arg.key.length - 2) + chalk.bold.gray('--' + arg.key) + '  ' + arg.description + '\n'
+              }
+            })
+          }
+        }
+      } else {
+        if (this.description) {
+          output += chalk.green('Description:') + ' ' + this.description + '\n\n'
+        }
+
+        if (this.commands.size) {
+          output += chalk.green('Commands:') + '\n'
+
+          let commandLongest = 0
+
+          this.commands.forEach((command, key) => {
+            commandLongest = key.length > commandLongest ? key.length : commandLongest
+          })
+
+          this.commands.forEach((command, key) => {
+            output += '  ' + ' '.repeat(commandLongest - key.length) + chalk.bold.gray(key) + '  '
+
+            if (command.args.size) {
+              command.args.forEach((arg, key) => {
+                if (Number.isInteger(key)) {
+                  output += '<' + arg.key + '> '
+                } else {
+                  output += '[--' + arg.key + '] '
+                }
+              })
+            }
+
+            output += '\n'
+          })
+        }
+      }
+
+      log.error(output)
+    })
   }
 
   describe (description) {
@@ -30,217 +128,45 @@ module.exports = class {
   command (name) {
     var command = new Command()
 
-    this.commands[name] = command
+    this.commands.set(name, command)
 
     return command
   }
 
-  run (callback) {
-    callback = callback || function () {}
+  run () {
+    var command
+    var args = new Map()
+    var result = new Promise((resolve, reject) => {
+      var result
 
-    var arg0 = this.settings.context.args.length ? this.settings.context.args[0] : false
-    var command = false
-    var action, result, done
-
-    if (arg0 && this.commands[arg0]) {
-      command = this.commands[arg0]
-    }
-
-    if (command && this.settings.context.options.help) {
-      this.settings.context.args.unshift('')
-
-      command = this.help
-    }
-
-    if (command) {
-      let args = {}
-      let options = {}
-      let commandAliases = command.get('aliases')
-      let commandOptions = command.get('options')
-      let commandParameters = command.get('parameters')
-      let commandAction = command.get('action')
-
-      Object.keys(commandAliases).forEach(function (s) {
-        var alias = commandAliases[s]
-
-        if (this.settings.context.options[s] === true) {
-          delete this.settings.context.options[s]
-
-          this.settings.context.options = assign(this.settings.context.options, alias)
-        }
-      }, this)
-
-      try {
-        this.settings.context.args.shift()
-
-        if (this.settings.context.args.length < commandParameters.length) {
-          let missing = commandParameters.slice(this.settings.context.args.length)
-
-          throw new Error('missing argument' + (missing.length > 1 ? 's' : '') + ' (' + missing.map(function (m) { return m.name }).join(', ') + ') for ' + arg0)
-        }
-
-        if (this.settings.context.args.length > commandParameters.length) {
-          throw new Error('too many arguments for ' + arg0)
-        }
-
-        done = once(dezalgo(function (err) {
-          if (err) {
-            this.settings.error(err)
-
-            callback(err)
-          } else {
-            callback()
-          }
-        }.bind(this)))
-
-        commandParameters.forEach(function (param) {
-          if (this.settings.context.args.length) {
-            args[param.name] = param.handler(this.settings.context.args.shift())
-          }
-        }, this)
-
-        Object.keys(this.settings.context.options).forEach(function (option) {
-          options[option] = commandOptions[option] ? commandOptions[option].handler(this.settings.context.options[option]) : this.settings.context.options[option]
-        }, this)
-
-        action = ap([args, options, done].slice(0 - commandAction.length), commandAction)
-
-        result = action()
-
-        if (result && typeof result.then === 'function') {
-          result.then(function () {
-            callback()
-          }).catch(done)
-        }
-      } catch (err) {
-        this.settings.error(err)
-
-        callback(err)
-      }
-    } else {
-      let err = new Error('run help to get a list of commands')
-
-      this.settings.error(err)
-
-      callback(err)
-    }
-  }
-
-  appHelp (options, done) {
-    var cols = []
-    var longest = 0
-    var usage
-
-    if (this.description) {
-      this.settings.log(this.settings.primary('Description:') + ' ' + this.description)
-    }
-
-    this.settings.log(this.settings.primary('Commands:'))
-
-    for (let c in this.commands) {
-      usage = '[options] ' + c + ' ' + this.commands[c].get('parameters').map(function (v) { return '<' + v.name + '>' }).join(' ')
-
-      if (usage.length > longest) {
-        longest = usage.length
+      if (!this.args.has(0) || !this.commands.has(this.args.get(0))) {
+        throw new HelpError()
       }
 
-      cols.push([usage, this.commands[c].get('description')])
-    }
+      command = this.commands.get(this.args.get(0))
 
-    longest += 2
+      command.args.forEach((arg, key) => {
+        var value = arg.handler(this.args.get(Number.isInteger(key) ? key + 1 : key))
+        var k = arg.key
 
-    cols.forEach(function (v) {
-      this.settings.log(' ' + this.settings.secondary(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-    }.bind(this))
+        args.set(k, value)
+      })
 
-    done()
-  }
+      result = typeof command.act === 'function' ? command.act(args) : true
 
-  commandHelp (args, options, done) {
-    var command = this.commands[args.command]
-    var commandAliases = command.get('aliases')
-    var commandOptions = command.get('options')
-    var commandParameters = command.get('parameters')
-    var commandDescription = command.get('description')
-    var cols = []
-    var longest = 0
-    var usage = commandParameters.map(function (v) { return '<' + v.name + '>' }).join(' ').trim()
-
-    this.settings.log(this.settings.primary('Description:') + ' ' + commandDescription)
-    this.settings.log(this.settings.primary('Usage:') + ' [options] ' + args.command + (usage ? ' ' + usage : ''))
-
-    if (commandParameters.length) {
-      this.settings.log(this.settings.primary('Parameters:'))
-    }
-
-    commandParameters.forEach(function (p) {
-      if (p.name.length > longest) {
-        longest = p.name.length
+      if (typeof result === 'object' && result instanceof Promise) {
+        result.then(resolve).catch(reject)
+      } else {
+        resolve(result)
       }
-
-      cols.push([p.name, p.description || ''])
     })
 
-    longest += 2
-
-    cols.forEach(function (v) {
-      this.settings.log(' ' + this.settings.secondary(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-    }.bind(this))
-
-    longest = 0
-    cols = []
-
-    this.settings.log(this.settings.primary('Options:'))
-
-    for (let o in commandOptions) {
-      let oDashed = (o.length === 1 ? '-' : '--') + o
-
-      if (oDashed.length > longest) {
-        longest = oDashed.length
+    return result.catch(function (e) {
+      if (typeof e === 'object' && e instanceof HelpError) {
+        log.error(chalk.red('run `help` for a list of commands'))
       }
 
-      cols.push([oDashed, commandOptions[o].description])
-    }
-
-    longest += 2
-
-    cols.forEach(function (v) {
-      this.settings.log(' ' + this.settings.secondary(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-    }.bind(this))
-
-    longest = 0
-    cols = []
-
-    if (Object.keys(commandAliases).length) {
-      this.settings.log(this.settings.primary('Aliases:'))
-    }
-
-    for (let o in commandAliases) {
-      let alias = []
-
-      if (o.length > longest) {
-        longest = o.length
-      }
-
-      for (let k in commandAliases[o]) {
-        if (commandAliases[o][k] === true) {
-          alias.push('--' + k)
-        } else if (typeof commandAliases[o][k] === 'string') {
-          alias.push('--' + k + '="' + commandAliases[o][k] + '"')
-        } else {
-          alias.push('--' + k + '=' + commandAliases[o][k])
-        }
-      }
-
-      cols.push([o, alias.join(' ')])
-    }
-
-    longest += 2
-
-    cols.forEach(function (v) {
-      this.settings.log(' ' + this.settings.secondary(v[0]) + repeat(' ', longest - v[0].length) + v[1])
-    }.bind(this))
-
-    done()
+      throw e
+    })
   }
 }

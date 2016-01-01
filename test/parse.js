@@ -3,18 +3,24 @@ var tap = require('tap')
 var parse = require('../code/parse.js')
 
 tap.test('should parse', function (t) {
-  var context = {
-    args: ['one', 'two'],
-    options: {
-      x: true,
-      y: true,
-      z: true,
-      aaa: true,
-      bbb: 'ccc'
-    }
-  }
+  var context = [
+    [0, 'zero'],
+    ['aaa', true],
+    ['bbb', '1 2 3'],
+    ['ccc', true],
+    [1, 'one']
+  ]
+  var parsed = parse([
+    'zero',
+    '--aaa',
+    '--bbb',
+    '1 2 3',
+    '--ccc',
+    '--',
+    'one'
+  ])
 
-  t.deepEqual(parse(['one', 'two', '-x', '-yz', '--aaa', '--bbb=ccc']), context)
+  t.deepEqual(Array.from(parsed), context)
 
   t.end()
 })

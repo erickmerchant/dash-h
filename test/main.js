@@ -1,15 +1,18 @@
 var tap = require('tap')
+
 var main = require('../code/main.js')
 var Application = require('../code/application.js')
 
-tap.test('should make applications', function (t) {
-  t.ok(main([]) instanceof Application)
+tap.test('should return an instanceof Application', function (t) {
+  var app
 
-  t.end()
-})
+  app = main()
 
-tap.test('should parse', function (t) {
-  t.deepEqual(main.parse(), main.parse(process.argv.slice(2)))
+  t.ok(app instanceof Application)
+
+  app = main(new Map([]))
+
+  t.ok(app instanceof Application)
 
   t.end()
 })

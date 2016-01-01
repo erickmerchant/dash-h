@@ -1,37 +1,26 @@
 'use strict'
 
-const coerce = require('./coerce.js')
-
 module.exports = function (argv) {
-  var args = []
-  var options = {}
+  var args = new Map()
+  var i = 0
 
-  argv.forEach(function (arg) {
-    var parts
-    var val
+  while (argv.length) {
+    let arg = argv.shift()
 
     if (arg.startsWith('--')) {
-      arg = arg.substr(2)
-
-      parts = arg.split('=')
-
-      if (parts.length === 1) {
-        val = true
-      } else {
-        val = coerce(parts.slice(1).join('='))
+      if (arg.length > 2) {
+        if (!argv.length || argv[0].startsWith('-')) {
+          args.set(arg.substr(2), true)
+        } else {
+          args.set(arg.substr(2), argv.shift())
+        }
       }
-
-      options[parts[0]] = val
-    } else if (arg.startsWith('-')) {
-      arg.substr(1).split('').forEach(function (v) {
-        options[v] = true
-      })
     } else {
-      val = coerce(arg)
+      args.set(i, arg)
 
-      args.push(val)
+      i += 1
     }
-  })
+  }
 
-  return {args: args, options: options}
+  return args
 }

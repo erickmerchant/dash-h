@@ -2,54 +2,44 @@
 
 module.exports = class {
   constructor () {
-    this.settings = {
-      description: '',
-      options: {},
-      parameters: [],
-      aliases: {}
-    }
+    this.count = 0
 
-    this.option('help', 'provide help for this command')
-  }
+    this.description = ''
 
-  alias (alias, options) {
-    this.settings.aliases[alias] = options
-
-    return this
+    this.args = new Map()
   }
 
   describe (description) {
-    this.settings.description = description
+    this.description = description
 
     return this
   }
 
-  parameter (name, description, handler) {
-    this.settings.parameters.push({
-      name: name,
-      description: description,
-      handler: handler || function (param) { return param }
+  option (key, description, handler) {
+    this.args.set(key, {
+      key: key,
+      description: description || '',
+      handler: handler || ((v) => v)
     })
 
     return this
   }
 
-  option (option, description, handler) {
-    this.settings.options[option] = {
-      description: description,
-      handler: handler || function (opt) { return opt }
-    }
+  parameter (key, description, handler) {
+    this.args.set(this.count, {
+      key: key,
+      description: description || '',
+      handler: handler || ((v) => v)
+    })
+
+    this.count += 1
 
     return this
   }
 
   action (action) {
-    this.settings.action = action
+    this.act = (args) => action(args)
 
     return this
-  }
-
-  get (key) {
-    return this.settings[key]
   }
 }

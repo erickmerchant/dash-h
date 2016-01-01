@@ -1,15 +1,6 @@
-'use strict'
+const Application = require('./application')
+const parse = require('./parse')
 
-const Application = require('./application.js')
-const parse = require('./parse.js')
-const defaultArgv = process.argv.slice(2)
-
-function sergeant (argv) {
-  return new Application({context: parse(argv || defaultArgv)})
+module.exports = function (args) {
+  return new Application(args || parse(process.argv.slice(2)))
 }
-
-sergeant.parse = function (argv) {
-  return parse(argv || defaultArgv)
-}
-
-module.exports = sergeant
