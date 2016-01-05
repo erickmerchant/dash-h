@@ -15,6 +15,29 @@ module.exports = class {
     return this
   }
 
+  alias (key, map) {
+    var description = 'alias for: '
+
+    map.forEach((v, k) => {
+      if (Array.isArray(v)) {
+        v = v.map((v) => '"' + v + '"').join(' ')
+      }
+
+      ' --' + k + ' ' + v
+    })
+
+    this.args.set(key, {
+      description: description,
+      handler: (v, args) => {
+        map.forEach((v, k) => {
+          args.set(k, v)
+        })
+      }
+    })
+
+    return this
+  }
+
   option (key, description, handler) {
     this.args.set(key, {
       key: key,

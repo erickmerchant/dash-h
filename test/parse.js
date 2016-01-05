@@ -5,16 +5,18 @@ var parse = require('../code/parse.js')
 tap.test('should parse', function (t) {
   var context = [
     [0, 'zero'],
-    ['aaa', true],
-    ['bbb', '1 2 3'],
+    ['aaa', '1'],
+    ['bbb', ['2', '3']],
     ['ccc', true],
     [1, 'one']
   ]
   var parsed = parse([
     'zero',
     '--aaa',
+    '1',
     '--bbb',
-    '1 2 3',
+    '2',
+    '3',
     '--ccc',
     '--',
     'one'
