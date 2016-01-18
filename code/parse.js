@@ -1,26 +1,52 @@
 'use strict'
 
 module.exports = function (argv) {
-  var args = new Map()
-  var i = 0
+  return parse()
 
-  while (argv.length) {
-    let arg = argv.shift()
+  function parse () {
+    var args = new Map()
+    var i = 0
+    var level = 1
 
-    if (arg.startsWith('--')) {
-      if (arg.length > 2) {
-        if (!argv.length || argv[0].startsWith('-')) {
-          args.set(arg.substr(2), true)
-        } else {
-          args.set(arg.substr(2), argv.shift())
+    while (argv.length && level) {
+      let arg = argv.shift()
+
+      if (arg.startsWith('-')) {
+        let key = arg.startsWith('--') ? arg.substr(2) : arg.substr(1)
+        let val
+
+        if (key.length > 0) {
+          if (!argv.length || argv[0].startsWith('-')) {
+            val = true
+          } else if (argv[0] === '[') {
+            argv.shift()
+
+            val = parse()
+          } else {
+            val = argv.shift()
+          }
+
+          args.set(key, val)
         }
+      } else if (arg === ']') {
+        level = level - 1
+      } else {
+        let val
+
+        if (arg === '[') {
+          argv.shift()
+
+          val = parse()
+        } else {
+          val = arg
+        }
+
+        args.set(i, val)
+
+        i += 1
       }
-    } else {
-      args.set(i, arg)
-
-      i += 1
     }
-  }
 
-  return args
+    return args
+  }
 }
