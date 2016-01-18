@@ -15,21 +15,19 @@ module.exports = class {
     return this
   }
 
-  option (key, description, handler) {
+  option (key, description) {
     this.args.set(key, {
       key: key,
-      description: description || '',
-      handler: handler || ((v) => v)
+      description: description || ''
     })
 
     return this
   }
 
-  parameter (key, description, handler) {
+  parameter (key, description) {
     this.args.set(this.count, {
       key: key,
-      description: description || '',
-      handler: handler || ((v) => v)
+      description: description || ''
     })
 
     this.count += 1

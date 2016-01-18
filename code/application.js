@@ -14,15 +14,7 @@ module.exports = class {
 
     this.command('help')
     .describe('provide help for the application or a command')
-    .parameter('command', 'the command you need help with', (command) => {
-      if (command) {
-        if (!this.commands.has(command)) {
-          throw new HelpError()
-        }
-
-        return command
-      }
-    })
+    .parameter('command', 'the command you need help with')
     .action((args) => {
       var output = ''
 
@@ -31,6 +23,10 @@ module.exports = class {
         let argLongest = 0
         let paramCount = 0
         let optCount = 0
+
+        if (!command) {
+          throw new HelpError()
+        }
 
         if (command.description) {
           output += chalk.green('Description:') + ' ' + command.description + '\n\n'
@@ -146,7 +142,7 @@ module.exports = class {
       command = this.commands.get(this.args.get(0))
 
       command.args.forEach((arg, key) => {
-        var value = arg.handler(this.args.get(Number.isInteger(key) ? key + 1 : key))
+        var value = this.args.get(Number.isInteger(key) ? key + 1 : key) || null
         var k = arg.key
 
         args.set(k, value)
