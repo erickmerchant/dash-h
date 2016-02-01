@@ -34,8 +34,6 @@ module.exports = function (argv) {
         let val
 
         if (arg === '[') {
-          argv.shift()
-
           val = parse()
         } else {
           val = arg

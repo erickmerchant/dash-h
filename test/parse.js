@@ -3,7 +3,7 @@ var tap = require('tap')
 var parse = require('../code/parse.js')
 
 tap.test('should parse', function (t) {
-  var parsed = parse(['--a', '--', '-', 'abc', '--b', '123', '-c', '[', '1', '2', '3', ']', '-d', '[', '-e', '[', '123', ']', ']', 'abc'])
+  var parsed = parse(['--a', '--', '-', 'abc', '--b', '123', '-c', '[', '1', '2', '3', ']', '-d', '[', '-e', '[', '123', ']', ']', 'abc', '[', 'abc', ']'])
 
   t.ok(parsed instanceof Map)
 
@@ -26,6 +26,8 @@ tap.test('should parse', function (t) {
   t.deepEqual(Array.from(d.get('e')), [[ 0, '123' ]])
 
   t.ok(parsed.get(1) === 'abc')
+
+  t.deepEqual(Array.from(parsed.get(2)), [[0, 'abc']])
 
   t.end()
 })
