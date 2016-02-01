@@ -6,23 +6,15 @@ A CLI solution inspired by [Commander.js](https://github.com/tj/commander.js).
 
 ```javascript
 var app = require('sergeant')()
+var assert = require('assert')
 
 app.command('command1')
-  .parameter('title', function (val) {
-    // validate parameters and options by throwing exceptions
-    assert.ok(typeof val === 'string')
+.parameter('title', 'the title')
+.option('option1', 'option 1')
+.action(function (args) {
+  assert.ok(args.get('title'), 'the title is required')
 
-    return val + '...' // transform them
-  })
-  .option('option1', function (val) {
-    // validate options and options by throwing exceptions
-    assert.ok(typeof val === 'string')
-
-    return val + '...' // transform them
-  })
-  .action(function (args) {
-
-    return Promise.resolve(true)
-  })
+  return Promise.resolve(true)
+})
 
 ```
