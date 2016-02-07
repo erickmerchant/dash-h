@@ -19,7 +19,7 @@
   "homepage": "https://github.com/erickmerchant/sergeant#README",
   "devDependencies": {
     "mockery": "^1.4.0",
-    "standard": "^5.0.0",
+    "standard": "^6.0.4",
     "tap": "^5.0.0"
   },
   "dependencies": {
