@@ -7,9 +7,9 @@ tap.test('.arg should set a value on .args', function (t) {
 
   command.option('test', null)
 
-  t.ok(command.args.has('test'))
+  t.ok(command._args.has('test'))
 
-  t.deepEquals(command.args.get('test'), {
+  t.deepEquals(command._args.get('test'), {
     key: 'test',
     description: ''
   })
@@ -24,7 +24,7 @@ tap.test('.action should set a value on .act', function (t) {
 
   command.action(handler)
 
-  t.ok(typeof command.act !== 'undefined')
+  t.ok(typeof command._action !== 'undefined')
 
   t.end()
 })
