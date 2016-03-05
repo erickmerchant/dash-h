@@ -24,7 +24,7 @@ module.exports = class extends Command {
           throw new HelpError()
         }
 
-        command.help(args.get('command'))
+        command.help()
       } else {
         this.help()
       }
@@ -32,7 +32,7 @@ module.exports = class extends Command {
   }
 
   command (name) {
-    var command = new Command(this.args)
+    var command = new Command(this.args, name)
 
     this.commands.set(name, command)
 

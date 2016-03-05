@@ -5,14 +5,21 @@ const log = require('./log')
 const chalk = require('chalk')
 
 module.exports = class {
-  constructor (args) {
+  constructor (args, name) {
     this.args = args
+
+    this.name = name || ''
 
     this.count = 0
 
     this.description = ''
 
     this._args = new Map()
+
+    if (!this.name) {
+      this.option('help', 'display this message')
+      this.option('h', 'display this message')
+    }
   }
 
   describe (description) {
@@ -53,11 +60,19 @@ module.exports = class {
       var result
 
       this._args.forEach((arg, key) => {
-        var value = this.args.get(Number.isInteger(key) ? key + 1 : key) || null
+        var value = this.args.get(Number.isInteger(key) ? (this.name ? key + 1 : key) : key) || null
         var k = arg.key
 
         args.set(k, value)
       })
+
+      if (!this.name) {
+        if (args.get('help') || args.get('h')) {
+          this.help()
+
+          return Promise.resolve(true)
+        }
+      }
 
       result = typeof this._action === 'function' ? this._action(args) : true
 
@@ -75,9 +90,7 @@ module.exports = class {
     }
   }
 
-  help (name) {
-    name = name || ''
-
+  help () {
     var output = ''
     let argLongest = 0
     let paramCount = 0
@@ -87,7 +100,7 @@ module.exports = class {
       output += chalk.green('Description:') + ' ' + this.description + '\n\n'
     }
 
-    output += chalk.green('Usage:') + ' ' + name
+    output += chalk.green('Usage:') + ' ' + this.name
 
     if (this._args.size) {
       this._args.forEach((arg, key) => {
