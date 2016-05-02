@@ -1,6 +1,6 @@
 var tap = require('tap')
 
-var HelpError = require('../code/help-error.js')
+var HelpError = require('../code/help-error')
 
 tap.test('should return an instanceof Application', function (t) {
   var error = new HelpError('test')

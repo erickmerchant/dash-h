@@ -14,7 +14,7 @@ module.exports = class {
 
     this.description = ''
 
-    this._args = new Map()
+    this.optionsParameters = new Map()
 
     if (!this.name) {
       this.option('help', 'display this message')
@@ -29,7 +29,7 @@ module.exports = class {
   }
 
   option (key, description) {
-    this._args.set(key, {
+    this.optionsParameters.set(key, {
       key: key,
       description: description || ''
     })
@@ -38,7 +38,7 @@ module.exports = class {
   }
 
   parameter (key, description) {
-    this._args.set(this.count, {
+    this.optionsParameters.set(this.count, {
       key: key,
       description: description || ''
     })
@@ -49,7 +49,7 @@ module.exports = class {
   }
 
   action (action) {
-    this._action = (args) => action(args)
+    this.callAction = (args) => action(args)
 
     return this
   }
@@ -59,7 +59,7 @@ module.exports = class {
       var args = new Map()
       var result
 
-      this._args.forEach((arg, key) => {
+      this.optionsParameters.forEach((arg, key) => {
         var value = this.args.get(Number.isInteger(key) ? (this.name ? key + 1 : key) : key) || null
         var k = arg.key
 
@@ -74,7 +74,7 @@ module.exports = class {
         }
       }
 
-      result = typeof this._action === 'function' ? this._action(args) : true
+      result = typeof this.callAction === 'function' ? this.callAction(args) : true
 
       if (typeof result === 'object' && result instanceof Promise) {
         return result
@@ -102,8 +102,8 @@ module.exports = class {
 
     output += chalk.green('Usage:') + ' ' + this.name
 
-    if (this._args.size) {
-      this._args.forEach((arg, key) => {
+    if (this.optionsParameters.size) {
+      this.optionsParameters.forEach((arg, key) => {
         let length = arg.key.length
 
         if (Number.isInteger(key)) {
@@ -128,7 +128,7 @@ module.exports = class {
         output += chalk.green('Parameters:')
         output += '\n'
 
-        this._args.forEach((arg, key) => {
+        this.optionsParameters.forEach((arg, key) => {
           if (Number.isInteger(key)) {
             output += '  ' + ' '.repeat(argLongest - arg.key.length) + chalk.bold.gray(arg.key) + '  ' + arg.description + '\n'
           }
@@ -140,7 +140,7 @@ module.exports = class {
         output += chalk.green('Options:')
         output += '\n'
 
-        this._args.forEach((arg, key) => {
+        this.optionsParameters.forEach((arg, key) => {
           if (!Number.isInteger(key)) {
             output += '  ' + ' '.repeat(argLongest - arg.key.length - 2) + chalk.bold.gray('--' + arg.key) + '  ' + arg.description + '\n'
           }

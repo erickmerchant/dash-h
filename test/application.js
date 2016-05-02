@@ -1,10 +1,10 @@
 var tap = require('tap')
 var mockery = require('mockery')
-var Command = require('../code/command.js')
+var Command = require('../code/command')
 var chalk = require('chalk')
 
 tap.test('.command should return a new Command', function (t) {
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([]))
 
   var command = app.command('test')
@@ -15,7 +15,7 @@ tap.test('.command should return a new Command', function (t) {
 })
 
 tap.test('.describe should set a value on .description', function (t) {
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([]))
 
   var description = 'test'
@@ -42,9 +42,9 @@ tap.test('.run should return a new Promise', function (t) {
     }
   })
 
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([]))
-  var HelpError = require('../code/help-error.js')
+  var HelpError = require('../code/help-error')
 
   t.plan(3)
 
@@ -74,9 +74,9 @@ tap.test('.run should throw a HelpError if no command is selected', function (t)
     }
   })
 
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([]))
-  var HelpError = require('../code/help-error.js')
+  var HelpError = require('../code/help-error')
 
   t.plan(2)
 
@@ -90,7 +90,7 @@ tap.test('.run should throw a HelpError if no command is selected', function (t)
 })
 
 tap.test('.run should run commands that return a value', function (t) {
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([[0, 'test']]))
 
   t.plan(1)
@@ -105,7 +105,7 @@ tap.test('.run should run commands that return a value', function (t) {
 })
 
 tap.test('.run should run commands that return a promise', function (t) {
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([[0, 'test']]))
 
   t.plan(1)
@@ -120,7 +120,7 @@ tap.test('.run should run commands that return a promise', function (t) {
 })
 
 tap.test('.run should pass args', function (t) {
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([[0, 'test'], ['x', 'a'], [1, 'b']]))
 
   t.plan(1)
@@ -150,9 +150,9 @@ tap.test('help should throw an error if passed a non-existent command', function
     }
   })
 
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([[0, 'help'], [1, 'test']]))
-  var HelpError = require('../code/help-error.js')
+  var HelpError = require('../code/help-error')
 
   t.plan(2)
 
@@ -180,7 +180,7 @@ tap.test('help should provide help for the application', function (t) {
     }
   })
 
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([[0, 'help']]))
 
   t.plan(1)
@@ -207,7 +207,7 @@ tap.test('help should provide help for the application with description and args
     }
   })
 
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([[0, 'help']]))
 
   app.describe('Test application')
@@ -242,7 +242,7 @@ tap.test('help should provide help for a command', function (t) {
 
   t.plan(1)
 
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([[0, 'help'], [1, 'test']]))
 
   app.command('test')
@@ -271,7 +271,7 @@ tap.test('help should provide help for a command with description and args', fun
 
   t.plan(1)
 
-  var Application = require('../code/application.js')
+  var Application = require('../code/application')
   var app = new Application(new Map([[0, 'help'], [1, 'test']]))
 
   app.command('test').describe('This is the description')

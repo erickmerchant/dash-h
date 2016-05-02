@@ -2,7 +2,7 @@
   "name": "sergeant",
   "version": "10.1.0",
   "description": "",
-  "main": "code/main.js",
+  "main": "application.js",
   "scripts": {
     "test": "standard && tap test/*.js",
     "cover": "tap test/*.js --cov --coverage-report=html"

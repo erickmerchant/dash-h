@@ -78,8 +78,8 @@ module.exports = class extends Command {
       this.commands.forEach((command, key) => {
         output += '  ' + ' '.repeat(commandLongest - key.length) + chalk.bold.gray(key) + '  '
 
-        if (command._args.size) {
-          command._args.forEach((arg, key) => {
+        if (command.optionsParameters.size) {
+          command.optionsParameters.forEach((arg, key) => {
             if (Number.isInteger(key)) {
               output += '<' + arg.key + '> '
             } else {
