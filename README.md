@@ -33,7 +33,7 @@ app.run()
 ## an example (single command)
 
 ```javascript
-var command = require('sergeant').command()
+var command = require('sergeant/command')()
 var assert = require('assert')
 
 command
