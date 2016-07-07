@@ -20,7 +20,7 @@
   "devDependencies": {
     "mockery": "^1.4.0",
     "standard": "^7.0.0",
-    "tap": "^5.0.0"
+    "tap": "^6.1.1"
   },
   "dependencies": {
     "chalk": "^1.1.1"
