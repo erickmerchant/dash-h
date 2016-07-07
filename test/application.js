@@ -127,9 +127,10 @@ tap.test('.run should pass args', function (t) {
 
   app.command('test')
   .option('x')
-  .parameter('y')
+  .option('y')
+  .parameter('z')
   .action(function (args) {
-    t.deepEquals(Array.from(args), [['x', 'a'], ['y', 'b']])
+    t.deepEquals(Array.from(args), [['x', 'a'], ['z', 'b']])
   })
 
   app.run()

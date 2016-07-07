@@ -60,10 +60,12 @@ module.exports = class {
       var result
 
       this.optionsParameters.forEach((arg, key) => {
-        var value = this.args.get(Number.isInteger(key) ? (this.name ? key + 1 : key) : key) || null
+        var value = this.args.get(Number.isInteger(key) ? (this.name ? key + 1 : key) : key)
         var k = arg.key
 
-        args.set(k, value)
+        if (value != null) {
+          args.set(k, value)
+        }
       })
 
       if (!this.name) {
