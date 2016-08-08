@@ -1,8 +1,8 @@
-var tap = require('tap')
+var test = require('tape')
 
 var parse = require('../code/parse.js')
 
-tap.test('should parse', function (t) {
+test('should parse', function (t) {
   var parsed = parse(['--a', '--', '-', 'abc', '--b', '123', '-c', '[', '1', '2', '3', ']', '-d', '[', '-e', '[', '123', ']', ']', 'abc', '[', 'abc', ']'])
 
   t.ok(parsed instanceof Map)

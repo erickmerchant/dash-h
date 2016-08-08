@@ -1,8 +1,8 @@
-var tap = require('tap')
+var test = require('tape')
 
 var Command = require('../code/command')
 
-tap.test('.arg should set a value on .args', function (t) {
+test('.arg should set a value on .args', function (t) {
   var command = new Command()
 
   command.option('test', null)
@@ -17,7 +17,7 @@ tap.test('.arg should set a value on .args', function (t) {
   t.end()
 })
 
-tap.test('.action should set a value on .act', function (t) {
+test('.action should set a value on .act', function (t) {
   var command = new Command()
 
   var handler = function () {}
@@ -29,7 +29,7 @@ tap.test('.action should set a value on .act', function (t) {
   t.end()
 })
 
-tap.test('.describe should set a value on .description', function (t) {
+test('.describe should set a value on .description', function (t) {
   var command = new Command()
 
   var description = 'test'

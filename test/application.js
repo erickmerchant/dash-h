@@ -1,9 +1,9 @@
-var tap = require('tap')
+var test = require('tape')
 var mockery = require('mockery')
 var Command = require('../code/command')
 var chalk = require('chalk')
 
-tap.test('.command should return a new Command', function (t) {
+test('.command should return a new Command', function (t) {
   var Application = require('../code/application')
   var app = new Application(new Map([]))
 
@@ -14,7 +14,7 @@ tap.test('.command should return a new Command', function (t) {
   t.end()
 })
 
-tap.test('.describe should set a value on .description', function (t) {
+test('.describe should set a value on .description', function (t) {
   var Application = require('../code/application')
   var app = new Application(new Map([]))
 
@@ -27,7 +27,7 @@ tap.test('.describe should set a value on .description', function (t) {
   t.end()
 })
 
-tap.test('.run should return a new Promise', function (t) {
+test('.run should return a new Promise', function (t) {
   var errors = []
 
   mockery.enable({
@@ -59,7 +59,7 @@ tap.test('.run should return a new Promise', function (t) {
   mockery.disable()
 })
 
-tap.test('.run should throw a HelpError if no command is selected', function (t) {
+test('.run should throw a HelpError if no command is selected', function (t) {
   var errors = []
 
   mockery.enable({
@@ -89,7 +89,7 @@ tap.test('.run should throw a HelpError if no command is selected', function (t)
   mockery.disable()
 })
 
-tap.test('.run should run commands that return a value', function (t) {
+test('.run should run commands that return a value', function (t) {
   var Application = require('../code/application')
   var app = new Application(new Map([[0, 'test']]))
 
@@ -104,7 +104,7 @@ tap.test('.run should run commands that return a value', function (t) {
   })
 })
 
-tap.test('.run should run commands that return a promise', function (t) {
+test('.run should run commands that return a promise', function (t) {
   var Application = require('../code/application')
   var app = new Application(new Map([[0, 'test']]))
 
@@ -119,7 +119,7 @@ tap.test('.run should run commands that return a promise', function (t) {
   })
 })
 
-tap.test('.run should pass args', function (t) {
+test('.run should pass args', function (t) {
   var Application = require('../code/application')
   var app = new Application(new Map([[0, 'test'], ['x', 'a'], [1, 'b']]))
 
@@ -136,7 +136,7 @@ tap.test('.run should pass args', function (t) {
   app.run()
 })
 
-tap.test('help should throw an error if passed a non-existent command', function (t) {
+test('help should throw an error if passed a non-existent command', function (t) {
   var errors = []
 
   mockery.enable({
@@ -166,7 +166,7 @@ tap.test('help should throw an error if passed a non-existent command', function
   mockery.disable()
 })
 
-tap.test('help should provide help for the application', function (t) {
+test('help should provide help for the application', function (t) {
   var errors = []
 
   mockery.enable({
@@ -193,7 +193,7 @@ tap.test('help should provide help for the application', function (t) {
   mockery.disable()
 })
 
-tap.test('help should provide help for the application with description and args', function (t) {
+test('help should provide help for the application with description and args', function (t) {
   var errors = []
 
   mockery.enable({
@@ -226,7 +226,7 @@ tap.test('help should provide help for the application with description and args
   mockery.disable()
 })
 
-tap.test('help should provide help for a command', function (t) {
+test('help should provide help for a command', function (t) {
   var errors = []
 
   mockery.enable({
@@ -255,7 +255,7 @@ tap.test('help should provide help for a command', function (t) {
   mockery.disable()
 })
 
-tap.test('help should provide help for a command with description and args', function (t) {
+test('help should provide help for a command with description and args', function (t) {
   var errors = []
 
   mockery.enable({

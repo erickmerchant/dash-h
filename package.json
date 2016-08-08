@@ -4,8 +4,8 @@
   "description": "",
   "main": "application.js",
   "scripts": {
-    "test": "standard && tap test/*.js",
-    "cover": "tap test/*.js --cov --coverage-report=html"
+    "test": "standard && tape 'test/**/*.js' | faucet",
+    "cover": "nyc --reporter=html npm test"
   },
   "repository": {
     "type": "git",
@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/erickmerchant/sergeant#README",
   "devDependencies": {
+    "faucet": "0.0.1",
     "mockery": "^1.4.0",
+    "nyc": "^7.1.0",
     "standard": "^7.0.0",
-    "tap": "^6.1.1"
+    "tape": "^4.6.0"
   },
   "dependencies": {
     "chalk": "^1.1.1"
