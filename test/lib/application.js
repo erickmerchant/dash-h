@@ -1,10 +1,10 @@
 var test = require('tape')
 var mockery = require('mockery')
-var Command = require('../code/command')
+var Command = require('../../lib/command')
 var chalk = require('chalk')
 
 test('.command should return a new Command', function (t) {
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([]))
 
   var command = app.command('test')
@@ -15,7 +15,7 @@ test('.command should return a new Command', function (t) {
 })
 
 test('.describe should set a value on .description', function (t) {
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([]))
 
   var description = 'test'
@@ -42,9 +42,9 @@ test('.run should return a new Promise', function (t) {
     }
   })
 
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([]))
-  var HelpError = require('../code/help-error')
+  var HelpError = require('../../help-error')
 
   t.plan(3)
 
@@ -74,9 +74,9 @@ test('.run should throw a HelpError if no command is selected', function (t) {
     }
   })
 
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([]))
-  var HelpError = require('../code/help-error')
+  var HelpError = require('../../help-error')
 
   t.plan(2)
 
@@ -90,7 +90,7 @@ test('.run should throw a HelpError if no command is selected', function (t) {
 })
 
 test('.run should run commands that return a value', function (t) {
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'test']]))
 
   t.plan(1)
@@ -105,7 +105,7 @@ test('.run should run commands that return a value', function (t) {
 })
 
 test('.run should run commands that return a promise', function (t) {
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'test']]))
 
   t.plan(1)
@@ -120,7 +120,7 @@ test('.run should run commands that return a promise', function (t) {
 })
 
 test('.run should pass args', function (t) {
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'test'], ['x', 'a'], [1, 'b']]))
 
   t.plan(1)
@@ -151,9 +151,9 @@ test('help should throw an error if passed a non-existent command', function (t)
     }
   })
 
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'help'], [1, 'test']]))
-  var HelpError = require('../code/help-error')
+  var HelpError = require('../../help-error')
 
   t.plan(2)
 
@@ -181,7 +181,7 @@ test('help should provide help for the application', function (t) {
     }
   })
 
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'help']]))
 
   t.plan(1)
@@ -208,7 +208,7 @@ test('help should provide help for the application with description and args', f
     }
   })
 
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'help']]))
 
   app.describe('Test application')
@@ -243,7 +243,7 @@ test('help should provide help for a command', function (t) {
 
   t.plan(1)
 
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'help'], [1, 'test']]))
 
   app.command('test')
@@ -272,7 +272,7 @@ test('help should provide help for a command with description and args', functio
 
   t.plan(1)
 
-  var Application = require('../code/application')
+  var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'help'], [1, 'test']]))
 
   app.command('test').describe('This is the description')

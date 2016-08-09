@@ -1,6 +1,6 @@
 var test = require('tape')
 
-var Command = require('../code/command')
+var Command = require('../../lib/command')
 
 test('.arg should set a value on .args', function (t) {
   var command = new Command()

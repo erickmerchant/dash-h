@@ -1,6 +1,6 @@
 var test = require('tape')
 
-var HelpError = require('../code/help-error')
+var HelpError = require('../help-error')
 
 test('should return an instanceof Application', function (t) {
   var error = new HelpError('test')

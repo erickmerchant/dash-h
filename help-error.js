@@ -1,1 +1,3 @@
-module.exports = require('./code/help-error')
+'use strict'
+
+module.exports = class HelpError extends Error {}
