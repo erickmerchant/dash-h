@@ -214,13 +214,14 @@ test('help should provide help for the application with description and args', f
   app.describe('Test application')
 
   app.command('test').describe('This is the description')
+  .option('x', 'Option xxx')
   .option('xxx', 'Option xxx')
   .parameter('yyy', 'Parameter yyy')
 
   t.plan(1)
 
   app.run().then(function () {
-    t.deepEquals(errors, ['Description: Test application\n\nCommands:\n  help  <command> \n  test  [--xxx] <yyy> \n'])
+    t.deepEquals(errors, ['Description: Test application\n\nCommands:\n  help  <command> \n  test  [-x] [--xxx] <yyy> \n'])
   })
 
   mockery.disable()
@@ -276,11 +277,12 @@ test('help should provide help for a command with description and args', functio
   var app = new Application(new Map([[0, 'help'], [1, 'test']]))
 
   app.command('test').describe('This is the description')
+  .option('x', 'Option xxx')
   .option('xxx', 'Option xxx')
   .parameter('yyy', 'Parameter yyy')
 
   app.run().then(function () {
-    t.deepEquals(errors, ['Description: This is the description\n\nUsage: test [--xxx] <yyy>\n\nParameters:\n    yyy  Parameter yyy\n\nOptions:\n  --xxx  Option xxx\n'])
+    t.deepEquals(errors, ['Description: This is the description\n\nUsage: test [-x] [--xxx] <yyy>\n\nParameters:\n    yyy  Parameter yyy\n\nOptions:\n     -x  Option xxx\n  --xxx  Option xxx\n'])
   })
 
   mockery.disable()
