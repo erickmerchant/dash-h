@@ -10,6 +10,7 @@ test('.arg should set a value on .args', function (t) {
   t.ok(command.optionsParameters.has('test'))
 
   t.deepEquals(command.optionsParameters.get('test'), {
+    aliases: [],
     key: 'test',
     description: ''
   })
