@@ -44,14 +44,11 @@ test('.run should return a new Promise', function (t) {
 
   var Application = require('../../lib/application')
   var app = new Application(new Map([]))
-  var HelpError = require('../../help-error')
 
-  t.plan(3)
+  t.plan(2)
 
-  var ran = app.run().catch(function (err) {
+  var ran = app.run().then(function () {
     t.deepEquals(errors, ['Command not found. Run `help` for a list of commands.'])
-
-    t.ok(err instanceof HelpError)
   })
 
   t.ok(ran instanceof Promise)
@@ -76,14 +73,11 @@ test('.run should throw a HelpError if no command is selected', function (t) {
 
   var Application = require('../../lib/application')
   var app = new Application(new Map([]))
-  var HelpError = require('../../help-error')
 
-  t.plan(2)
+  t.plan(1)
 
-  app.run().catch(function (err) {
+  app.run().then(function () {
     t.deepEquals(errors, ['Command not found. Run `help` for a list of commands.'])
-
-    t.ok(err instanceof HelpError)
   })
 
   mockery.disable()
@@ -153,14 +147,11 @@ test('help should throw an error if passed a non-existent command', function (t)
 
   var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'help'], [1, 'test']]))
-  var HelpError = require('../../help-error')
 
-  t.plan(2)
+  t.plan(1)
 
-  app.run().catch(function (err) {
+  app.run().then(function () {
     t.deepEquals(errors, ['Command not found. Run `help` for a list of commands.'])
-
-    t.ok(err instanceof HelpError)
   })
 
   mockery.disable()
@@ -250,7 +241,7 @@ test('help should provide help for a command', function (t) {
   app.command('test')
 
   app.run().then(function () {
-    t.deepEquals(errors, [chalk.red('Usage: test [--help]\n\nOptions:\n  --help  display this message\n')])
+    t.deepEquals(errors, [chalk.red('Usage: test [--help]\n\nOptions:\n --help,-h display this message\n')])
   })
 
   mockery.disable()
@@ -282,7 +273,7 @@ test('help should provide help for a command with description and args', functio
   .parameter('yyy', 'Parameter yyy')
 
   app.run().then(function () {
-    t.deepEquals(errors, ['Description: This is the description\n\nUsage: test [--help] [-x] [--xxx] <yyy>\n\nParameters:\n     yyy  Parameter yyy\n\nOptions:\n  --help  display this message\n      -x  Option xxx\n   --xxx  Option xxx\n'])
+    t.deepEquals(errors, ['Description: This is the description\n\nUsage: test [--help] [-x] [--xxx] <yyy>\n\nParameters:\n yyy Parameter yyy\n\nOptions:\n --help,-h display this message\n -x Option xxx\n --xxx Option xxx\n'])
   })
 
   mockery.disable()

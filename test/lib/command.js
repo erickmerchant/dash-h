@@ -1,4 +1,5 @@
 var test = require('tape')
+var mockery = require('mockery')
 
 var Command = require('../../lib/command')
 
@@ -18,14 +19,14 @@ test('.arg should set a value on .args', function (t) {
   t.end()
 })
 
-test('.action should set a value on .act', function (t) {
+test('.action should set a value on .callback', function (t) {
   var command = new Command()
 
   var handler = function () {}
 
   command.action(handler)
 
-  t.ok(typeof command.callAction !== 'undefined')
+  t.ok(typeof command.callback !== 'undefined')
 
   t.end()
 })
@@ -40,4 +41,46 @@ test('.describe should set a value on .description', function (t) {
   t.equals(command.description, description)
 
   t.end()
+})
+
+test('help should provide help for the application', function (t) {
+  var errors = []
+
+  mockery.enable({
+    warnOnReplace: false,
+    warnOnUnregistered: false,
+    useCleanCache: true
+  })
+
+  mockery.registerMock('./log', {
+    error: function (err) {
+      errors.push(err)
+    }
+  })
+
+  var Command = require('../../lib/command')
+  var app = new Command(new Map([['h', true]]))
+
+  t.plan(1)
+
+  app.run().then(function () {
+    t.deepEquals(errors, ['Usage:  [--help]\n\nOptions:\n --help,-h display this message\n'])
+  })
+
+  mockery.disable()
+})
+
+test('should pass errors through', function (t) {
+  var Command = require('../../lib/command')
+  var command = new Command(new Map())
+
+  command.action(function () {
+    throw new Error('testing errors')
+  })
+
+  t.plan(1)
+
+  command.run().catch(function (err) {
+    t.equals(err.message, 'testing errors')
+  })
 })
