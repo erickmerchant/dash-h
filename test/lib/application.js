@@ -178,7 +178,7 @@ test('help should provide help for the application', function (t) {
   t.plan(1)
 
   app.run().then(function () {
-    t.deepEquals(errors, ['Commands:\n  help  [--help] <command> \n'])
+    t.deepEquals(errors, ['\nCommands:\n\n  help  Provide help for the application or a command.\n'])
   })
 
   mockery.disable()
@@ -212,7 +212,7 @@ test('help should provide help for the application with description and args', f
   t.plan(1)
 
   app.run().then(function () {
-    t.deepEquals(errors, ['Description: Test application\n\nCommands:\n  help  [--help] <command> \n  test  [--help] [-x] [--xxx] <yyy> \n'])
+    t.deepEquals(errors, ['\nDescription: Test application\n\nCommands:\n\n  help  Provide help for the application or a command.\n  test  This is the description\n'])
   })
 
   mockery.disable()
@@ -241,7 +241,36 @@ test('help should provide help for a command', function (t) {
   app.command('test')
 
   app.run().then(function () {
-    t.deepEquals(errors, [chalk.red('Usage: test [--help]\n\nOptions:\n --help,-h display this message\n')])
+    t.deepEquals(errors, [chalk.red('\nUsage: test [--help]\n\nOptions:\n\n  --help,-h  display this message\n')])
+  })
+
+  mockery.disable()
+})
+
+test('help should provide help for a command', function (t) {
+  var errors = []
+
+  mockery.enable({
+    warnOnReplace: false,
+    warnOnUnregistered: false,
+    useCleanCache: true
+  })
+
+  mockery.registerMock('./log', {
+    error: function (err) {
+      errors.push(err)
+    }
+  })
+
+  t.plan(1)
+
+  var Application = require('../../lib/application')
+  var app = new Application(new Map([['help', 'test']]))
+
+  app.command('test')
+
+  app.run().then(function () {
+    t.deepEquals(errors, [chalk.red('\nUsage: test [--help]\n\nOptions:\n\n  --help,-h  display this message\n')])
   })
 
   mockery.disable()
@@ -273,7 +302,7 @@ test('help should provide help for a command with description and args', functio
   .parameter('yyy', 'Parameter yyy')
 
   app.run().then(function () {
-    t.deepEquals(errors, ['Description: This is the description\n\nUsage: test [--help] [-x] [--xxx] <yyy>\n\nParameters:\n yyy Parameter yyy\n\nOptions:\n --help,-h display this message\n -x Option xxx\n --xxx Option xxx\n'])
+    t.deepEquals(errors, ['\nDescription: This is the description\n\nUsage: test [--help] [-x] [--xxx] <yyy>\n\nParameters:\n\n  yyy  Parameter yyy\n\nOptions:\n\n  --help,-h  display this message\n         -x  Option xxx\n      --xxx  Option xxx\n'])
   })
 
   mockery.disable()

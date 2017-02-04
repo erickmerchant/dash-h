@@ -43,7 +43,7 @@ test('.describe should set a value on .description', function (t) {
   t.end()
 })
 
-test('help should provide help for the application', function (t) {
+test('help should provide help for the command', function (t) {
   var errors = []
 
   mockery.enable({
@@ -59,12 +59,12 @@ test('help should provide help for the application', function (t) {
   })
 
   var Command = require('../../lib/command')
-  var app = new Command(new Map([['h', true]]))
+  var command = new Command(new Map([['h', true]]))
 
   t.plan(1)
 
-  app.run().then(function () {
-    t.deepEquals(errors, ['Usage:  [--help]\n\nOptions:\n --help,-h display this message\n'])
+  command.run().then(function () {
+    t.deepEquals(errors, ['\nUsage:  [--help]\n\nOptions:\n\n  --help,-h  display this message\n'])
   })
 
   mockery.disable()
