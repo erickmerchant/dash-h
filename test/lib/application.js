@@ -29,6 +29,9 @@ test('.describe should set a value on .description', function (t) {
 
 test('.run should return a new Promise', function (t) {
   var errors = []
+  var process = {
+    exitCode: 0
+  }
 
   mockery.enable({
     warnOnReplace: false,
@@ -36,19 +39,23 @@ test('.run should return a new Promise', function (t) {
     useCleanCache: true
   })
 
-  mockery.registerMock('./log', {
-    error: function (err) {
-      errors.push(err)
-    }
+  mockery.registerMock('./globals', {
+    console: {
+      error: function (err) {
+        errors.push(err)
+      }
+    },
+    process
   })
 
   var Application = require('../../lib/application')
   var app = new Application(new Map([]))
 
-  t.plan(2)
+  t.plan(3)
 
   var ran = app.run().then(function () {
     t.deepEquals(errors, ['Command not found. Run `help` for a list of commands.'])
+    t.equals(process.exitCode, 1)
   })
 
   t.ok(ran instanceof Promise)
@@ -58,6 +65,9 @@ test('.run should return a new Promise', function (t) {
 
 test('.run should throw a HelpError if no command is selected', function (t) {
   var errors = []
+  var process = {
+    exitCode: 0
+  }
 
   mockery.enable({
     warnOnReplace: false,
@@ -65,19 +75,23 @@ test('.run should throw a HelpError if no command is selected', function (t) {
     useCleanCache: true
   })
 
-  mockery.registerMock('./log', {
-    error: function (err) {
-      errors.push(err)
-    }
+  mockery.registerMock('./globals', {
+    console: {
+      error: function (err) {
+        errors.push(err)
+      }
+    },
+    process
   })
 
   var Application = require('../../lib/application')
   var app = new Application(new Map([]))
 
-  t.plan(1)
+  t.plan(2)
 
   app.run().then(function () {
     t.deepEquals(errors, ['Command not found. Run `help` for a list of commands.'])
+    t.equals(process.exitCode, 1)
   })
 
   mockery.disable()
@@ -132,6 +146,9 @@ test('.run should pass args', function (t) {
 
 test('help should throw an error if passed a non-existent command', function (t) {
   var errors = []
+  var process = {
+    exitCode: 0
+  }
 
   mockery.enable({
     warnOnReplace: false,
@@ -139,19 +156,23 @@ test('help should throw an error if passed a non-existent command', function (t)
     useCleanCache: true
   })
 
-  mockery.registerMock('./log', {
-    error: function (err) {
-      errors.push(err)
-    }
+  mockery.registerMock('./globals', {
+    console: {
+      error: function (err) {
+        errors.push(err)
+      }
+    },
+    process
   })
 
   var Application = require('../../lib/application')
   var app = new Application(new Map([[0, 'help'], [1, 'test']]))
 
-  t.plan(1)
+  t.plan(2)
 
   app.run().then(function () {
     t.deepEquals(errors, ['Command not found. Run `help` for a list of commands.'])
+    t.equals(process.exitCode, 1)
   })
 
   mockery.disable()
@@ -159,6 +180,9 @@ test('help should throw an error if passed a non-existent command', function (t)
 
 test('help should provide help for the application', function (t) {
   var errors = []
+  var process = {
+    exitCode: 0
+  }
 
   mockery.enable({
     warnOnReplace: false,
@@ -166,10 +190,13 @@ test('help should provide help for the application', function (t) {
     useCleanCache: true
   })
 
-  mockery.registerMock('./log', {
-    error: function (err) {
-      errors.push(err)
-    }
+  mockery.registerMock('./globals', {
+    console: {
+      error: function (err) {
+        errors.push(err)
+      }
+    },
+    process
   })
 
   var Application = require('../../lib/application')
@@ -186,6 +213,9 @@ test('help should provide help for the application', function (t) {
 
 test('help should provide help for the application with description and args', function (t) {
   var errors = []
+  var process = {
+    exitCode: 0
+  }
 
   mockery.enable({
     warnOnReplace: false,
@@ -193,10 +223,13 @@ test('help should provide help for the application with description and args', f
     useCleanCache: true
   })
 
-  mockery.registerMock('./log', {
-    error: function (err) {
-      errors.push(err)
-    }
+  mockery.registerMock('./globals', {
+    console: {
+      error: function (err) {
+        errors.push(err)
+      }
+    },
+    process
   })
 
   var Application = require('../../lib/application')
@@ -220,6 +253,9 @@ test('help should provide help for the application with description and args', f
 
 test('help should provide help for a command', function (t) {
   var errors = []
+  var process = {
+    exitCode: 0
+  }
 
   mockery.enable({
     warnOnReplace: false,
@@ -227,10 +263,13 @@ test('help should provide help for a command', function (t) {
     useCleanCache: true
   })
 
-  mockery.registerMock('./log', {
-    error: function (err) {
-      errors.push(err)
-    }
+  mockery.registerMock('./globals', {
+    console: {
+      error: function (err) {
+        errors.push(err)
+      }
+    },
+    process
   })
 
   t.plan(1)
@@ -249,6 +288,9 @@ test('help should provide help for a command', function (t) {
 
 test('help should provide help for a command', function (t) {
   var errors = []
+  var process = {
+    exitCode: 0
+  }
 
   mockery.enable({
     warnOnReplace: false,
@@ -256,10 +298,13 @@ test('help should provide help for a command', function (t) {
     useCleanCache: true
   })
 
-  mockery.registerMock('./log', {
-    error: function (err) {
-      errors.push(err)
-    }
+  mockery.registerMock('./globals', {
+    console: {
+      error: function (err) {
+        errors.push(err)
+      }
+    },
+    process
   })
 
   t.plan(1)
@@ -278,6 +323,9 @@ test('help should provide help for a command', function (t) {
 
 test('help should provide help for a command with description and args', function (t) {
   var errors = []
+  var process = {
+    exitCode: 0
+  }
 
   mockery.enable({
     warnOnReplace: false,
@@ -285,10 +333,13 @@ test('help should provide help for a command with description and args', functio
     useCleanCache: true
   })
 
-  mockery.registerMock('./log', {
-    error: function (err) {
-      errors.push(err)
-    }
+  mockery.registerMock('./globals', {
+    console: {
+      error: function (err) {
+        errors.push(err)
+      }
+    },
+    process
   })
 
   t.plan(1)

@@ -45,6 +45,9 @@ test('.describe should set a value on .description', function (t) {
 
 test('help should provide help for the command', function (t) {
   var errors = []
+  var process = {
+    exitCode: 0
+  }
 
   mockery.enable({
     warnOnReplace: false,
@@ -52,10 +55,13 @@ test('help should provide help for the command', function (t) {
     useCleanCache: true
   })
 
-  mockery.registerMock('./log', {
-    error: function (err) {
-      errors.push(err)
-    }
+  mockery.registerMock('./globals', {
+    console: {
+      error: function (err) {
+        errors.push(err)
+      }
+    },
+    process
   })
 
   var Command = require('../../lib/command')
@@ -71,6 +77,23 @@ test('help should provide help for the command', function (t) {
 })
 
 test('should pass errors through', function (t) {
+  var process = {
+    exitCode: 0
+  }
+
+  mockery.enable({
+    warnOnReplace: false,
+    warnOnUnregistered: false,
+    useCleanCache: true
+  })
+
+  mockery.registerMock('./globals', {
+    console: {
+      error: function () {}
+    },
+    process
+  })
+
   var Command = require('../../lib/command')
   var command = new Command(new Map())
 
@@ -78,9 +101,12 @@ test('should pass errors through', function (t) {
     throw new Error('testing errors')
   })
 
-  t.plan(1)
+  t.plan(2)
 
   command.run().catch(function (err) {
     t.equals(err.message, 'testing errors')
+    t.equals(process.exitCode, 1)
   })
+
+  mockery.disable()
 })
