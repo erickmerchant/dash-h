@@ -8,7 +8,7 @@ module.exports = function (argv, opts) {
 
     let split = optKey.split('-')
 
-    opts[optKey].name = split[0] + split.slice(1).map((part) => part.substr(0, 1).toUppercase() + part.substr(1)).join('')
+    opts[optKey].name = opts[optKey].name || split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')
 
     if (opts[optKey].aliases) {
       opts[optKey].aliases.forEach((alias) => {
@@ -22,14 +22,14 @@ module.exports = function (argv, opts) {
   let indexOfDashDash = argv.indexOf('--')
 
   if (indexOfDashDash > -1) {
-    argv = argv.slice(0, indexOfDashDash)
+    afterDashDash = argv.slice(indexOfDashDash + 1)
 
-    afterDashDash = argv.slice(indexOfDashDash)
+    argv = argv.slice(0, indexOfDashDash)
   }
 
   // normalize -abc and -abc=value
   argv = argv.reduce((argv, arg) => {
-    if (arg.startsWith('-') && !arg.startsWith('--')) {
+    if (arg !== '-' && arg.startsWith('-') && !arg.startsWith('--')) {
       if (arg.indexOf('=') > -1) {
         argv.push('-' + arg.substr(arg.indexOf('=') - 1))
 
@@ -38,7 +38,7 @@ module.exports = function (argv, opts) {
         arg = arg.substr(1)
       }
 
-      argv = argv.concat(arg.split('').map((arg) => '-' + arg + '='))
+      argv = argv.concat(arg.split('').map((arg) => '-' + arg))
     } else {
       argv.push(arg)
     }
@@ -48,12 +48,12 @@ module.exports = function (argv, opts) {
 
   let toBeDeleted = []
 
-  // loop through opts
-  Object.keys(opts).forEach((optKey) => {
-    let search = optKey.length === 1 ? '-' + optKey : '--' + optKey
-    let vals = []
+  // loop through argv
+  for (let i = 0; i < argv.length; i++) {
+    Object.keys(opts).forEach((optKey) => {
+      let search = optKey.length === 1 ? '-' + optKey : '--' + optKey
+      let vals = []
 
-    for (let i = 0; i < argv.length; i++) {
       if (argv[i] === search) {
         if (opts[optKey].type !== 'boolean') {
           if (argv[i + 1] != null && (!argv[i + 1].startsWith('-') || argv[i + 1].startsWith('---') || argv[i + 1] === '-')) {
@@ -71,30 +71,28 @@ module.exports = function (argv, opts) {
 
         toBeDeleted.push(i)
       }
-    }
 
-    console.log(vals)
+      if (opts[optKey].type != null) {
+        switch (opts[optKey].type) {
+          case 'number':
+            vals = vals.map((val) => Number(val))
+            break
 
-    if (opts[optKey].type != null) {
-      switch (opts[optKey].type) {
-        case 'number':
-          vals = vals.map((val) => Number(val))
-          break
-
-        case 'boolean':
-          vals = vals.map((val) => Boolean(val || true)) || [true]
-          break
+          case 'boolean':
+            vals = vals.map((val) => Boolean(val))
+            break
+        }
       }
-    }
 
-    if (vals != null) {
-      if (opts[optKey].multiple === true) {
-        args[opts[optKey].name] = args[opts[optKey].name] != null ? args[opts[optKey].name].concat(vals) : vals
-      } else {
-        args[opts[optKey].name] = vals.pop()
+      if (vals != null && vals.length) {
+        if (opts[optKey].multiple === true) {
+          args[opts[optKey].name] = args[opts[optKey].name] != null ? args[opts[optKey].name].concat(vals) : vals
+        } else {
+          args[opts[optKey].name] = vals.pop()
+        }
       }
-    }
-  })
+    })
+  }
 
   Object.keys(opts).filter((optKey) => opts[optKey].alias !== true).forEach((optKey) => {
     if (args[opts[optKey].name] == null && opts[optKey].default != null) {
@@ -115,8 +113,17 @@ module.exports = function (argv, opts) {
     return argv
   }, [])
 
+  // throw errors for unknown options
+  argv.forEach((arg) => {
+    if (arg.startsWith('-') && !arg.startsWith('---')) {
+      let key = arg.split('=')[0].substr(arg.startsWith('--') ? 2 : 1)
+
+      throw new Error('unknown option ' + key)
+    }
+  })
+
   // now handle _
-  args._ = argv.concat(afterDashDash)
+  args._ = argv.concat(afterDashDash).filter((arg) => arg !== '')
 
   return args
 }
