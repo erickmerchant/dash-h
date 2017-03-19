@@ -2,7 +2,7 @@ var test = require('tape')
 const parse = require('./parse')
 
 test('test parse', function (t) {
-  t.plan(10)
+  t.plan(12)
 
   t.deepEquals(parse('-- -a'.split(' '), {}), {_: ['-a']})
 
@@ -25,6 +25,25 @@ test('test parse', function (t) {
       aliases: ['a']
     }
   }), {_: [], aaA: 'bcd'})
+
+  t.deepEquals(parse(['-ba=bcd'], {
+    'aa-a': {
+      aliases: ['a']
+    },
+    b: {
+      type: 'boolean'
+    }
+  }), {_: [], aaA: 'bcd', b: true})
+
+  t.deepEquals(parse(['-ba'], {
+    'aa-a': {
+      type: 'boolean',
+      aliases: ['a']
+    },
+    b: {
+      type: 'boolean'
+    }
+  }), {_: [], aaA: true, b: true})
 
   t.deepEquals(parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     'aa-a': {
