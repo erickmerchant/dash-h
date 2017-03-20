@@ -76,13 +76,13 @@ module.exports = function (argv, opts) {
         }
       }
 
-      if (opts[optKey].type != null) {
-        let type = opts[optKey].type
-
-        vals = vals.map((val) => type(val))
-      }
-
       if (vals != null && vals.length) {
+        if (opts[optKey].type != null) {
+          let type = opts[optKey].type
+
+          vals = vals.map((val) => type(val))
+        }
+
         if (opts[optKey].multiple === true) {
           args[opts[optKey].property] = args[opts[optKey].property] != null ? args[opts[optKey].property].concat(vals) : vals
         } else {
