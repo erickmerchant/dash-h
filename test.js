@@ -1,14 +1,34 @@
 var test = require('tape')
-const parse = require('./parse')
 
 test('test parse', function (t) {
-  t.plan(15)
+  const parse = require('./parse')
 
-  // test dashdash
-  t.deepEquals(parse('-- -a'.split(' '), {}), {_: ['-a']})
+  t.plan(19)
+
+  // test dashdash and parameter
+  t.deepEquals(parse(['--', '-a'], {
+    '0': {
+      key: 'test'
+    }
+  }), {'test': '-a'})
+
+  // test dashdash and parameter with type
+  t.deepEquals(parse(['--', '123'], {
+    '0': {
+      type: Number,
+      key: 'test'
+    }
+  }), {'test': 123})
+
+  // test non-required parameter
+  t.deepEquals(parse([], {
+    '0': {
+      key: 'test'
+    }
+  }), {})
 
   // test empty
-  t.deepEquals(parse([''], {}), {_: []})
+  t.deepEquals(parse([''], {}), {})
 
   // test short
   t.deepEquals(parse(['-a'], {
@@ -16,14 +36,14 @@ test('test parse', function (t) {
       type: Boolean,
       aliases: ['a']
     }
-  }), {_: [], aaA: true})
+  }), {aaA: true})
 
   // test short with value
   t.deepEquals(parse(['-a=bcd'], {
     'aa-a': {
       aliases: ['a']
     }
-  }), {_: [], aaA: 'bcd'})
+  }), {aaA: 'bcd'})
 
   // test multiple short with value
   t.deepEquals(parse(['-ba=bcd'], {
@@ -33,7 +53,7 @@ test('test parse', function (t) {
     b: {
       type: Boolean
     }
-  }), {_: [], aaA: 'bcd', b: true})
+  }), {aaA: 'bcd', b: true})
 
   // test multiple short
   t.deepEquals(parse(['-ba'], {
@@ -44,7 +64,7 @@ test('test parse', function (t) {
     b: {
       type: Boolean
     }
-  }), {_: [], aaA: true, b: true})
+  }), {aaA: true, b: true})
 
   // test multiple, ---, and -
   t.deepEquals(parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
@@ -52,7 +72,7 @@ test('test parse', function (t) {
       multiple: true,
       aliases: ['a']
     }
-  }), {_: [], aaA: ['bcd', '---', '-']})
+  }), {aaA: ['bcd', '---', '-']})
 
   // test non-empty default
   t.deepEquals(parse(['-a'], {
@@ -60,7 +80,7 @@ test('test parse', function (t) {
       aliases: ['a'],
       default: ''
     }
-  }), {_: [], aaA: ''})
+  }), {aaA: ''})
 
   // test default with equals
   t.deepEquals(parse(['--aa-a='], {
@@ -68,7 +88,7 @@ test('test parse', function (t) {
       aliases: ['a'],
       default: 'abc'
     }
-  }), {_: [], aaA: ''})
+  }), {aaA: ''})
 
   // test boolean with value
   try {
@@ -127,4 +147,35 @@ test('test parse', function (t) {
   } catch (e) {
     t.equals(e.message, '--aaa is required')
   }
+
+  // test required parameter
+  try {
+    parse([], {
+      '0': {
+        key: 'test',
+        required: true
+      }
+    })
+  } catch (e) {
+    t.equals(e.message, 'test is required')
+  }
+
+  // test too many arguments
+  try {
+    parse(['--', '-a'], {})
+  } catch (e) {
+    t.equals(e.message, 'too many arguments')
+  }
+})
+
+test('test command', function (t) {
+  const command = require('./command')
+
+  t.plan(1)
+
+  t.ok(true)
+
+  command(function ({option, paramets}) {
+
+  })
 })

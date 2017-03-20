@@ -1,25 +1,29 @@
-module.exports = function (argv, opts) {
+module.exports = function (argv, definitions) {
   argv = argv.slice(0)
   const args = {}
 
-  // add a prop property and camelcase it and make aliases part of opts definitions
-  Object.keys(opts).forEach((optKey) => {
-    opts[optKey].key = optKey
+  // add a prop property and camelcase it and make aliases part of definitions definitions
+  Object.keys(definitions).forEach((key) => {
+    const definition = definitions[key]
 
-    let split = optKey.split('-')
+    if (definition.key == null) {
+      definition.key = key
+    }
 
-    opts[optKey].property = opts[optKey].property || split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')
+    const split = definition.key.split('-')
 
-    if (opts[optKey].aliases) {
-      opts[optKey].aliases.forEach((alias) => {
-        opts[alias] = Object.assign({}, opts[optKey], {alias: true})
+    definition.property = split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')
+
+    if (definition.aliases) {
+      definition.aliases.forEach((alias) => {
+        definitions[alias] = Object.assign({}, definition, {alias: true})
       })
     }
   })
 
   // handle arguments after --
   let afterDashDash = []
-  let indexOfDashDash = argv.indexOf('--')
+  const indexOfDashDash = argv.indexOf('--')
 
   if (indexOfDashDash > -1) {
     afterDashDash = argv.slice(indexOfDashDash + 1)
@@ -46,16 +50,18 @@ module.exports = function (argv, opts) {
     return argv
   }, [])
 
-  let toBeDeleted = []
+  const toBeDeleted = []
+  const optionKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)) === false)
 
   // loop through argv
   for (let i = 0; i < argv.length; i++) {
-    Object.keys(opts).forEach((optKey) => {
-      let search = optKey.length === 1 ? '-' + optKey : '--' + optKey
+    optionKeys.forEach((key) => {
+      const search = key.length === 1 ? '-' + key : '--' + key
+      const definition = definitions[key]
       let vals = []
 
       if (argv[i] === search) {
-        if (opts[optKey].type !== Boolean) {
+        if (definition.type !== Boolean) {
           if (argv[i + 1] != null && (!argv[i + 1].startsWith('-') || argv[i + 1].startsWith('---') || argv[i + 1] === '-')) {
             vals.push(argv[i + 1])
 
@@ -67,38 +73,38 @@ module.exports = function (argv, opts) {
 
         toBeDeleted.push(i)
       } else if (argv[i].startsWith(search + '=')) {
-        if (opts[optKey].type !== Boolean) {
+        if (definition.type !== Boolean) {
           vals.push(argv[i].substr(argv[i].indexOf('=') + 1))
 
           toBeDeleted.push(i)
         } else {
-          throw new Error((opts[optKey].key.length === 1 ? '-' : '--') + opts[optKey].key + ' is a boolean and does not accept a value')
+          throw new Error((definition.key.length === 1 ? '-' : '--') + definition.key + ' is a boolean and does not accept a value')
         }
       }
 
       if (vals != null && vals.length) {
-        if (opts[optKey].type != null) {
-          let type = opts[optKey].type
-
-          vals = vals.map((val) => type(val))
+        if (definition.type != null) {
+          vals = vals.map((val) => definition.type(val))
         }
 
-        if (opts[optKey].multiple === true) {
-          args[opts[optKey].property] = args[opts[optKey].property] != null ? args[opts[optKey].property].concat(vals) : vals
+        if (definition.multiple === true) {
+          args[definition.property] = args[definition.property] != null ? args[definition.property].concat(vals) : vals
         } else {
-          args[opts[optKey].property] = vals.pop()
+          args[definition.property] = vals.pop()
         }
       }
     })
   }
 
-  Object.keys(opts).filter((optKey) => opts[optKey].alias !== true).forEach((optKey) => {
-    if (args[opts[optKey].property] == null && opts[optKey].default != null) {
-      args[opts[optKey].property] = opts[optKey].default
+  optionKeys.filter((key) => definitions[key].alias !== true).forEach((key) => {
+    const definition = definitions[key]
+
+    if (args[definition.property] == null && definition.default != null) {
+      args[definition.property] = definition.default
     }
 
-    if (args[opts[optKey].property] == null && opts[optKey].required === true) {
-      throw new Error((opts[optKey].key.length === 1 ? '-' : '--') + opts[optKey].key + ' is required')
+    if (args[definition.property] == null && definition.required === true) {
+      throw new Error((definition.key.length === 1 ? '-' : '--') + definitions[key].key + ' is required')
     }
   })
 
@@ -114,14 +120,32 @@ module.exports = function (argv, opts) {
   // throw errors for unknown options
   argv.forEach((arg) => {
     if (arg.startsWith('-') && !arg.startsWith('---')) {
-      let key = arg.split('=')[0]
-
-      throw new Error('unknown option ' + key)
+      throw new Error('unknown option ' + arg.split('=')[0])
     }
   })
 
-  // now handle _
-  args._ = argv.concat(afterDashDash).filter((arg) => arg !== '')
+  // now handle parameters or postional options
+  const remainder = argv.concat(afterDashDash).filter((arg) => arg !== '')
+
+  const paramKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)))
+
+  if (remainder.length > paramKeys.length) {
+    throw new Error('too many arguments')
+  }
+
+  paramKeys.forEach((key) => {
+    const definition = definitions[key]
+
+    if (remainder[key] == null) {
+      if (definition.required === true) {
+        throw new Error(definition.key + ' is required')
+      }
+    } else if (definition.type) {
+      args[definition.property] = definition.type(remainder[key])
+    } else {
+      args[definition.property] = remainder[key]
+    }
+  })
 
   return args
 }
