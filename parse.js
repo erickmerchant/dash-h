@@ -2,13 +2,13 @@ module.exports = function (argv, opts) {
   argv = argv.slice(0)
   const args = {}
 
-  // add a name prop and camelcase it and make aliases part of opts definitions
+  // add a prop property and camelcase it and make aliases part of opts definitions
   Object.keys(opts).forEach((optKey) => {
     opts[optKey].key = optKey
 
     let split = optKey.split('-')
 
-    opts[optKey].name = opts[optKey].name || split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')
+    opts[optKey].property = opts[optKey].property || split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')
 
     if (opts[optKey].aliases) {
       opts[optKey].aliases.forEach((alias) => {
@@ -55,7 +55,7 @@ module.exports = function (argv, opts) {
       let vals = []
 
       if (argv[i] === search) {
-        if (opts[optKey].type !== 'boolean') {
+        if (opts[optKey].type !== Boolean) {
           if (argv[i + 1] != null && (!argv[i + 1].startsWith('-') || argv[i + 1].startsWith('---') || argv[i + 1] === '-')) {
             vals.push(argv[i + 1])
 
@@ -67,40 +67,38 @@ module.exports = function (argv, opts) {
 
         toBeDeleted.push(i)
       } else if (argv[i].startsWith(search + '=')) {
-        vals.push(argv[i].substr(argv[i].indexOf('=') + 1))
+        if (opts[optKey].type !== Boolean) {
+          vals.push(argv[i].substr(argv[i].indexOf('=') + 1))
 
-        toBeDeleted.push(i)
+          toBeDeleted.push(i)
+        } else {
+          throw new Error((opts[optKey].key.length === 1 ? '-' : '--') + opts[optKey].key + ' is a boolean and does not accept a value')
+        }
       }
 
       if (opts[optKey].type != null) {
-        switch (opts[optKey].type) {
-          case 'number':
-            vals = vals.map((val) => Number(val))
-            break
+        let type = opts[optKey].type
 
-          case 'boolean':
-            vals = vals.map((val) => Boolean(val))
-            break
-        }
+        vals = vals.map((val) => type(val))
       }
 
       if (vals != null && vals.length) {
         if (opts[optKey].multiple === true) {
-          args[opts[optKey].name] = args[opts[optKey].name] != null ? args[opts[optKey].name].concat(vals) : vals
+          args[opts[optKey].property] = args[opts[optKey].property] != null ? args[opts[optKey].property].concat(vals) : vals
         } else {
-          args[opts[optKey].name] = vals.pop()
+          args[opts[optKey].property] = vals.pop()
         }
       }
     })
   }
 
   Object.keys(opts).filter((optKey) => opts[optKey].alias !== true).forEach((optKey) => {
-    if (args[opts[optKey].name] == null && opts[optKey].default != null) {
-      args[opts[optKey].name] = opts[optKey].default
+    if (args[opts[optKey].property] == null && opts[optKey].default != null) {
+      args[opts[optKey].property] = opts[optKey].default
     }
 
-    if (args[opts[optKey].name] == null && opts[optKey].required === true) {
-      throw new Error(opts[optKey].key + ' is required')
+    if (args[opts[optKey].property] == null && opts[optKey].required === true) {
+      throw new Error((opts[optKey].key.length === 1 ? '-' : '--') + opts[optKey].key + ' is required')
     }
   })
 
@@ -116,7 +114,7 @@ module.exports = function (argv, opts) {
   // throw errors for unknown options
   argv.forEach((arg) => {
     if (arg.startsWith('-') && !arg.startsWith('---')) {
-      let key = arg.split('=')[0].substr(arg.startsWith('--') ? 2 : 1)
+      let key = arg.split('=')[0]
 
       throw new Error('unknown option ' + key)
     }

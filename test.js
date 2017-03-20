@@ -2,49 +2,51 @@ var test = require('tape')
 const parse = require('./parse')
 
 test('test parse', function (t) {
-  t.plan(12)
+  t.plan(15)
 
+  // test dashdash
   t.deepEquals(parse('-- -a'.split(' '), {}), {_: ['-a']})
 
-  t.deepEquals(parse([''], {
-    'aa-a': {
-      type: 'boolean',
-      default: false
-    }
-  }), {_: [], aaA: false})
+  // test empty
+  t.deepEquals(parse([''], {}), {_: []})
 
+  // test short
   t.deepEquals(parse(['-a'], {
     'aa-a': {
-      type: 'boolean',
+      type: Boolean,
       aliases: ['a']
     }
   }), {_: [], aaA: true})
 
+  // test short with value
   t.deepEquals(parse(['-a=bcd'], {
     'aa-a': {
       aliases: ['a']
     }
   }), {_: [], aaA: 'bcd'})
 
+  // test multiple short with value
   t.deepEquals(parse(['-ba=bcd'], {
     'aa-a': {
       aliases: ['a']
     },
     b: {
-      type: 'boolean'
+      type: Boolean
     }
   }), {_: [], aaA: 'bcd', b: true})
 
+  // test multiple short
   t.deepEquals(parse(['-ba'], {
     'aa-a': {
-      type: 'boolean',
+      type: Boolean,
       aliases: ['a']
     },
     b: {
-      type: 'boolean'
+      type: Boolean
     }
   }), {_: [], aaA: true, b: true})
 
+  // test multiple, ---, and -
   t.deepEquals(parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     'aa-a': {
       multiple: true,
@@ -52,6 +54,7 @@ test('test parse', function (t) {
     }
   }), {_: [], aaA: ['bcd', '---', '-']})
 
+  // test non-empty default
   t.deepEquals(parse(['-a'], {
     'aa-a': {
       aliases: ['a'],
@@ -59,26 +62,51 @@ test('test parse', function (t) {
     }
   }), {_: [], aaA: ''})
 
-  t.deepEquals(parse(['-a=123', '-a=456'], {
+  // test default with equals
+  t.deepEquals(parse(['--aa-a='], {
     'aa-a': {
-      type: 'number',
-      multiple: true,
-      aliases: ['a']
+      aliases: ['a'],
+      default: 'abc'
     }
-  }), {_: [], aaA: [123, 456]})
+  }), {_: [], aaA: ''})
 
+  // test boolean with value
+  try {
+    parse(['-a=abc'], {
+      a: {
+        type: Boolean
+      }
+    })
+  } catch (e) {
+    t.equals(e.message, '-a is a boolean and does not accept a value')
+  }
+
+  // test boolean with value
+  try {
+    parse(['--aaa=abc'], {
+      aaa: {
+        type: Boolean
+      }
+    })
+  } catch (e) {
+    t.equals(e.message, '--aaa is a boolean and does not accept a value')
+  }
+
+  // test unknown
   try {
     parse(['-a'], {})
   } catch (e) {
-    t.equals(e.message, 'unknown option a')
+    t.equals(e.message, 'unknown option -a')
   }
 
+  // test unknown
   try {
     parse(['--aaa'], {})
   } catch (e) {
-    t.equals(e.message, 'unknown option aaa')
+    t.equals(e.message, 'unknown option --aaa')
   }
 
+  // test required
   try {
     parse([''], {
       a: {
@@ -86,6 +114,17 @@ test('test parse', function (t) {
       }
     })
   } catch (e) {
-    t.equals(e.message, 'a is required')
+    t.equals(e.message, '-a is required')
+  }
+
+  // test required
+  try {
+    parse([''], {
+      aaa: {
+        required: true
+      }
+    })
+  } catch (e) {
+    t.equals(e.message, '--aaa is required')
   }
 })
