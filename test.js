@@ -1,4 +1,11 @@
-var test = require('tape')
+const test = require('tape')
+const mockery = require('mockery')
+const chalk = require('chalk')
+const mockerySettings = {
+  useCleanCache: true,
+  warnOnReplace: false,
+  warnOnUnregistered: false
+}
 
 test('test parse', function (t) {
   const parse = require('./parse')
@@ -166,6 +173,53 @@ test('test parse', function (t) {
   } catch (e) {
     t.equals(e.message, 'too many arguments')
   }
+})
+
+test('test error', function (t) {
+  mockery.enable(mockerySettings)
+
+  const messages = []
+
+  const globals = {
+    process: {
+      exitCode: 0
+    },
+    Error: function Error (message, stack) {
+      this.message = message
+      this.stack = stack
+    },
+    console: {
+      log: function (message) {
+        messages.push(message)
+      },
+      error: function (message) {
+        messages.push(message)
+      }
+    }
+  }
+
+  mockery.registerMock('./globals', globals)
+
+  const error = require('./error')
+
+  error(new globals.Error('testing errors', ['at thing (file.js:123:45)', 'at another'].join('\n')))
+
+  error(new globals.Error('testing errors'))
+
+  error()
+
+  t.plan(2)
+
+  t.equals(1, globals.process.exitCode)
+
+  t.deepEquals(messages, [
+    chalk.red('testing errors'),
+    'at thing ' + chalk.gray('(file.js:123:45)'),
+    'at another',
+    chalk.red('testing errors')
+  ])
+
+  mockery.disable()
 })
 
 test('test command', function (t) {

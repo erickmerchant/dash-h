@@ -4,10 +4,17 @@ const help = require('./help')
 
 module.exports = function (define) {
   const definitions = {}
+
+  option('help', {
+    type: Boolean,
+    aliases: ['h'],
+    description: 'get help'
+  })
+
   const action = define({option, parameter})
   let i = 0
 
-  return function (argv) {
+  return (argv) => {
     try {
       const args = parse(argv, definitions)
 
