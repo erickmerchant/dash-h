@@ -7,12 +7,16 @@ module.exports = function (error) {
   process.exitCode = 1
 
   if (typeof error === 'object' && error instanceof Error) {
-    console.error(chalk.red(error.message))
-
     if (error.stack != null) {
-      error.stack.split('\n').map((line) => line.match(/^(.*?)(\(.*\))?$/)).forEach((parts) => {
-        console.error(parts[1] + (parts[2] != null ? chalk.gray(parts[2]) : ''))
+      const stack = error.stack.split('\n')
+
+      console.error(chalk.red(stack.shift()))
+
+      stack.map((line) => line.match(/^(.*?)(\(.*\))?$/)).forEach((parts) => {
+        console.error(chalk.gray(parts[1]) + (parts[2] != null ? parts[2] : ''))
       })
+    } else {
+      console.error(chalk.red(error.message))
     }
   }
 }

@@ -7,7 +7,7 @@ const mockerySettings = {
   warnOnUnregistered: false
 }
 
-test('test parse', function (t) {
+test('test ./parse', function (t) {
   const parse = require('./parse')
 
   t.plan(19)
@@ -175,7 +175,98 @@ test('test parse', function (t) {
   }
 })
 
-test('test error', function (t) {
+test('test ./help', function (t) {
+  mockery.enable(mockerySettings)
+
+  const messages = []
+
+  const globals = {
+    console: {
+      error: function (message) {
+        messages.push(message)
+      }
+    },
+    process: {
+      exitCode: 0
+    }
+  }
+
+  mockery.registerMock('./globals', globals)
+
+  const help = require('./help')
+
+  help('test-command', {
+    '0': {
+      key: 'p0',
+      required: true
+    },
+    '1': {
+      key: 'p1',
+      default: 'a default'
+    },
+    'aaa': {
+      aliases: ['aa', 'a'],
+      type: Boolean,
+      multiple: true,
+      description: 'a Boolean'
+    },
+    'b': {
+      type: Number,
+      description: 'a Number'
+    }
+  })
+
+  help('test-command', {
+    '0': {
+      key: 'p0',
+      required: true
+    }
+  })
+
+  help('test-command', {
+    'aaa': {
+      aliases: ['aa', 'a'],
+      type: Boolean,
+      multiple: true,
+      description: 'a Boolean'
+    }
+  })
+
+  t.plan(2)
+
+  t.equals(1, globals.process.exitCode)
+
+  t.deepEquals(messages, [
+    chalk.green('Usage:') + ' test-command [options] p0 p1',
+    '',
+    chalk.green('Parameters:'),
+    '',
+    'p0  ' + chalk.gray('Required'),
+    'p1  ' + chalk.gray('Default: a default'),
+    '',
+    chalk.green('Options:'),
+    '',
+    ' --aaa,--aa,-a  ' + chalk.gray('a Boolean. Type: Boolean. Multiple'),
+    '            -b  ' + chalk.gray('a Number. Type: Number'),
+    '',
+    chalk.green('Usage:') + ' test-command [options] p0',
+    '',
+    chalk.green('Parameters:'),
+    '',
+    'p0  ' + chalk.gray('Required'),
+    '',
+    chalk.green('Usage:') + ' test-command [options] ',
+    '',
+    chalk.green('Options:'),
+    '',
+    ' --aaa,--aa,-a  ' + chalk.gray('a Boolean. Type: Boolean. Multiple'),
+    ''
+  ])
+
+  mockery.disable()
+})
+
+test('test ./error', function (t) {
   mockery.enable(mockerySettings)
 
   const messages = []
@@ -189,9 +280,6 @@ test('test error', function (t) {
       this.stack = stack
     },
     console: {
-      log: function (message) {
-        messages.push(message)
-      },
       error: function (message) {
         messages.push(message)
       }
@@ -202,7 +290,7 @@ test('test error', function (t) {
 
   const error = require('./error')
 
-  error(new globals.Error('testing errors', ['at thing (file.js:123:45)', 'at another'].join('\n')))
+  error(new globals.Error('testing errors', ['testing errors', 'at thing (file.js:123:45)', 'at another'].join('\n')))
 
   error(new globals.Error('testing errors'))
 
@@ -214,7 +302,7 @@ test('test error', function (t) {
 
   t.deepEquals(messages, [
     chalk.red('testing errors'),
-    'at thing ' + chalk.gray('(file.js:123:45)'),
+    chalk.gray('at thing ') + '(file.js:123:45)',
     'at another',
     chalk.red('testing errors')
   ])
@@ -222,14 +310,167 @@ test('test error', function (t) {
   mockery.disable()
 })
 
-test('test command', function (t) {
+test('test ./command - no help. no errors', function (t) {
+  mockery.enable(mockerySettings)
+
+  mockery.registerMock('./parse', mockedParse)
+
   const command = require('./command')
+
+  t.plan(3)
+
+  function mockedParse (argv, definitions) {
+    t.deepEquals(argv, ['testing'])
+
+    t.deepEquals(definitions, {
+      '0': {
+        key: 'aaa',
+        testing: true
+      },
+      bbb: {
+        testing: true
+      },
+      help: {
+        aliases: [ 'h' ],
+        description: 'get help',
+        type: Boolean
+      }
+    })
+
+    return {}
+  }
+
+  const testCommand = command('test-command', function ({option, parameter}) {
+    parameter('aaa', {
+      testing: true
+    })
+
+    option('bbb', {
+      testing: true
+    })
+
+    return function () {
+      t.ok(true)
+    }
+  })
+
+  testCommand(['testing'])
+
+  mockery.disable()
+})
+
+test('test ./command - help', function (t) {
+  mockery.enable(mockerySettings)
+
+  mockery.registerMock('./parse', mockedParse)
+
+  mockery.registerMock('./help', mockedHelp)
+
+  const command = require('./command')
+
+  t.plan(2)
+
+  function mockedParse (argv, definitions) {
+    return {
+      help: true
+    }
+  }
+
+  function mockedHelp (name, definitions) {
+    t.equals(name, 'test-command')
+
+    t.deepEquals(definitions, {
+      '0': {
+        key: 'aaa',
+        testing: true
+      },
+      bbb: {
+        testing: true
+      },
+      help: {
+        aliases: [ 'h' ],
+        description: 'get help',
+        type: Boolean
+      }
+    })
+  }
+
+  const testCommand = command('test-command', function ({parameter, option}) {
+    parameter('aaa', {
+      testing: true
+    })
+
+    option('bbb', {
+      testing: true
+    })
+    return function () {}
+  })
+
+  testCommand(['testing'])
+
+  mockery.disable()
+})
+
+test('test ./command - thrown error', function (t) {
+  mockery.enable(mockerySettings)
+
+  mockery.registerMock('./parse', mockedParse)
+
+  mockery.registerMock('./error', mockedError)
+
+  const command = require('./command')
+
+  const ourError = new Error('testing errors')
 
   t.plan(1)
 
-  t.ok(true)
+  function mockedParse () {
+    return {}
+  }
 
-  command(function ({option, paramets}) {
+  function mockedError (error) {
+    t.deepEquals(error, ourError)
+  }
 
+  const testCommand = command('test-command', function () {
+    return function () {
+      throw ourError
+    }
   })
+
+  testCommand(['testing'])
+
+  mockery.disable()
+})
+
+test('test ./command - rejected promise', function (t) {
+  mockery.enable(mockerySettings)
+
+  mockery.registerMock('./parse', mockedParse)
+
+  mockery.registerMock('./error', mockedError)
+
+  const command = require('./command')
+
+  const ourError = new Error('testing errors')
+
+  t.plan(1)
+
+  function mockedParse () {
+    return {}
+  }
+
+  function mockedError (error) {
+    t.deepEquals(error, ourError)
+  }
+
+  const testCommand = command('test-command', function () {
+    return function () {
+      return Promise.reject(ourError)
+    }
+  })
+
+  testCommand(['testing'])
+
+  mockery.disable()
 })

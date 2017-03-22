@@ -2,7 +2,7 @@ const parse = require('./parse')
 const error = require('./error')
 const help = require('./help')
 
-module.exports = function (define) {
+module.exports = function (name, define) {
   const definitions = {}
 
   option('help', {
@@ -11,17 +11,15 @@ module.exports = function (define) {
     description: 'get help'
   })
 
-  const action = define({option, parameter})
   let i = 0
+  const action = define({option, parameter})
 
   return (argv) => {
     try {
       const args = parse(argv, definitions)
 
       if (args.help === true) {
-        help(definitions)
-
-        error()
+        help(name, definitions)
       } else {
         const result = action(args)
 

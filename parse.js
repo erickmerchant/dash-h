@@ -2,7 +2,6 @@ module.exports = function (argv, definitions) {
   argv = argv.slice(0)
   const args = {}
 
-  // add a prop property and camelcase it and make aliases part of definitions definitions
   Object.keys(definitions).forEach((key) => {
     const definition = definitions[key]
 
@@ -21,7 +20,6 @@ module.exports = function (argv, definitions) {
     }
   })
 
-  // handle arguments after --
   let afterDashDash = []
   const indexOfDashDash = argv.indexOf('--')
 
@@ -31,7 +29,6 @@ module.exports = function (argv, definitions) {
     argv = argv.slice(0, indexOfDashDash)
   }
 
-  // normalize -abc and -abc=value
   argv = argv.reduce((argv, arg) => {
     if (arg !== '-' && arg.startsWith('-') && !arg.startsWith('--')) {
       if (arg.indexOf('=') > -1) {
@@ -53,7 +50,6 @@ module.exports = function (argv, definitions) {
   const toBeDeleted = []
   const optionKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)) === false)
 
-  // loop through argv
   for (let i = 0; i < argv.length; i++) {
     optionKeys.forEach((key) => {
       const search = key.length === 1 ? '-' + key : '--' + key
@@ -99,16 +95,17 @@ module.exports = function (argv, definitions) {
   optionKeys.filter((key) => definitions[key].alias !== true).forEach((key) => {
     const definition = definitions[key]
 
-    if (args[definition.property] == null && definition.default != null) {
-      args[definition.property] = definition.default
-    }
+    if (args[definition.property] == null) {
+      if (definition.default != null) {
+        args[definition.property] = definition.default
+      }
 
-    if (args[definition.property] == null && definition.required === true) {
-      throw new Error((definition.key.length === 1 ? '-' : '--') + definitions[key].key + ' is required')
+      if (definition.required === true) {
+        throw new Error((definition.key.length === 1 ? '-' : '--') + definitions[key].key + ' is required')
+      }
     }
   })
 
-  // delete used argv items
   argv = argv.reduce((argv, arg, i) => {
     if (!toBeDeleted.includes(i)) {
       argv.push(arg)
@@ -117,23 +114,21 @@ module.exports = function (argv, definitions) {
     return argv
   }, [])
 
-  // throw errors for unknown options
   argv.forEach((arg) => {
     if (arg.startsWith('-') && !arg.startsWith('---')) {
       throw new Error('unknown option ' + arg.split('=')[0])
     }
   })
 
-  // now handle parameters or postional options
   const remainder = argv.concat(afterDashDash).filter((arg) => arg !== '')
 
-  const paramKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)))
+  const parameterKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)))
 
-  if (remainder.length > paramKeys.length) {
+  if (remainder.length > parameterKeys.length) {
     throw new Error('too many arguments')
   }
 
-  paramKeys.forEach((key) => {
+  parameterKeys.forEach((key) => {
     const definition = definitions[key]
 
     if (remainder[key] == null) {
