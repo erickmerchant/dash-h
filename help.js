@@ -3,6 +3,8 @@ const console = require('./globals').console
 const process = require('./globals').process
 
 module.exports = function (name, definitions) {
+  definitions = Object.assign({}, definitions)
+
   process.exitCode = 1
 
   Object.keys(definitions).forEach(function (key) {

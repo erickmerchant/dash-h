@@ -1,4 +1,6 @@
 module.exports = function (argv, definitions) {
+  definitions = Object.assign({}, definitions)
+
   argv = argv.slice(0)
   const args = {}
 
