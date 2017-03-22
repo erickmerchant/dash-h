@@ -2,9 +2,9 @@
   "name": "sergeant",
   "version": "14.1.1",
   "description": "",
-  "main": "application.js",
+  "main": "command.js",
   "scripts": {
-    "test": "standard && tape 'test/**/*.js' | faucet",
+    "test": "standard && tape test.js | faucet",
     "cover": "nyc --reporter=html npm test"
   },
   "repository": {
