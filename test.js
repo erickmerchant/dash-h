@@ -10,7 +10,7 @@ const mockerySettings = {
 test('test ./parse', function (t) {
   const parse = require('./parse')
 
-  t.plan(20)
+  t.plan(12)
 
   // test dashdash and parameter
   t.deepEquals(parse(['--', '-a'], {
@@ -105,83 +105,89 @@ test('test ./parse', function (t) {
       default: 'yes'
     }
   }), {'0': 'testing', '1': 'yes'})
+})
+
+test('test ./parse - with errors', function (t) {
+  mockery.enable(mockerySettings)
+
+  const messages = []
+
+  const globals = {
+    console: {
+      error: function (message) {
+        messages.push(message)
+      }
+    },
+    process: {
+      exitCode: 0
+    }
+  }
+
+  mockery.registerMock('./globals', globals)
+
+  const parse = require('./parse')
+
+  t.plan(2)
 
   // test boolean with value
-  try {
-    parse(['-a=abc'], {
-      a: {
-        type: Boolean
-      }
-    })
-  } catch (e) {
-    t.equals(e.message, '-a is a boolean and does not accept a value')
-  }
+  parse(['-a=abc'], {
+    a: {
+      type: Boolean
+    }
+  })
 
   // test boolean with value
-  try {
-    parse(['--aaa=abc'], {
-      aaa: {
-        type: Boolean
-      }
-    })
-  } catch (e) {
-    t.equals(e.message, '--aaa is a boolean and does not accept a value')
-  }
+  parse(['--aaa=abc'], {
+    aaa: {
+      type: Boolean
+    }
+  })
 
   // test unknown
-  try {
-    parse(['-a'], {})
-  } catch (e) {
-    t.equals(e.message, 'unknown option -a')
-  }
+  parse(['-a'], {})
 
   // test unknown
-  try {
-    parse(['--aaa'], {})
-  } catch (e) {
-    t.equals(e.message, 'unknown option --aaa')
-  }
+  parse(['--aaa'], {})
 
   // test required
-  try {
-    parse([''], {
-      a: {
-        required: true
-      }
-    })
-  } catch (e) {
-    t.equals(e.message, '-a is required')
-  }
+  parse([''], {
+    a: {
+      required: true
+    }
+  })
 
   // test required
-  try {
-    parse([''], {
-      aaa: {
-        required: true
-      }
-    })
-  } catch (e) {
-    t.equals(e.message, '--aaa is required')
-  }
+  parse([''], {
+    aaa: {
+      required: true
+    }
+  })
 
   // test required parameter
-  try {
-    parse([], {
-      '0': {
-        key: 'test',
-        required: true
-      }
-    })
-  } catch (e) {
-    t.equals(e.message, 'test is required')
-  }
+  parse([], {
+    '0': {
+      key: 'test',
+      required: true
+    }
+  })
 
   // test too many arguments
-  try {
-    parse(['--', '-a'], {})
-  } catch (e) {
-    t.equals(e.message, 'too many arguments')
-  }
+  parse(['--', '-a'], {})
+
+  t.equals(1, globals.process.exitCode)
+
+  t.deepEquals(messages, [
+    chalk.red('-a is a boolean and does not accept a value'),
+    chalk.red('--aaa is a boolean and does not accept a value'),
+    chalk.red('unknown option -a'),
+    chalk.red('unknown option --aaa'),
+    chalk.red('-a is required'),
+    chalk.red('--aaa is required'),
+    chalk.red('test is required'),
+    chalk.red('too many arguments')
+  ])
+
+  mockery.disable()
 })
 
 test('test ./help', function (t) {

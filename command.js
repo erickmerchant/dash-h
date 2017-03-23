@@ -15,20 +15,22 @@ module.exports = function (name, define) {
   const action = define({option, parameter})
 
   return (argv) => {
-    try {
-      const args = parse(argv, definitions)
+    const args = parse(argv, definitions)
 
-      if (args.help === true) {
-        help(name, definitions)
-      } else {
-        const result = action(args)
+    if (args != null) {
+      try {
+        if (args.help === true) {
+          help(name, definitions)
+        } else {
+          const result = action(args)
 
-        if (typeof result === 'object' && result instanceof Promise) {
-          result.catch(error)
+          if (typeof result === 'object' && result instanceof Promise) {
+            result.catch(error)
+          }
         }
+      } catch (e) {
+        error(e)
       }
-    } catch (e) {
-      error(e)
     }
   }
 
