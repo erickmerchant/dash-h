@@ -1,6 +1,6 @@
 {
   "name": "sergeant",
-  "version": "15.0.1",
+  "version": "15.0.2",
   "description": "",
   "main": "command.js",
   "scripts": {
