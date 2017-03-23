@@ -10,7 +10,7 @@ const mockerySettings = {
 test('test ./parse', function (t) {
   const parse = require('./parse')
 
-  t.plan(19)
+  t.plan(20)
 
   // test dashdash and parameter
   t.deepEquals(parse(['--', '-a'], {
@@ -96,6 +96,15 @@ test('test ./parse', function (t) {
       default: 'abc'
     }
   }), {aaA: ''})
+
+  // test default parameter
+  t.deepEquals(parse(['testing'], {
+    '0': {
+    },
+    '1': {
+      default: 'yes'
+    }
+  }), {'0': 'testing', '1': 'yes'})
 
   // test boolean with value
   try {

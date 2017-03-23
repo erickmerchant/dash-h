@@ -102,7 +102,7 @@ module.exports = function (argv, definitions) {
         args[definition.property] = definition.default
       }
 
-      if (definition.required === true) {
+      if (definition.required === true && args['help'] !== true) {
         throw new Error((definition.key.length === 1 ? '-' : '--') + definitions[key].key + ' is required')
       }
     }
@@ -134,7 +134,11 @@ module.exports = function (argv, definitions) {
     const definition = definitions[key]
 
     if (remainder[key] == null) {
-      if (definition.required === true) {
+      if (definition.default != null) {
+        args[definition.property] = definition.default
+      }
+
+      if (definition.required === true && args['help'] !== true) {
         throw new Error(definition.key + ' is required')
       }
     } else if (definition.type) {
