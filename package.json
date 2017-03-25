@@ -2,7 +2,7 @@
   "name": "sergeant",
   "version": "15.0.2",
   "description": "",
-  "main": "command.js",
+  "main": "main.js",
   "scripts": {
     "test": "standard && tape test.js | faucet",
     "cover": "nyc --reporter=html npm test"

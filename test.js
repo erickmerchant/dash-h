@@ -210,7 +210,7 @@ test('test ./help', function (t) {
 
   const help = require('./help')
 
-  help('test-command', {
+  help('test-command', '', {
     '0': {
       key: 'p0',
       required: true
@@ -231,14 +231,20 @@ test('test ./help', function (t) {
     }
   })
 
-  help('test-command', {
+  help('test-command', 'a test command', {
     '0': {
       key: 'p0',
       required: true
     }
+  }, {
+    'sub-command-b': {
+    },
+    'sub-command': {
+      description: 'a sub command'
+    }
   })
 
-  help('test-command', {
+  help('test-command', 'a test command', {
     'aaa': {
       aliases: ['aa', 'a'],
       type: Boolean,
@@ -266,11 +272,20 @@ test('test ./help', function (t) {
     '',
     chalk.green('Usage:') + ' test-command [options] p0',
     '',
+    'a test command',
+    '',
     chalk.green('Parameters:'),
     '',
     'p0  ' + chalk.gray('Required'),
     '',
+    chalk.green('Additional Commands:'),
+    '',
+    'test-command sub-command-b  ' + chalk.gray(''),
+    'test-command sub-command    ' + chalk.gray('a sub command'),
+    '',
     chalk.green('Usage:') + ' test-command [options] ',
+    '',
+    'a test command',
     '',
     chalk.green('Options:'),
     '',
@@ -330,7 +345,7 @@ test('test ./command - no help. no errors', function (t) {
 
   mockery.registerMock('./parse', mockedParse)
 
-  const command = require('./command')
+  const command = require('./main')
 
   t.plan(3)
 
@@ -381,7 +396,7 @@ test('test ./command - help', function (t) {
 
   mockery.registerMock('./help', mockedHelp)
 
-  const command = require('./command')
+  const command = require('./main')
 
   t.plan(2)
 
@@ -391,7 +406,7 @@ test('test ./command - help', function (t) {
     }
   }
 
-  function mockedHelp (name, definitions) {
+  function mockedHelp (name, description, definitions) {
     t.equals(name, 'test-command')
 
     t.deepEquals(definitions, {
@@ -433,7 +448,7 @@ test('test ./command - thrown error', function (t) {
 
   mockery.registerMock('./error', mockedError)
 
-  const command = require('./command')
+  const command = require('./main')
 
   const ourError = new Error('testing errors')
 
@@ -465,7 +480,7 @@ test('test ./command - rejected promise', function (t) {
 
   mockery.registerMock('./error', mockedError)
 
-  const command = require('./command')
+  const command = require('./main')
 
   const ourError = new Error('testing errors')
 
@@ -486,6 +501,37 @@ test('test ./command - rejected promise', function (t) {
   })
 
   testCommand(['testing'])
+
+  mockery.disable()
+})
+
+test('test ./command - sub commands', function (t) {
+  mockery.enable(mockerySettings)
+
+  mockery.registerMock('./parse', () => { return {} })
+
+  const command = require('./main')
+
+  t.plan(1)
+
+  const testCommand = command('test-command', function ({option, parameter, command}) {
+    command('sub-command', 'a sub command', () => {
+      return function () {
+        t.ok(true)
+      }
+    })
+
+    command('sub-command-b', () => {
+    })
+
+    return function () {
+      t.ok(false)
+    }
+  })
+
+  testCommand(['sub-command'])
+
+  testCommand(['sub-command-b'])
 
   mockery.disable()
 })

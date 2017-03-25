@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const console = require('./globals').console
 const process = require('./globals').process
 
-module.exports = function (name, definitions) {
+module.exports = function (name, description, definitions, commands = {}) {
   definitions = Object.assign({}, definitions)
 
   process.exitCode = 1
@@ -27,6 +27,12 @@ module.exports = function (name, definitions) {
   console.error(chalk.green('Usage:') + ' ' + name + ' [options] ' + parameterKeys.map((key) => definitions[key].signature).join(' '))
 
   console.error('')
+
+  if (description) {
+    console.error(description)
+
+    console.error('')
+  }
 
   if (parameterKeys.length) {
     console.error(chalk.green('Parameters:'))
@@ -69,6 +75,26 @@ module.exports = function (name, definitions) {
       const details = describe(definition)
 
       console.error(' '.repeat(longestOption - definition.signature.length) + definition.signature + '  ' + details)
+    })
+
+    console.error('')
+  }
+
+  const commandKeys = Object.keys(commands)
+
+  if (commandKeys.length) {
+    const longestCommand = commandKeys.reduce((longest, key) => {
+      return key.length > longest ? key.length : longest
+    }, 0)
+
+    console.error(chalk.green('Additional Commands:'))
+
+    console.error('')
+
+    commandKeys.forEach((key) => {
+      const command = commands[key]
+
+      console.error(name + ' ' + key + '  ' + ' '.repeat(longestCommand - key.length) + chalk.gray(command.description != null ? command.description : ''))
     })
 
     console.error('')
