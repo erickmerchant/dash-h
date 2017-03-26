@@ -28,13 +28,15 @@ module.exports = function sergeant (name, description, define) {
       const args = parse(argv, definitions)
 
       try {
-        if (args.help === true) {
-          help(name, description, definitions, commands)
-        } else if (action != null) {
-          const result = action(args)
+        if (args != null) {
+          if (args.help === true) {
+            help(name, description, definitions, commands)
+          } else if (action != null) {
+            const result = action(args)
 
-          if (typeof result === 'object' && result instanceof Promise) {
-            result.catch(error)
+            if (typeof result === 'object' && result instanceof Promise) {
+              result.catch(error)
+            }
           }
         }
       } catch (e) {
