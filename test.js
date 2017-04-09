@@ -10,7 +10,7 @@ const mockerySettings = {
 test('test ./parse', function (t) {
   const parse = require('./parse')
 
-  t.plan(12)
+  t.plan(15)
 
   // test dashdash and parameter
   t.deepEquals(parse(['--', '-a'], {
@@ -105,6 +105,56 @@ test('test ./parse', function (t) {
       default: 'yes'
     }
   }), {'0': 'testing', '1': 'yes'})
+
+  // test multiple param beginning
+  t.deepEquals(parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+    '0': {
+      type: Number,
+      key: 'test0',
+      multiple: true
+    },
+    '1': {
+      type: Number,
+      key: 'test1'
+    },
+    '2': {
+      type: Number,
+      key: 'test2'
+    }
+  }), {'test0': [1, 2, 3, 4, 5, 6, 7], 'test1': 8, 'test2': 9})
+
+  // test multiple param middle. No type
+  t.deepEquals(parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+    '0': {
+      type: Number,
+      key: 'test0'
+    },
+    '1': {
+      key: 'test1',
+      multiple: true
+    },
+    '2': {
+      type: Number,
+      key: 'test2'
+    }
+  }), {'test0': 1, 'test1': ['2', '3', '4', '5', '6', '7', '8'], 'test2': 9})
+
+  // test multiple param end
+  t.deepEquals(parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+    '0': {
+      type: Number,
+      key: 'test0'
+    },
+    '1': {
+      type: Number,
+      key: 'test1'
+    },
+    '2': {
+      type: Number,
+      key: 'test2',
+      multiple: true
+    }
+  }), {'test0': 1, 'test1': 2, 'test2': [3, 4, 5, 6, 7, 8, 9]})
 })
 
 test('test ./parse - with errors', function (t) {

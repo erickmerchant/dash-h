@@ -130,15 +130,17 @@ module.exports = function (argv, definitions) {
     const remainder = argv.concat(afterDashDash).filter((arg) => arg !== '')
 
     const parameterKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)))
+    const hasMultiple = parameterKeys.filter((key) => definitions[key].multiple).length > 0
 
-    if (remainder.length > parameterKeys.length) {
+    if (!hasMultiple && remainder.length > parameterKeys.length) {
       throw new Error('too many arguments')
     }
 
     parameterKeys.forEach((key) => {
       const definition = definitions[key]
+      const remainingKeys = parameterKeys.length - 1 - key
 
-      if (remainder[key] == null) {
+      if (!remainder.length) {
         if (definition.default != null) {
           args[definition.property] = definition.default
         }
@@ -146,10 +148,16 @@ module.exports = function (argv, definitions) {
         if (definition.required === true && args['help'] !== true) {
           throw new Error(definition.key + ' is required')
         }
+      } else if (definition.multiple === true) {
+        args[definition.property] = remainder.splice(0, remainder.length - remainingKeys)
+
+        if (definition.type) {
+          args[definition.property] = args[definition.property].map((v) => definition.type(v))
+        }
       } else if (definition.type) {
-        args[definition.property] = definition.type(remainder[key])
+        args[definition.property] = definition.type(remainder.shift())
       } else {
-        args[definition.property] = remainder[key]
+        args[definition.property] = remainder.shift()
       }
     })
 
