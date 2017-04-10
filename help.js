@@ -24,7 +24,7 @@ module.exports = function (name, description, definitions, commands = {}) {
 
   const parameterKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)))
 
-  console.error(chalk.green('Usage:') + ' ' + name + ' [options] ' + parameterKeys.map((key) => definitions[key].signature).join(' '))
+  console.error(chalk.green('Usage:') + ' ' + name + ' [options] ' + parameterKeys.map((key) => (definitions[key].multiple === true ? '...' : '') + definitions[key].signature).join(' '))
 
   console.error('')
 

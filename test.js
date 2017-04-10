@@ -263,6 +263,7 @@ test('test ./help', function (t) {
   help('test-command', '', {
     '0': {
       key: 'p0',
+      multiple: true,
       required: true
     },
     '1': {
@@ -308,11 +309,11 @@ test('test ./help', function (t) {
   t.equals(1, globals.process.exitCode)
 
   t.deepEquals(messages, [
-    chalk.green('Usage:') + ' test-command [options] p0 p1',
+    chalk.green('Usage:') + ' test-command [options] ...p0 p1',
     '',
     chalk.green('Parameters:'),
     '',
-    'p0  ' + chalk.gray('Required'),
+    'p0  ' + chalk.gray('Required. Multiple'),
     'p1  ' + chalk.gray('Default: a default'),
     '',
     chalk.green('Options:'),
