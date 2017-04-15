@@ -29,7 +29,7 @@ module.exports = function sergeant (name, description, define) {
 
       try {
         if (args != null) {
-          if (args.help === true) {
+          if (args.help === true || action == null) {
             help(name, description, definitions, commands)
           } else if (action != null) {
             const result = action(args)

@@ -24,9 +24,13 @@ module.exports = function (name, description, definitions, commands = {}) {
 
   const parameterKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)))
 
-  console.error(chalk.green('Usage:') + ' ' + name + ' [options] ' + parameterKeys.map((key) => (definitions[key].multiple === true ? '...' : '') + definitions[key].signature).join(' '))
+  const optionKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)) === false)
 
-  console.error('')
+  if (parameterKeys.length || optionKeys.length) {
+    console.error(chalk.green('Usage:') + ' ' + name + ' [options] ' + parameterKeys.map((key) => (definitions[key].multiple === true ? '...' : '') + definitions[key].signature).join(' '))
+
+    console.error('')
+  }
 
   if (description) {
     console.error(description)
@@ -55,8 +59,6 @@ module.exports = function (name, description, definitions, commands = {}) {
 
     console.error('')
   }
-
-  const optionKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)) === false)
 
   if (optionKeys.length) {
     console.error(chalk.green('Options:'))
@@ -87,7 +89,7 @@ module.exports = function (name, description, definitions, commands = {}) {
       return key.length > longest ? key.length : longest
     }, 0)
 
-    console.error(chalk.green('Additional Commands:'))
+    console.error(chalk.green('Commands:'))
 
     console.error('')
 

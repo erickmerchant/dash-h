@@ -304,6 +304,8 @@ test('test ./help', function (t) {
     }
   })
 
+  help('test-command', 'a test command', {})
+
   t.plan(2)
 
   t.equals(1, globals.process.exitCode)
@@ -329,7 +331,7 @@ test('test ./help', function (t) {
     '',
     'p0  ' + chalk.gray('Required'),
     '',
-    chalk.green('Additional Commands:'),
+    chalk.green('Commands:'),
     '',
     'test-command sub-command-b  ' + chalk.gray(''),
     'test-command sub-command    ' + chalk.gray('a sub command'),
@@ -341,6 +343,8 @@ test('test ./help', function (t) {
     chalk.green('Options:'),
     '',
     ' --aaa,--aa,-a  ' + chalk.gray('a Boolean. Type: Boolean. Multiple'),
+    '',
+    'a test command',
     ''
   ])
 
@@ -563,7 +567,7 @@ test('test ./command - sub commands', function (t) {
 
   const command = require('./main')
 
-  t.plan(1)
+  t.plan(2)
 
   const testCommand = command('test-command', function ({option, parameter, command}) {
     command('sub-command', 'a sub command', () => {
@@ -573,6 +577,9 @@ test('test ./command - sub commands', function (t) {
     })
 
     command('sub-command-b', () => {
+      return function () {
+        t.ok(true)
+      }
     })
 
     return function () {
