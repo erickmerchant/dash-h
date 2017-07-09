@@ -22,8 +22,10 @@ module.exports = function sergeant (name, description, define) {
   const action = define({option, parameter, command})
 
   return (argv) => {
-    if (argv[0] != null && commands[argv[0]] != null) {
-      commands[argv[0]].action(argv.slice(1))
+    const filtered = argv.filter((arg) => arg !== '-' && !arg.startsWith('-'))
+
+    if (filtered[0] != null && commands[filtered[0]] != null) {
+      commands[filtered[0]].action(filtered.slice(1))
     } else {
       const args = parse(argv, definitions)
 
