@@ -27,7 +27,9 @@ module.exports = function sergeant (name, description, define) {
     if (filtered[0] != null && commands[filtered[0]] != null) {
       const index0 = argv.indexOf(filtered[0])
 
-      commands[filtered[0]].action(argv.splice(index0, 1))
+      argv.splice(index0, 1)
+
+      commands[filtered[0]].action(argv)
     } else {
       const args = parse(argv, definitions)
 
