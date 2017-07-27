@@ -2,6 +2,59 @@
 
 A CLI solution with simple argument parsing and built in help messages.
 
+## Example
+
+``` javascript
+const command = require('sergeant')
+const assert = require('assert')
+
+command('hello', function ({option, parameter, command}) {
+  parameter('name', {
+    description: 'the name',
+    required: true
+  })
+
+  option('loud', {
+    description: 'say it loud',
+    type: Boolean,
+    default: false,
+    aliases: ['l']
+  })
+
+  command('world', function ({option}) {
+    option('loud', {
+      description: 'say it loud',
+      type: Boolean,
+      default: false,
+      aliases: ['l']
+    })
+
+    return function (args) {
+      args.name = 'world'
+
+      say(args)
+    }
+  })
+
+  return function (args) {
+    assert.notEqual(args.name, 'world', 'use hello world')
+
+    say(args)
+  }
+})(process.argv.slice(2))
+
+function say (args) {
+  let message = `hello ${args.name}!`
+
+  if (args.loud) {
+    message = message.toUpperCase()
+  }
+
+  console.log(message)
+}
+
+```
+
 ## API Reference
 
 ### command
