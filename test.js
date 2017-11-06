@@ -327,6 +327,7 @@ test('test ./help', function (t) {
     ' --aaa,--aa,-a  ' + chalk.gray('a Boolean'),
     '            -b  ' + chalk.gray('a Number'),
     '',
+    '',
     'a test command',
     '',
     chalk.green('Usage:'),
@@ -343,6 +344,7 @@ test('test ./help', function (t) {
     'sub-command-b',
     'sub-command    ' + chalk.gray('a sub command'),
     '',
+    '',
     'a test command',
     '',
     chalk.green('Usage:') + ' test-command [--aaa,--aa,-a...]',
@@ -351,7 +353,9 @@ test('test ./help', function (t) {
     '',
     ' --aaa,--aa,-a  ' + chalk.gray('a Boolean'),
     '',
-    'a test command'
+    '',
+    'a test command',
+    ''
   ].join('\n'), messages.join('\n'))
 
   mockery.disable()

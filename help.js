@@ -143,4 +143,6 @@ module.exports = function (name, description, definitions, commands = {}) {
       console.error(key + (command.description ? '  ' + ' '.repeat(longestCommand - key.length) + chalk.gray(command.description != null ? command.description : '') : ''))
     })
   }
+
+  console.error('')
 }
