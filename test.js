@@ -13,57 +13,57 @@ test('test ./parse', function (t) {
   t.plan(15)
 
   // test dashdash and parameter
-  t.deepEquals(parse(['--', '-a'], {
+  t.deepEquals({'test': '-a'}, parse(['--', '-a'], {
     '0': {
       key: 'test'
     }
-  }), {'test': '-a'})
+  }))
 
   // test dashdash and parameter with type
-  t.deepEquals(parse(['--', '123'], {
+  t.deepEquals({'test': 123}, parse(['--', '123'], {
     '0': {
       type: Number,
       key: 'test'
     }
-  }), {'test': 123})
+  }))
 
   // test non-required parameter
-  t.deepEquals(parse([], {
+  t.deepEquals({}, parse([], {
     '0': {
       key: 'test'
     }
-  }), {})
+  }))
 
   // test empty
-  t.deepEquals(parse([''], {}), {})
+  t.deepEquals({}, parse([''], {}))
 
   // test short
-  t.deepEquals(parse(['-a'], {
+  t.deepEquals({aaA: true}, parse(['-a'], {
     'aa-a': {
       type: Boolean,
       aliases: ['a']
     }
-  }), {aaA: true})
+  }))
 
   // test short with value
-  t.deepEquals(parse(['-a=bcd'], {
+  t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
     'aa-a': {
       aliases: ['a']
     }
-  }), {aaA: 'bcd'})
+  }))
 
   // test multiple short with value
-  t.deepEquals(parse(['-ba=bcd'], {
+  t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
     'aa-a': {
       aliases: ['a']
     },
     b: {
       type: Boolean
     }
-  }), {aaA: 'bcd', b: true})
+  }))
 
   // test multiple short
-  t.deepEquals(parse(['-ba'], {
+  t.deepEquals({aaA: true, b: true}, parse(['-ba'], {
     'aa-a': {
       type: Boolean,
       aliases: ['a']
@@ -71,43 +71,44 @@ test('test ./parse', function (t) {
     b: {
       type: Boolean
     }
-  }), {aaA: true, b: true})
+  }))
 
   // test multiple, ---, and -
-  t.deepEquals(parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
+  t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     'aa-a': {
       multiple: true,
       aliases: ['a']
     }
-  }), {aaA: ['bcd', '---', '-']})
+  }))
 
   // test non-empty default
-  t.deepEquals(parse(['-a'], {
+  t.deepEquals({aaA: ''}, parse(['-a'], {
     'aa-a': {
       aliases: ['a'],
       default: ''
     }
-  }), {aaA: ''})
+  }))
 
   // test default with equals
-  t.deepEquals(parse(['--aa-a='], {
+  t.deepEquals({aaA: ''}, parse(['--aa-a='], {
     'aa-a': {
       aliases: ['a'],
       default: 'abc'
     }
-  }), {aaA: ''})
+  }))
 
   // test default parameter
-  t.deepEquals(parse(['testing'], {
+  t.deepEquals({'0': 'testing', '1': 'yes'}, parse(['testing'], {
     '0': {
     },
     '1': {
       default: 'yes'
     }
-  }), {'0': 'testing', '1': 'yes'})
+  }))
 
   // test multiple param beginning
-  t.deepEquals(parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+  t.deepEquals({'test0': [1, 2, 3, 4, 5, 6, 7], 'test1': 8, 'test2': 9},
+  parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
     '0': {
       type: Number,
       key: 'test0',
@@ -121,10 +122,11 @@ test('test ./parse', function (t) {
       type: Number,
       key: 'test2'
     }
-  }), {'test0': [1, 2, 3, 4, 5, 6, 7], 'test1': 8, 'test2': 9})
+  }))
 
   // test multiple param middle. No type
-  t.deepEquals(parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+  t.deepEquals({'test0': 1, 'test1': ['2', '3', '4', '5', '6', '7', '8'], 'test2': 9},
+  parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
     '0': {
       type: Number,
       key: 'test0'
@@ -137,10 +139,11 @@ test('test ./parse', function (t) {
       type: Number,
       key: 'test2'
     }
-  }), {'test0': 1, 'test1': ['2', '3', '4', '5', '6', '7', '8'], 'test2': 9})
+  }))
 
   // test multiple param end
-  t.deepEquals(parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+  t.deepEquals({'test0': 1, 'test1': 2, 'test2': [3, 4, 5, 6, 7, 8, 9]},
+  parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
     '0': {
       type: Number,
       key: 'test0'
@@ -154,7 +157,7 @@ test('test ./parse', function (t) {
       key: 'test2',
       multiple: true
     }
-  }), {'test0': 1, 'test1': 2, 'test2': [3, 4, 5, 6, 7, 8, 9]})
+  }))
 })
 
 test('test ./parse - with errors', function (t) {
@@ -224,9 +227,9 @@ test('test ./parse - with errors', function (t) {
   // test too many arguments
   parse(['--', '-a'], {})
 
-  t.equals(1, globals.process.exitCode)
+  t.equals(globals.process.exitCode, 1)
 
-  t.deepEquals(messages, [
+  t.deepEquals([
     chalk.red('-a is a boolean and does not accept a value'),
     chalk.red('--aaa is a boolean and does not accept a value'),
     chalk.red('unknown option -a'),
@@ -235,7 +238,7 @@ test('test ./parse - with errors', function (t) {
     chalk.red('--aaa is required'),
     chalk.red('test is required'),
     chalk.red('too many arguments')
-  ])
+  ].join('\n'), messages.join('\n'))
 
   mockery.disable()
 })
@@ -308,45 +311,48 @@ test('test ./help', function (t) {
 
   t.plan(2)
 
-  t.equals(1, globals.process.exitCode)
+  t.equals(globals.process.exitCode, 1)
 
-  t.deepEquals(messages, [
-    chalk.green('Usage:') + ' test-command [options] ...p0 p1',
+  t.deepEquals([
+    '',
+    chalk.green('Usage:') + ' test-command [--aaa,--aa,-a...] [-b=<Number>] <p0>... [<p1>]',
     '',
     chalk.green('Parameters:'),
     '',
-    'p0  ' + chalk.gray('Required. Multiple'),
-    'p1  ' + chalk.gray('Default: a default'),
+    'p0',
+    'p1  ' + chalk.gray('[default: "a default"]'),
     '',
     chalk.green('Options:'),
     '',
-    ' --aaa,--aa,-a  ' + chalk.gray('a Boolean. Type: Boolean. Multiple'),
-    '            -b  ' + chalk.gray('a Number. Type: Number'),
-    '',
-    chalk.green('Usage:') + ' test-command [options] p0',
+    ' --aaa,--aa,-a  ' + chalk.gray('a Boolean'),
+    '            -b  ' + chalk.gray('a Number'),
     '',
     'a test command',
     '',
+    chalk.green('Usage:'),
+    '',
+    'test-command <p0>',
+    'test-command <command> [--help,-h]',
+    '',
     chalk.green('Parameters:'),
     '',
-    'p0  ' + chalk.gray('Required'),
+    'p0',
     '',
     chalk.green('Commands:'),
     '',
-    'test-command sub-command-b  ' + chalk.gray(''),
-    'test-command sub-command    ' + chalk.gray('a sub command'),
-    '',
-    chalk.green('Usage:') + ' test-command [options] ',
+    'sub-command-b',
+    'sub-command    ' + chalk.gray('a sub command'),
     '',
     'a test command',
+    '',
+    chalk.green('Usage:') + ' test-command [--aaa,--aa,-a...]',
     '',
     chalk.green('Options:'),
     '',
-    ' --aaa,--aa,-a  ' + chalk.gray('a Boolean. Type: Boolean. Multiple'),
+    ' --aaa,--aa,-a  ' + chalk.gray('a Boolean'),
     '',
-    'a test command',
-    ''
-  ])
+    'a test command'
+  ].join('\n'), messages.join('\n'))
 
   mockery.disable()
 })
@@ -383,14 +389,14 @@ test('test ./error', function (t) {
 
   t.plan(2)
 
-  t.equals(1, globals.process.exitCode)
+  t.equals(globals.process.exitCode, 1)
 
-  t.deepEquals(messages, [
+  t.deepEquals([
     chalk.red('testing errors'),
     chalk.gray('at thing ') + '(file.js:123:45)',
     'at another',
     chalk.red('testing errors')
-  ])
+  ].join('\n'), messages.join('\n'))
 
   mockery.disable()
 })
@@ -405,9 +411,9 @@ test('test ./command - no help. no errors', function (t) {
   t.plan(3)
 
   function mockedParse (argv, definitions) {
-    t.deepEquals(argv, ['testing'])
+    t.deepEquals(['testing'], argv)
 
-    t.deepEquals(definitions, {
+    t.deepEquals({
       '0': {
         key: 'aaa',
         testing: true
@@ -420,7 +426,7 @@ test('test ./command - no help. no errors', function (t) {
         description: 'get help',
         type: Boolean
       }
-    })
+    }, definitions)
 
     return {}
   }
@@ -462,9 +468,9 @@ test('test ./command - help', function (t) {
   }
 
   function mockedHelp (name, description, definitions) {
-    t.equals(name, 'test-command')
+    t.equals('test-command', name)
 
-    t.deepEquals(definitions, {
+    t.deepEquals({
       '0': {
         key: 'aaa',
         testing: true
@@ -477,7 +483,7 @@ test('test ./command - help', function (t) {
         description: 'get help',
         type: Boolean
       }
-    })
+    }, definitions)
   }
 
   const testCommand = command('test-command', function ({parameter, option}) {
@@ -514,7 +520,7 @@ test('test ./command - thrown error', function (t) {
   }
 
   function mockedError (error) {
-    t.deepEquals(error, ourError)
+    t.deepEquals(ourError, error)
   }
 
   const testCommand = command('test-command', function () {
@@ -546,7 +552,7 @@ test('test ./command - rejected promise', function (t) {
   }
 
   function mockedError (error) {
-    t.deepEquals(error, ourError)
+    t.deepEquals(ourError, error)
   }
 
   const testCommand = command('test-command', function () {
