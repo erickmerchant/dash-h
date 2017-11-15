@@ -65,7 +65,7 @@ module.exports = function sergeant (name, description, define) {
   }
 
   function option (key, definition) {
-    definitions[key] = definition
+    definitions[key] = Object.assign(definition, {key})
   }
 
   function parameter (key, definition) {

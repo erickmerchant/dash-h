@@ -12,10 +12,6 @@ module.exports = function (argv, definitions) {
     Object.keys(definitions).forEach((key) => {
       const definition = definitions[key]
 
-      if (definition.key == null) {
-        definition.key = key
-      }
-
       const split = definition.key.split('-')
 
       definition.property = split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')

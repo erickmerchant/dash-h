@@ -40,6 +40,7 @@ test('test ./parse', function (t) {
   // test short
   t.deepEquals({aaA: true}, parse(['-a'], {
     'aa-a': {
+      key: 'aa-a',
       type: Boolean,
       aliases: ['a']
     }
@@ -48,6 +49,7 @@ test('test ./parse', function (t) {
   // test short with value
   t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
     'aa-a': {
+      key: 'aa-a',
       aliases: ['a']
     }
   }))
@@ -55,9 +57,11 @@ test('test ./parse', function (t) {
   // test multiple short with value
   t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
     'aa-a': {
+      key: 'aa-a',
       aliases: ['a']
     },
     b: {
+      key: 'b',
       type: Boolean
     }
   }))
@@ -65,10 +69,12 @@ test('test ./parse', function (t) {
   // test multiple short
   t.deepEquals({aaA: true, b: true}, parse(['-ba'], {
     'aa-a': {
+      key: 'aa-a',
       type: Boolean,
       aliases: ['a']
     },
     b: {
+      key: 'b',
       type: Boolean
     }
   }))
@@ -76,6 +82,7 @@ test('test ./parse', function (t) {
   // test multiple, ---, and -
   t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     'aa-a': {
+      key: 'aa-a',
       multiple: true,
       aliases: ['a']
     }
@@ -84,6 +91,7 @@ test('test ./parse', function (t) {
   // test non-empty default
   t.deepEquals({aaA: ''}, parse(['-a'], {
     'aa-a': {
+      key: 'aa-a',
       aliases: ['a'],
       default: ''
     }
@@ -92,6 +100,7 @@ test('test ./parse', function (t) {
   // test default with equals
   t.deepEquals({aaA: ''}, parse(['--aa-a='], {
     'aa-a': {
+      key: 'aa-a',
       aliases: ['a'],
       default: 'abc'
     }
@@ -100,8 +109,10 @@ test('test ./parse', function (t) {
   // test default parameter
   t.deepEquals({'0': 'testing', '1': 'yes'}, parse(['testing'], {
     '0': {
+      key: '0'
     },
     '1': {
+      key: '1',
       default: 'yes'
     }
   }))
@@ -185,6 +196,7 @@ test('test ./parse - with errors', function (t) {
   // test boolean with value
   parse(['-a=abc'], {
     a: {
+      key: 'a',
       type: Boolean
     }
   })
@@ -192,6 +204,7 @@ test('test ./parse - with errors', function (t) {
   // test boolean with value
   parse(['--aaa=abc'], {
     aaa: {
+      key: 'aaa',
       type: Boolean
     }
   })
@@ -205,6 +218,7 @@ test('test ./parse - with errors', function (t) {
   // test required
   parse([''], {
     a: {
+      key: 'a',
       required: true
     }
   })
@@ -212,6 +226,7 @@ test('test ./parse - with errors', function (t) {
   // test required
   parse([''], {
     aaa: {
+      key: 'aaa',
       required: true
     }
   })
@@ -274,12 +289,14 @@ test('test ./help', function (t) {
       default: 'a default'
     },
     'aaa': {
+      key: 'aaa',
       aliases: ['aa', 'a'],
       type: Boolean,
       multiple: true,
       description: 'a Boolean'
     },
     'b': {
+      key: 'b',
       type: Number,
       description: 'a Number'
     }
@@ -300,6 +317,7 @@ test('test ./help', function (t) {
 
   help('test-command', 'a test command', {
     'aaa': {
+      key: 'aaa',
       aliases: ['aa', 'a'],
       type: Boolean,
       multiple: true,
@@ -423,9 +441,11 @@ test('test ./command - no help. no errors', function (t) {
         testing: true
       },
       bbb: {
+        key: 'bbb',
         testing: true
       },
       help: {
+        key: 'help',
         aliases: [ 'h' ],
         description: 'get help',
         type: Boolean
@@ -480,9 +500,11 @@ test('test ./command - help', function (t) {
         testing: true
       },
       bbb: {
+        key: 'bbb',
         testing: true
       },
       help: {
+        key: 'help',
         aliases: [ 'h' ],
         description: 'get help',
         type: Boolean

@@ -15,12 +15,11 @@ module.exports = function (name, description, definitions, commands = {}) {
 
   Object.keys(definitions).forEach(function (key) {
     const definition = definitions[key]
-    const k = definition.key != null ? definition.key : key
 
     if (Number.isInteger(Number(key))) {
-      definition.signature = k
+      definition.signature = definition.key
     } else {
-      definition.signature = (k.length === 1 ? '-' : '--') + k
+      definition.signature = (definition.key.length === 1 ? '-' : '--') + definition.key
 
       if (definition.aliases != null && definition.aliases.length) {
         definition.signature += ',' + definition.aliases.map((k) => (k.length === 1 ? '-' : '--') + k).join(',')
