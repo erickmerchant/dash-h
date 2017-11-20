@@ -1,7 +1,5 @@
 const chalk = require('chalk')
-const process = require('./globals').process
-const console = require('./globals').console
-const Error = require('./globals').Error
+const { process, console, Error } = require('./src/globals')
 
 module.exports = function (error) {
   process.exitCode = 1

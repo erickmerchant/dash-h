@@ -10,7 +10,7 @@ const mockerySettings = {
 test('test ./parse', function (t) {
   const parse = require('./parse')
 
-  t.plan(15)
+  t.plan(16)
 
   // test dashdash and parameter
   t.deepEquals({'test': '-a'}, parse(['--', '-a'], {
@@ -89,10 +89,23 @@ test('test ./parse', function (t) {
   }))
 
   // test non-empty default
+  t.deepEquals({aaA: ['', ' ']}, parse(['-a'], {
+    'aa-a': {
+      key: 'aa-a',
+      aliases: ['a'],
+      type: String,
+      multiple: true,
+      default: ['', ' ']
+    }
+  }))
+
+  // test non-empty default
   t.deepEquals({aaA: ''}, parse(['-a'], {
     'aa-a': {
       key: 'aa-a',
       aliases: ['a'],
+      type: String,
+      multiple: true,
       default: ''
     }
   }))
@@ -187,7 +200,7 @@ test('test ./parse - with errors', function (t) {
     }
   }
 
-  mockery.registerMock('./globals', globals)
+  mockery.registerMock('./src/globals', globals)
 
   const parse = require('./parse')
 
@@ -231,6 +244,14 @@ test('test ./parse - with errors', function (t) {
     }
   })
 
+  // test non multiple multiple
+  parse(['--aaa=123', '--aaa=456'], {
+    aaa: {
+      type: Number,
+      key: 'aaa'
+    }
+  })
+
   // test required parameter
   parse([], {
     '0': {
@@ -251,9 +272,10 @@ test('test ./parse - with errors', function (t) {
     chalk.red('unknown option --aaa'),
     chalk.red('-a is required'),
     chalk.red('--aaa is required'),
+    chalk.red('--aaa does not accept multiple values'),
     chalk.red('test is required'),
     chalk.red('too many arguments')
-  ].join('\n'), messages.join('\n'))
+  ], messages)
 
   mockery.disable()
 })
@@ -274,19 +296,20 @@ test('test ./help', function (t) {
     }
   }
 
-  mockery.registerMock('./globals', globals)
+  mockery.registerMock('./src/globals', globals)
 
   const help = require('./help')
 
   help('test-command', '', {
     '0': {
       key: 'p0',
-      multiple: true,
+      description: 'the description',
       required: true
     },
     '1': {
       key: 'p1',
-      default: 'a default'
+      multiple: true,
+      default: ['a', 'b']
     },
     'aaa': {
       key: 'aaa',
@@ -298,7 +321,8 @@ test('test ./help', function (t) {
     'b': {
       key: 'b',
       type: Number,
-      description: 'a Number'
+      description: 'a Number',
+      default: 100
     }
   })
 
@@ -333,17 +357,17 @@ test('test ./help', function (t) {
 
   t.deepEquals([
     '',
-    chalk.green('Usage:') + ' test-command [--aaa,--aa,-a...] [-b=<Number>] <p0>... [<p1>]',
+    chalk.green('Usage:') + ' test-command [--aaa,--aa,-a...] [-b=<Number>] <p0> [<p1>...]',
     '',
     chalk.green('Parameters:'),
     '',
-    'p0',
-    'p1  ' + chalk.gray('[default: "a default"]'),
+    'p0  ' + chalk.gray('the description'),
+    'p1  ' + '[default: "a", "b"]',
     '',
     chalk.green('Options:'),
     '',
     ' --aaa,--aa,-a  ' + chalk.gray('a Boolean'),
-    '            -b  ' + chalk.gray('a Number'),
+    '            -b  ' + chalk.gray('a Number') + '  [default: 100]',
     '',
     '',
     'a test command',
@@ -374,7 +398,7 @@ test('test ./help', function (t) {
     '',
     'a test command',
     ''
-  ].join('\n'), messages.join('\n'))
+  ], messages)
 
   mockery.disable()
 })
@@ -399,7 +423,7 @@ test('test ./error', function (t) {
     }
   }
 
-  mockery.registerMock('./globals', globals)
+  mockery.registerMock('./src/globals', globals)
 
   const error = require('./error')
 
@@ -416,9 +440,9 @@ test('test ./error', function (t) {
   t.deepEquals([
     chalk.red('testing errors'),
     chalk.gray('at thing ') + '(file.js:123:45)',
-    'at another',
+    chalk.gray('at another'),
     chalk.red('testing errors')
-  ].join('\n'), messages.join('\n'))
+  ], messages)
 
   mockery.disable()
 })
@@ -590,6 +614,41 @@ test('test ./command - rejected promise', function (t) {
   testCommand(['testing'])
 
   mockery.disable()
+})
+
+test('test ./command - api errors', function (t) {
+  const command = require('./main')
+
+  t.plan(3)
+
+  t.throws(() => command('test-command', function ({option}) {
+    option('a', {
+      multiple: true,
+      default: 'a'
+    })
+
+    return function () {
+    }
+  }), /the default of a should be an array/)
+
+  t.throws(() => command('test-command', function ({option}) {
+    option('a', {
+      default: ['a']
+    })
+
+    return function () {
+    }
+  }), /the default of a should not be an array/)
+
+  t.throws(() => command('test-command', function ({option}) {
+    option('a', {
+      type: Boolean,
+      default: false
+    })
+
+    return function () {
+    }
+  }), /the default of a should not be true/)
 })
 
 test('test ./command - sub commands', function (t) {

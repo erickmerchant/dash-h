@@ -1,6 +1,6 @@
 const chalk = require('chalk')
-const console = require('./globals').console
-const process = require('./globals').process
+const { console, process } = require('./src/globals')
+const { isNumber, addDashes, getDefault } = require('./src/helpers')
 
 module.exports = function (argv, definitions) {
   try {
@@ -51,12 +51,13 @@ module.exports = function (argv, definitions) {
     }, [])
 
     const toBeDeleted = []
-    const optionKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)) === false)
+    const optionKeys = Object.keys(definitions).filter((key) => isNumber(key) === false)
 
     for (let i = 0; i < argv.length; i++) {
       optionKeys.forEach((key) => {
-        const search = key.length === 1 ? '-' + key : '--' + key
+        const search = addDashes(key)
         const definition = definitions[key]
+        const property = definition.property
         let vals = []
 
         if (argv[i] === search) {
@@ -77,7 +78,7 @@ module.exports = function (argv, definitions) {
 
             toBeDeleted.push(i)
           } else {
-            throw new Error((definition.key.length === 1 ? '-' : '--') + definition.key + ' is a boolean and does not accept a value')
+            throw new Error(addDashes(definition.key) + ' is a boolean and does not accept a value')
           }
         }
 
@@ -87,9 +88,11 @@ module.exports = function (argv, definitions) {
           }
 
           if (definition.multiple === true) {
-            args[definition.property] = args[definition.property] != null ? args[definition.property].concat(vals) : vals
+            args[property] = args[property] != null ? args[property].concat(vals) : vals
+          } else if (args[property] != null) {
+            throw new Error(addDashes(definition.key) + ' does not accept multiple values')
           } else {
-            args[definition.property] = vals.pop()
+            args[property] = vals.pop()
           }
         }
       })
@@ -97,14 +100,15 @@ module.exports = function (argv, definitions) {
 
     optionKeys.filter((key) => definitions[key].alias !== true).forEach((key) => {
       const definition = definitions[key]
+      const property = definition.property
 
-      if (args[definition.property] == null) {
+      if (args[property] == null) {
         if (definition.default != null) {
-          args[definition.property] = definition.default
+          args[property] = getDefault(definition)
         }
 
         if (definition.required === true && args['help'] !== true) {
-          throw new Error((definition.key.length === 1 ? '-' : '--') + definitions[key].key + ' is required')
+          throw new Error(addDashes(definition.key) + ' is required')
         }
       }
     })
@@ -125,7 +129,7 @@ module.exports = function (argv, definitions) {
 
     const remainder = argv.concat(afterDashDash).filter((arg) => arg !== '')
 
-    const parameterKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)))
+    const parameterKeys = Object.keys(definitions).filter((key) => isNumber(key))
     const hasMultiple = parameterKeys.filter((key) => definitions[key].multiple).length > 0
 
     if (!hasMultiple && remainder.length > parameterKeys.length) {
@@ -134,26 +138,27 @@ module.exports = function (argv, definitions) {
 
     parameterKeys.forEach((key) => {
       const definition = definitions[key]
+      const property = definition.property
       const remainingKeys = parameterKeys.length - 1 - key
 
       if (!remainder.length) {
         if (definition.default != null) {
-          args[definition.property] = definition.default
+          args[property] = getDefault(definition)
         }
 
         if (definition.required === true && args['help'] !== true) {
           throw new Error(definition.key + ' is required')
         }
       } else if (definition.multiple === true) {
-        args[definition.property] = remainder.splice(0, remainder.length - remainingKeys)
+        args[property] = remainder.splice(0, remainder.length - remainingKeys)
 
         if (definition.type) {
-          args[definition.property] = args[definition.property].map((v) => definition.type(v))
+          args[property] = args[property].map((v) => definition.type(v))
         }
       } else if (definition.type) {
-        args[definition.property] = definition.type(remainder.shift())
+        args[property] = definition.type(remainder.shift())
       } else {
-        args[definition.property] = remainder.shift()
+        args[property] = remainder.shift()
       }
     })
 

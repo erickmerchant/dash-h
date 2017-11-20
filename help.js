@@ -1,6 +1,6 @@
 const chalk = require('chalk')
-const console = require('./globals').console
-const process = require('./globals').process
+const { console, process } = require('./src/globals')
+const { isNumber, addDashes, longest, spaces, quoteString } = require('./src/helpers')
 
 module.exports = function (name, description, definitions, commands = {}) {
   definitions = Object.assign({}, definitions)
@@ -16,20 +16,20 @@ module.exports = function (name, description, definitions, commands = {}) {
   Object.keys(definitions).forEach(function (key) {
     const definition = definitions[key]
 
-    if (Number.isInteger(Number(key))) {
+    if (isNumber(key)) {
       definition.signature = definition.key
     } else {
-      definition.signature = (definition.key.length === 1 ? '-' : '--') + definition.key
+      definition.signature = addDashes(definition.key)
 
       if (definition.aliases != null && definition.aliases.length) {
-        definition.signature += ',' + definition.aliases.map((k) => (k.length === 1 ? '-' : '--') + k).join(',')
+        definition.signature += ',' + definition.aliases.map((k) => addDashes(k)).join(',')
       }
     }
   })
 
-  const parameterKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)))
+  const parameterKeys = Object.keys(definitions).filter((key) => isNumber(key))
 
-  const optionKeys = Object.keys(definitions).filter((key) => Number.isInteger(Number(key)) === false)
+  const optionKeys = Object.keys(definitions).filter((key) => isNumber(key) === false)
 
   if (parameterKeys.length || optionKeys.length) {
     let usage = [name]
@@ -37,8 +37,11 @@ module.exports = function (name, description, definitions, commands = {}) {
     if (optionKeys.length) {
       usage = usage.concat(optionKeys.map((key) => {
         const definition = definitions[key]
+        const valPart = definition.type !== Boolean
+          ? '=' + '<' + (definition.type ? definition.type.name : key) + '>'
+          : ''
 
-        return (definition.required !== true ? '[' : '') + definition.signature + (definition.type !== Boolean ? '=' + '<' + (definition.type ? definition.type.name : key) + '>' : '') + (definition.multiple === true ? '...' : '') + (definition.required !== true ? ']' : '')
+        return wrapUsage(definition.signature + valPart, definition)
       }))
     }
 
@@ -46,7 +49,7 @@ module.exports = function (name, description, definitions, commands = {}) {
       usage = usage.concat(parameterKeys.map((key) => {
         const definition = definitions[key]
 
-        return (definition.required !== true ? '[' : '') + '<' + definition.signature + '>' + (definition.multiple === true ? '...' : '') + (definition.required !== true ? ']' : '')
+        return wrapUsage('<' + definition.signature + '>', definition)
       }))
     }
 
@@ -72,22 +75,20 @@ module.exports = function (name, description, definitions, commands = {}) {
 
     console.error('')
 
-    const longestParameter = parameterKeys.reduce((longest, key) => {
-      const definition = definitions[key]
-
-      return definition.signature.length > longest ? definition.signature.length : longest
-    }, 0)
+    const longestParameter = longest(parameterKeys.map((key) => {
+      return definitions[key].signature
+    }))
 
     parameterKeys.forEach((key) => {
       const definition = definitions[key]
-      const description = [' '.repeat(longestParameter - definition.signature.length) + definition.signature]
+      const description = [spaces(longestParameter - definition.signature.length) + definition.signature]
 
       if (definition.description) {
         description.push(chalk.gray(definition.description))
       }
 
       if (definition.default) {
-        description.push('[default: ' + (typeof definition.default === 'string' ? '"' : '') + definition.default + (typeof definition.default === 'string' ? '"' : '') + ']')
+        description.push('[default: ' + quoteString(definition.default) + ']')
       }
 
       console.error(description.join('  '))
@@ -101,22 +102,20 @@ module.exports = function (name, description, definitions, commands = {}) {
 
     console.error('')
 
-    const longestOption = optionKeys.reduce((longest, key) => {
-      const definition = definitions[key]
-
-      return definition.signature.length > longest ? definition.signature.length : longest
-    }, 0) + 1
+    const longestOption = longest(optionKeys.map((key) => {
+      return definitions[key].signature
+    })) + 1
 
     optionKeys.forEach((key) => {
       const definition = definitions[key]
-      const description = [' '.repeat(longestOption - definition.signature.length) + definition.signature]
+      const description = [spaces(longestOption - definition.signature.length) + definition.signature]
 
       if (definition.description) {
         description.push(chalk.gray(definition.description))
       }
 
       if (definition.default) {
-        description.push('[default: ' + (typeof definition.default === 'string' ? '"' : '') + definition.default + (typeof definition.default === 'string' ? '"' : '') + ']')
+        description.push('[default: ' + quoteString(definition.default) + ']')
       }
 
       console.error(description.join('  '))
@@ -126,9 +125,7 @@ module.exports = function (name, description, definitions, commands = {}) {
   const commandKeys = Object.keys(commands)
 
   if (commandKeys.length) {
-    const longestCommand = commandKeys.reduce((longest, key) => {
-      return key.length > longest ? key.length : longest
-    }, 0)
+    const longestCommand = longest(commandKeys)
 
     console.error('')
 
@@ -139,9 +136,13 @@ module.exports = function (name, description, definitions, commands = {}) {
     commandKeys.forEach((key) => {
       const command = commands[key]
 
-      console.error(key + (command.description ? '  ' + ' '.repeat(longestCommand - key.length) + chalk.gray(command.description != null ? command.description : '') : ''))
+      console.error(key + (command.description ? '  ' + spaces(longestCommand - key.length) + chalk.gray(command.description != null ? command.description : '') : ''))
     })
   }
 
   console.error('')
+}
+
+function wrapUsage (usage, {required, multiple}) {
+  return (required !== true ? '[' : '') + usage + (multiple === true ? '...' : '') + (required !== true ? ']' : '')
 }
