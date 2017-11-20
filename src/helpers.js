@@ -1,0 +1,43 @@
+module.exports = { addDashes, quoteString, longest, spaces, isNumber, getDefault }
+
+function addDashes (key) {
+  return (key.length === 1 ? '-' : '--') + key
+}
+
+function quoteString (value) {
+  if (Array.isArray(value)) {
+    return value.map(quoteString).join(', ')
+  }
+
+  const quote = (typeof value === 'string' ? '"' : '')
+
+  return quote + value + quote
+}
+
+function longest (arr) {
+  return arr.reduce((longest, item) => {
+    return item.length > longest ? item.length : longest
+  }, 0)
+}
+
+function spaces (number) {
+  return ' '.repeat(number)
+}
+
+function isNumber (key) {
+  return Number.isInteger(Number(key))
+}
+
+function getDefault (definition) {
+  let result = definition.default
+
+  if (definition.type) {
+    if (Array.isArray(result)) {
+      result = result.map((val) => definition.type(val))
+    } else {
+      result = definition.type(result)
+    }
+  }
+
+  return result
+}
