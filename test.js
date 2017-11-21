@@ -641,14 +641,14 @@ test('test ./command - api errors', function (t) {
   }), /the default of a should not be an array/)
 
   t.throws(() => command('test-command', function ({option}) {
-    option('a', {
+    option('aa', {
       type: Boolean,
-      default: false
+      default: true
     })
 
     return function () {
     }
-  }), /the default of a should not be true/)
+  }), /the default of aa should be false/)
 })
 
 test('test ./command - sub commands', function (t) {

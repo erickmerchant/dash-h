@@ -87,8 +87,8 @@ module.exports = function sergeant (name, description, define) {
 
     if (definition.type != null && definition.type === Boolean) {
       if (definition.default != null) {
-        if (definition.default !== true) {
-          throw new Error('the default of ' + key + ' should not be true')
+        if (definition.default !== false) {
+          throw new Error('the default of ' + key + ' should be false')
         }
       }
     }
