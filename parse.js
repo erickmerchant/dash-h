@@ -1,27 +1,25 @@
 const chalk = require('chalk')
 const { console, process } = require('./src/globals')
-const { isNumber, addDashes, getDefault } = require('./src/helpers')
+const { addDashes, getDefault, getProperty } = require('./src/helpers')
 
-module.exports = function (argv, definitions) {
+module.exports = function (argv, {options, parameters}) {
   try {
-    definitions = Object.assign({}, definitions)
-
     argv = argv.slice(0)
     const args = {}
 
-    Object.keys(definitions).forEach((key) => {
-      const definition = definitions[key]
+    options = options.reduce((options, definition) => {
+      definition = Object.assign({}, definition, {property: getProperty(definition)})
 
-      const split = definition.key.split('-')
-
-      definition.property = split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')
+      options.push(definition)
 
       if (definition.aliases) {
         definition.aliases.forEach((alias) => {
-          definitions[alias] = Object.assign({}, definition, {alias: true})
+          options.push(Object.assign({}, definition, {key: alias, alias: true}))
         })
       }
-    })
+
+      return options
+    }, [])
 
     let afterDashDash = []
     const indexOfDashDash = argv.indexOf('--')
@@ -51,12 +49,10 @@ module.exports = function (argv, definitions) {
     }, [])
 
     const toBeDeleted = []
-    const optionKeys = Object.keys(definitions).filter((key) => isNumber(key) === false)
 
     for (let i = 0; i < argv.length; i++) {
-      optionKeys.forEach((key) => {
-        const search = addDashes(key)
-        const definition = definitions[key]
+      options.forEach((definition) => {
+        const search = addDashes(definition.key)
         const property = definition.property
         let vals = []
 
@@ -98,8 +94,7 @@ module.exports = function (argv, definitions) {
       })
     }
 
-    optionKeys.filter((key) => definitions[key].alias !== true).forEach((key) => {
-      const definition = definitions[key]
+    options.filter((option) => options.alias !== true).forEach((definition) => {
       const property = definition.property
 
       if (args[property] == null) {
@@ -129,17 +124,15 @@ module.exports = function (argv, definitions) {
 
     const remainder = argv.concat(afterDashDash).filter((arg) => arg !== '')
 
-    const parameterKeys = Object.keys(definitions).filter((key) => isNumber(key))
-    const hasMultiple = parameterKeys.filter((key) => definitions[key].multiple).length > 0
+    const hasMultiple = parameters.filter((definition) => definition.multiple).length > 0
 
-    if (!hasMultiple && remainder.length > parameterKeys.length) {
+    if (!hasMultiple && remainder.length > parameters.length) {
       throw new Error('too many arguments')
     }
 
-    parameterKeys.forEach((key) => {
-      const definition = definitions[key]
-      const property = definition.property
-      const remainingKeys = parameterKeys.length - 1 - key
+    parameters.forEach((definition, key) => {
+      const property = definition.key
+      const remainingKeys = parameters.length - 1 - key
 
       if (!remainder.length) {
         if (definition.default != null) {

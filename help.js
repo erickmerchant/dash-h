@@ -1,10 +1,8 @@
 const chalk = require('chalk')
 const { console, process } = require('./src/globals')
-const { isNumber, addDashes, longest, spaces, quoteString } = require('./src/helpers')
+const { addDashes, longest, spaces, quoteString } = require('./src/helpers')
 
-module.exports = function (name, description, definitions, commands = {}) {
-  definitions = Object.assign({}, definitions)
-
+module.exports = function (name, description, {options, parameters, commands}) {
   process.exitCode = 1
 
   if (description) {
@@ -13,49 +11,28 @@ module.exports = function (name, description, definitions, commands = {}) {
     console.error(description)
   }
 
-  Object.keys(definitions).forEach(function (key) {
-    const definition = definitions[key]
-
-    if (isNumber(key)) {
-      definition.signature = definition.key
-    } else {
-      definition.signature = addDashes(definition.key)
-
-      if (definition.aliases != null && definition.aliases.length) {
-        definition.signature += ',' + definition.aliases.map((k) => addDashes(k)).join(',')
-      }
-    }
-  })
-
-  const parameterKeys = Object.keys(definitions).filter((key) => isNumber(key))
-
-  const optionKeys = Object.keys(definitions).filter((key) => isNumber(key) === false)
-
-  if (parameterKeys.length || optionKeys.length) {
+  if (parameters.length || options.length) {
     let usage = [name]
 
-    if (optionKeys.length) {
-      usage = usage.concat(optionKeys.map((key) => {
-        const definition = definitions[key]
+    if (options.length) {
+      usage = usage.concat(options.map((definition) => {
         const valPart = definition.type !== Boolean
-          ? '=' + '<' + (definition.type ? definition.type.name : key) + '>'
+          ? '=<' + (definition.type ? definition.type.name : 'String') + '>'
           : ''
 
-        return wrapUsage(definition.signature + valPart, definition)
+        return wrapUsage(getSignature(definition) + valPart, definition)
       }))
     }
 
-    if (parameterKeys.length) {
-      usage = usage.concat(parameterKeys.map((key) => {
-        const definition = definitions[key]
-
-        return wrapUsage('<' + definition.signature + '>', definition)
+    if (parameters.length) {
+      usage = usage.concat(parameters.map((definition) => {
+        return wrapUsage('<' + definition.key + '>', definition)
       }))
     }
 
     console.error('')
 
-    if (Object.keys(commands).length) {
+    if (commands.length) {
       console.error(chalk.green('Usage:'))
 
       console.error('')
@@ -68,20 +45,19 @@ module.exports = function (name, description, definitions, commands = {}) {
     }
   }
 
-  if (parameterKeys.length) {
+  if (parameters.length) {
     console.error('')
 
     console.error(chalk.green('Parameters:'))
 
     console.error('')
 
-    const longestParameter = longest(parameterKeys.map((key) => {
-      return definitions[key].signature
+    const longestParameter = longest(parameters.map((definition) => {
+      return definition.key
     }))
 
-    parameterKeys.forEach((key) => {
-      const definition = definitions[key]
-      const description = [spaces(longestParameter - definition.signature.length) + definition.signature]
+    parameters.forEach((definition) => {
+      const description = [spaces(longestParameter - definition.key.length) + definition.key]
 
       if (definition.description) {
         description.push(chalk.gray(definition.description))
@@ -95,20 +71,20 @@ module.exports = function (name, description, definitions, commands = {}) {
     })
   }
 
-  if (optionKeys.length) {
+  if (options.length) {
     console.error('')
 
     console.error(chalk.green('Options:'))
 
     console.error('')
 
-    const longestOption = longest(optionKeys.map((key) => {
-      return definitions[key].signature
+    const longestOption = longest(options.map((definition) => {
+      return getSignature(definition)
     })) + 1
 
-    optionKeys.forEach((key) => {
-      const definition = definitions[key]
-      const description = [spaces(longestOption - definition.signature.length) + definition.signature]
+    options.forEach((definition) => {
+      const signature = getSignature(definition)
+      const description = [spaces(longestOption - signature.length) + signature]
 
       if (definition.description) {
         description.push(chalk.gray(definition.description))
@@ -122,10 +98,8 @@ module.exports = function (name, description, definitions, commands = {}) {
     })
   }
 
-  const commandKeys = Object.keys(commands)
-
-  if (commandKeys.length) {
-    const longestCommand = longest(commandKeys)
+  if (commands.length) {
+    const longestCommand = longest(commands.map((command) => command.name))
 
     console.error('')
 
@@ -133,10 +107,8 @@ module.exports = function (name, description, definitions, commands = {}) {
 
     console.error('')
 
-    commandKeys.forEach((key) => {
-      const command = commands[key]
-
-      console.error(key + (command.description ? '  ' + spaces(longestCommand - key.length) + chalk.gray(command.description != null ? command.description : '') : ''))
+    commands.forEach((command) => {
+      console.error(command.name + (command.description ? '  ' + spaces(longestCommand - command.name.length) + chalk.gray(command.description != null ? command.description : '') : ''))
     })
   }
 
@@ -145,4 +117,14 @@ module.exports = function (name, description, definitions, commands = {}) {
 
 function wrapUsage (usage, {required, multiple}) {
   return (required !== true ? '[' : '') + usage + (multiple === true ? '...' : '') + (required !== true ? ']' : '')
+}
+
+function getSignature (definition) {
+  let signature = addDashes(definition.key)
+
+  if (definition.aliases != null && definition.aliases.length) {
+    signature += ',' + definition.aliases.map((k) => addDashes(k)).join(',')
+  }
+
+  return signature
 }

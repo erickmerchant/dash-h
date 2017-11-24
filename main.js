@@ -9,8 +9,9 @@ module.exports = function sergeant (name, description, define) {
     description = null
   }
 
-  const definitions = {}
-  const commands = {}
+  const options = []
+  const parameters = []
+  const commands = []
 
   option('help', {
     type: Boolean,
@@ -18,25 +19,25 @@ module.exports = function sergeant (name, description, define) {
     description: 'get help'
   })
 
-  let i = 0
   const action = define({option, parameter, command})
 
   return (argv) => {
     const filtered = argv.filter((arg) => arg !== '-' && !arg.startsWith('-'))
+    const command = commands.find((command) => command.name === filtered[0])
 
-    if (filtered[0] != null && commands[filtered[0]] != null) {
+    if (filtered[0] != null && command != null) {
       const index0 = argv.indexOf(filtered[0])
 
       argv.splice(index0, 1)
 
-      commands[filtered[0]].action(argv)
+      command.action(argv)
     } else {
-      const args = parse(argv, definitions)
+      const args = parse(argv, {options, parameters})
 
       try {
         if (args != null) {
           if (args.help === true || action == null) {
-            help(name, description, definitions, commands)
+            help(name, description, {options, parameters, commands})
           } else if (action != null) {
             const result = action(args)
 
@@ -58,18 +59,19 @@ module.exports = function sergeant (name, description, define) {
       description = null
     }
 
-    commands[subname] = {
+    commands.push({
+      name: subname,
       action: sergeant(name + ' ' + subname, description, define),
       description
-    }
+    })
   }
 
   function option (key, definition) {
-    definitions[key] = getDefinition(key, definition)
+    options.push(getDefinition(key, definition))
   }
 
   function parameter (key, definition) {
-    definitions[i++] = getDefinition(key, definition)
+    parameters.push(getDefinition(key, definition))
   }
 
   function getDefinition (key, definition) {

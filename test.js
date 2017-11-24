@@ -14,173 +14,188 @@ test('test ./parse', function (t) {
 
   // test dashdash and parameter
   t.deepEquals({'test': '-a'}, parse(['--', '-a'], {
-    '0': {
+    options: [],
+    parameters: [{
       key: 'test'
-    }
+    }]
   }))
 
   // test dashdash and parameter with type
   t.deepEquals({'test': 123}, parse(['--', '123'], {
-    '0': {
+    options: [],
+    parameters: [{
       type: Number,
       key: 'test'
-    }
+    }]
   }))
 
   // test non-required parameter
   t.deepEquals({}, parse([], {
-    '0': {
+    options: [],
+    parameters: [{
       key: 'test'
-    }
+    }]
   }))
 
   // test empty
-  t.deepEquals({}, parse([''], {}))
+  t.deepEquals({}, parse([''], {options: [], parameters: []}))
 
   // test short
   t.deepEquals({aaA: true}, parse(['-a'], {
-    'aa-a': {
+    parameters: [],
+    options: [{
       key: 'aa-a',
       type: Boolean,
       aliases: ['a']
-    }
+    }]
   }))
 
   // test short with value
   t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
-    'aa-a': {
+    parameters: [],
+    options: [{
       key: 'aa-a',
       aliases: ['a']
-    }
+    }]
   }))
 
   // test multiple short with value
   t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
-    'aa-a': {
+    parameters: [],
+    options: [{
       key: 'aa-a',
       aliases: ['a']
     },
-    b: {
+    {
       key: 'b',
       type: Boolean
-    }
+    }]
   }))
 
   // test multiple short
   t.deepEquals({aaA: true, b: true}, parse(['-ba'], {
-    'aa-a': {
+    parameters: [],
+    options: [{
       key: 'aa-a',
       type: Boolean,
       aliases: ['a']
     },
-    b: {
+    {
       key: 'b',
       type: Boolean
-    }
+    }]
   }))
 
   // test multiple, ---, and -
   t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
-    'aa-a': {
+    parameters: [],
+    options: [{
       key: 'aa-a',
       multiple: true,
       aliases: ['a']
-    }
+    }]
   }))
 
   // test non-empty default
   t.deepEquals({aaA: ['', ' ']}, parse(['-a'], {
-    'aa-a': {
+    parameters: [],
+    options: [{
       key: 'aa-a',
       aliases: ['a'],
       type: String,
       multiple: true,
       default: ['', ' ']
-    }
+    }]
   }))
 
   // test non-empty default
   t.deepEquals({aaA: ''}, parse(['-a'], {
-    'aa-a': {
+    parameters: [],
+    options: [{
       key: 'aa-a',
       aliases: ['a'],
       type: String,
       multiple: true,
       default: ''
-    }
+    }]
   }))
 
   // test default with equals
   t.deepEquals({aaA: ''}, parse(['--aa-a='], {
-    'aa-a': {
+    parameters: [],
+    options: [{
       key: 'aa-a',
       aliases: ['a'],
       default: 'abc'
-    }
+    }]
   }))
 
   // test default parameter
   t.deepEquals({'0': 'testing', '1': 'yes'}, parse(['testing'], {
-    '0': {
+    options: [],
+    parameters: [{
       key: '0'
     },
-    '1': {
+    {
       key: '1',
       default: 'yes'
-    }
+    }]
   }))
 
   // test multiple param beginning
   t.deepEquals({'test0': [1, 2, 3, 4, 5, 6, 7], 'test1': 8, 'test2': 9},
   parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
-    '0': {
+    options: [],
+    parameters: [{
       type: Number,
       key: 'test0',
       multiple: true
     },
-    '1': {
+    {
       type: Number,
       key: 'test1'
     },
-    '2': {
+    {
       type: Number,
       key: 'test2'
-    }
+    }]
   }))
 
   // test multiple param middle. No type
   t.deepEquals({'test0': 1, 'test1': ['2', '3', '4', '5', '6', '7', '8'], 'test2': 9},
   parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
-    '0': {
+    options: [],
+    parameters: [{
       type: Number,
       key: 'test0'
     },
-    '1': {
+    {
       key: 'test1',
       multiple: true
     },
-    '2': {
+    {
       type: Number,
       key: 'test2'
-    }
+    }]
   }))
 
   // test multiple param end
   t.deepEquals({'test0': 1, 'test1': 2, 'test2': [3, 4, 5, 6, 7, 8, 9]},
   parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
-    '0': {
+    options: [],
+    parameters: [{
       type: Number,
       key: 'test0'
     },
-    '1': {
+    {
       type: Number,
       key: 'test1'
     },
-    '2': {
+    {
       type: Number,
       key: 'test2',
       multiple: true
-    }
+    }]
   }))
 })
 
@@ -208,60 +223,66 @@ test('test ./parse - with errors', function (t) {
 
   // test boolean with value
   parse(['-a=abc'], {
-    a: {
+    parameters: [],
+    options: [{
       key: 'a',
       type: Boolean
-    }
+    }]
   })
 
   // test boolean with value
   parse(['--aaa=abc'], {
-    aaa: {
+    parameters: [],
+    options: [{
       key: 'aaa',
       type: Boolean
-    }
+    }]
   })
 
   // test unknown
-  parse(['-a'], {})
+  parse(['-a'], {options: [], parameters: []})
 
   // test unknown
-  parse(['--aaa'], {})
+  parse(['--aaa'], {options: [], parameters: []})
 
   // test required
   parse([''], {
-    a: {
+    parameters: [],
+    options: [{
       key: 'a',
       required: true
-    }
+    }]
   })
 
   // test required
   parse([''], {
-    aaa: {
+    parameters: [],
+    options: [{
       key: 'aaa',
       required: true
-    }
+    }]
   })
 
   // test non multiple multiple
   parse(['--aaa=123', '--aaa=456'], {
-    aaa: {
+    parameters: [],
+    options: [{
       type: Number,
       key: 'aaa'
-    }
+    }]
   })
 
   // test required parameter
   parse([], {
-    '0': {
+    options: [],
+    parameters: [{
       key: 'test',
       required: true
-    }
+    }]
   })
 
   // test too many arguments
-  parse(['--', '-a'], {})
+  parse(['--', '-a'], {options: [], parameters: []})
 
   t.equals(globals.process.exitCode, 1)
 
@@ -301,55 +322,66 @@ test('test ./help', function (t) {
   const help = require('./help')
 
   help('test-command', '', {
-    '0': {
+    parameters: [
+      {
+        key: 'p0',
+        description: 'the description',
+        required: true
+      },
+      {
+        key: 'p1',
+        multiple: true,
+        default: ['a', 'b']
+      }
+    ],
+    options: [
+      {
+        key: 'aaa',
+        aliases: ['aa', 'a'],
+        type: Boolean,
+        multiple: true,
+        description: 'a Boolean'
+      },
+      {
+        key: 'b',
+        type: Number,
+        description: 'a Number',
+        default: 100
+      }
+    ],
+    commands: []
+  })
+
+  help('test-command', 'a test command', {
+    parameters: [{
       key: 'p0',
-      description: 'the description',
       required: true
-    },
-    '1': {
-      key: 'p1',
-      multiple: true,
-      default: ['a', 'b']
-    },
-    'aaa': {
+    }],
+    options: [],
+    commands: [
+      {
+        name: 'sub-command-b'
+      },
+      {
+        name: 'sub-command',
+        description: 'a sub command'
+      }
+    ]
+  })
+
+  help('test-command', 'a test command', {
+    options: [{
       key: 'aaa',
       aliases: ['aa', 'a'],
       type: Boolean,
       multiple: true,
       description: 'a Boolean'
-    },
-    'b': {
-      key: 'b',
-      type: Number,
-      description: 'a Number',
-      default: 100
-    }
+    }],
+    parameters: [],
+    commands: []
   })
 
-  help('test-command', 'a test command', {
-    '0': {
-      key: 'p0',
-      required: true
-    }
-  }, {
-    'sub-command-b': {
-    },
-    'sub-command': {
-      description: 'a sub command'
-    }
-  })
-
-  help('test-command', 'a test command', {
-    'aaa': {
-      key: 'aaa',
-      aliases: ['aa', 'a'],
-      type: Boolean,
-      multiple: true,
-      description: 'a Boolean'
-    }
-  })
-
-  help('test-command', 'a test command', {})
+  help('test-command', 'a test command', {options: [], parameters: [], commands: []})
 
   t.plan(2)
 
@@ -460,20 +492,22 @@ test('test ./command - no help. no errors', function (t) {
     t.deepEquals(['testing'], argv)
 
     t.deepEquals({
-      '0': {
+      options: [
+        {
+          key: 'help',
+          aliases: [ 'h' ],
+          description: 'get help',
+          type: Boolean
+        },
+        {
+          key: 'bbb',
+          testing: true
+        }
+      ],
+      parameters: [{
         key: 'aaa',
         testing: true
-      },
-      bbb: {
-        key: 'bbb',
-        testing: true
-      },
-      help: {
-        key: 'help',
-        aliases: [ 'h' ],
-        description: 'get help',
-        type: Boolean
-      }
+      }]
     }, definitions)
 
     return {}
@@ -519,20 +553,23 @@ test('test ./command - help', function (t) {
     t.equals('test-command', name)
 
     t.deepEquals({
-      '0': {
+      options: [
+        {
+          key: 'help',
+          aliases: [ 'h' ],
+          description: 'get help',
+          type: Boolean
+        },
+        {
+          key: 'bbb',
+          testing: true
+        }
+      ],
+      parameters: [{
         key: 'aaa',
         testing: true
-      },
-      bbb: {
-        key: 'bbb',
-        testing: true
-      },
-      help: {
-        key: 'help',
-        aliases: [ 'h' ],
-        description: 'get help',
-        type: Boolean
-      }
+      }],
+      commands: []
     }, definitions)
   }
 

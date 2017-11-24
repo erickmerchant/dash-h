@@ -1,4 +1,4 @@
-module.exports = { addDashes, quoteString, longest, spaces, isNumber, getDefault }
+module.exports = { addDashes, quoteString, longest, spaces, getDefault, getProperty }
 
 function addDashes (key) {
   return (key.length === 1 ? '-' : '--') + key
@@ -24,10 +24,6 @@ function spaces (number) {
   return ' '.repeat(number)
 }
 
-function isNumber (key) {
-  return Number.isInteger(Number(key))
-}
-
 function getDefault (definition) {
   let result = definition.default
 
@@ -40,4 +36,11 @@ function getDefault (definition) {
   }
 
   return result
+}
+
+function getProperty (definition) {
+  const split = definition.key.split('-')
+  const property = split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')
+
+  return property
 }
