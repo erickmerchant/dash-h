@@ -365,7 +365,7 @@ test('test ./help', function (t) {
       {
         key: 'p1',
         multiple: true,
-        default: { text: ['a', 'b'] }
+        default: { value: ['a', 'b'] }
       }
     ],
     options: [
@@ -380,7 +380,7 @@ test('test ./help', function (t) {
         key: 'b',
         type: Number,
         description: 'a Number',
-        default: { text: 100 }
+        default: { value: 100 }
       }
     ],
     commands: []
