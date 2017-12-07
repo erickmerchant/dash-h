@@ -17,7 +17,7 @@ command('hello', function ({option, parameter, command}) {
   option('loud', {
     description: 'say it loud',
     type: Boolean,
-    default: false,
+    default: { value: false },
     aliases: ['l']
   })
 
@@ -25,7 +25,7 @@ command('hello', function ({option, parameter, command}) {
     option('loud', {
       description: 'say it loud',
       type: Boolean,
-      default: false,
+      default: { value: false },
       aliases: ['l']
     })
 
@@ -100,7 +100,7 @@ It's passed args which are all the options and parameters when run.
 __{aliases, default, description, multiple, required, type}__
 
 - aliases: Optional. An array of strings, each an alias.
-- default: Optional. The default value if none is given.
+- default: Optional. The default value if none is given. Should be in the form {text, value}, but only value is required.
 - description: A short description
 - multiple: Optional. A boolean. If true then multiple values are accepted.
 - required: Optional. A boolean. If true it is required.
