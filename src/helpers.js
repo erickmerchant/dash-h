@@ -1,4 +1,4 @@
-module.exports = { addDashes, quoteString, longest, spaces, getDefault, getProperty }
+module.exports = { addDashes, quoteString, longest, spaces, getProperty }
 
 function addDashes (key) {
   return (key.length === 1 ? '-' : '--') + key
@@ -22,20 +22,6 @@ function longest (arr) {
 
 function spaces (number) {
   return ' '.repeat(number)
-}
-
-function getDefault (definition) {
-  let result = definition.default
-
-  if (definition.type) {
-    if (Array.isArray(result)) {
-      result = result.map((val) => definition.type(val))
-    } else {
-      result = definition.type(result)
-    }
-  }
-
-  return result
 }
 
 function getProperty (definition) {

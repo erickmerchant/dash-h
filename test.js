@@ -10,7 +10,7 @@ const mockerySettings = {
 test('test ./parse', function (t) {
   const parse = require('./parse')
 
-  t.plan(16)
+  t.plan(18)
 
   // test dashdash and parameter
   t.deepEquals({'test': '-a'}, parse(['--', '-a'], {
@@ -104,7 +104,7 @@ test('test ./parse', function (t) {
       aliases: ['a'],
       type: String,
       multiple: true,
-      default: ['', ' ']
+      default: { value: ['', ' '] }
     }]
   }))
 
@@ -116,7 +116,7 @@ test('test ./parse', function (t) {
       aliases: ['a'],
       type: String,
       multiple: true,
-      default: ''
+      default: { value: '' }
     }]
   }))
 
@@ -126,7 +126,7 @@ test('test ./parse', function (t) {
     options: [{
       key: 'aa-a',
       aliases: ['a'],
-      default: 'abc'
+      default: { value: 'abc' }
     }]
   }))
 
@@ -138,7 +138,7 @@ test('test ./parse', function (t) {
     },
     {
       key: '1',
-      default: 'yes'
+      default: { value: 'yes' }
     }]
   }))
 
@@ -195,6 +195,40 @@ test('test ./parse', function (t) {
       type: Number,
       key: 'test2',
       multiple: true
+    }]
+  }))
+
+  const DEFAULT = Symbol('DEFAULT')
+
+  // test default with type
+  t.deepEquals({testOption: DEFAULT, testParameter: DEFAULT},
+  parse([], {
+    options: [{
+      key: 'test-option',
+      default: {
+        value: DEFAULT
+      },
+      type: String
+    }],
+    parameters: [{
+      key: 'test-parameter',
+      default: {
+        value: DEFAULT
+      },
+      type: String
+    }]
+  }))
+
+  // test camel-casing
+  t.deepEquals({testOption: 'a string', testParameter: 'another string'},
+  parse(['--test-option', 'a string', 'another string'], {
+    options: [{
+      key: 'test-option',
+      type: String
+    }],
+    parameters: [{
+      key: 'test-parameter',
+      type: String
     }]
   }))
 })
@@ -331,7 +365,7 @@ test('test ./help', function (t) {
       {
         key: 'p1',
         multiple: true,
-        default: ['a', 'b']
+        default: { text: ['a', 'b'] }
       }
     ],
     options: [
@@ -346,7 +380,7 @@ test('test ./help', function (t) {
         key: 'b',
         type: Number,
         description: 'a Number',
-        default: 100
+        default: { text: 100 }
       }
     ],
     commands: []
@@ -661,7 +695,7 @@ test('test ./command - api errors', function (t) {
   t.throws(() => command('test-command', function ({option}) {
     option('a', {
       multiple: true,
-      default: 'a'
+      default: { value: 'a' }
     })
 
     return function () {
@@ -670,7 +704,7 @@ test('test ./command - api errors', function (t) {
 
   t.throws(() => command('test-command', function ({option}) {
     option('a', {
-      default: ['a']
+      default: { value: ['a'] }
     })
 
     return function () {
@@ -680,7 +714,7 @@ test('test ./command - api errors', function (t) {
   t.throws(() => command('test-command', function ({option}) {
     option('aa', {
       type: Boolean,
-      default: true
+      default: { value: true }
     })
 
     return function () {

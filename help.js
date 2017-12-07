@@ -64,7 +64,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       }
 
       if (definition.default) {
-        description.push('[default: ' + quoteString(definition.default) + ']')
+        description.push('[default: ' + quoteString(definition.default.text) + ']')
       }
 
       console.error(description.join('  '))
@@ -91,7 +91,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       }
 
       if (definition.default) {
-        description.push('[default: ' + quoteString(definition.default) + ']')
+        description.push('[default: ' + quoteString(definition.default.text) + ']')
       }
 
       console.error(description.join('  '))

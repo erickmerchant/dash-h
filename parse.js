@@ -1,6 +1,6 @@
 const chalk = require('chalk')
 const { console, process } = require('./src/globals')
-const { addDashes, getDefault, getProperty } = require('./src/helpers')
+const { addDashes, getProperty } = require('./src/helpers')
 
 module.exports = function (argv, {options, parameters}) {
   try {
@@ -19,6 +19,14 @@ module.exports = function (argv, {options, parameters}) {
       }
 
       return options
+    }, [])
+
+    parameters = parameters.reduce((parameters, definition) => {
+      definition = Object.assign({}, definition, {property: getProperty(definition)})
+
+      parameters.push(definition)
+
+      return parameters
     }, [])
 
     let afterDashDash = []
@@ -99,7 +107,7 @@ module.exports = function (argv, {options, parameters}) {
 
       if (args[property] == null) {
         if (definition.default != null) {
-          args[property] = getDefault(definition)
+          args[property] = definition.default.value
         }
 
         if (definition.required === true && args['help'] !== true) {
@@ -131,12 +139,12 @@ module.exports = function (argv, {options, parameters}) {
     }
 
     parameters.forEach((definition, key) => {
-      const property = definition.key
+      const property = definition.property
       const remainingKeys = parameters.length - 1 - key
 
       if (!remainder.length) {
         if (definition.default != null) {
-          args[property] = getDefault(definition)
+          args[property] = definition.default.value
         }
 
         if (definition.required === true && args['help'] !== true) {
