@@ -15,7 +15,7 @@ function quoteString (value) {
 }
 
 function longest (arr) {
-  return arr.reduce((longest, item) => {
+  return arr.reduce(function (longest, item) {
     return item.length > longest ? item.length : longest
   }, 0)
 }

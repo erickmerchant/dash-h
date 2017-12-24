@@ -7,13 +7,13 @@ module.exports = function (argv, {options, parameters}) {
     argv = argv.slice(0)
     const args = {}
 
-    options = options.reduce((options, definition) => {
+    options = options.reduce(function (options, definition) {
       definition = Object.assign({}, definition, {property: getProperty(definition)})
 
       options.push(definition)
 
       if (definition.aliases) {
-        definition.aliases.forEach((alias) => {
+        definition.aliases.forEach(function (alias) {
           options.push(Object.assign({}, definition, {key: alias, alias: true}))
         })
       }
@@ -21,7 +21,7 @@ module.exports = function (argv, {options, parameters}) {
       return options
     }, [])
 
-    parameters = parameters.reduce((parameters, definition) => {
+    parameters = parameters.reduce(function (parameters, definition) {
       definition = Object.assign({}, definition, {property: getProperty(definition)})
 
       parameters.push(definition)
@@ -38,7 +38,7 @@ module.exports = function (argv, {options, parameters}) {
       argv = argv.slice(0, indexOfDashDash)
     }
 
-    argv = argv.reduce((argv, arg) => {
+    argv = argv.reduce(function (argv, arg) {
       if (arg !== '-' && arg.startsWith('-') && !arg.startsWith('--')) {
         if (arg.indexOf('=') > -1) {
           argv.push('-' + arg.substr(arg.indexOf('=') - 1))
@@ -59,7 +59,7 @@ module.exports = function (argv, {options, parameters}) {
     const toBeDeleted = []
 
     for (let i = 0; i < argv.length; i++) {
-      options.forEach((definition) => {
+      options.forEach(function (definition) {
         const search = addDashes(definition.key)
         const property = definition.property
         let vals = []
@@ -102,7 +102,7 @@ module.exports = function (argv, {options, parameters}) {
       })
     }
 
-    options.filter((option) => options.alias !== true).forEach((definition) => {
+    options.filter((option) => options.alias !== true).forEach(function (definition) {
       const property = definition.property
 
       if (args[property] == null) {
@@ -116,7 +116,7 @@ module.exports = function (argv, {options, parameters}) {
       }
     })
 
-    argv = argv.reduce((argv, arg, i) => {
+    argv = argv.reduce(function (argv, arg, i) {
       if (!toBeDeleted.includes(i)) {
         argv.push(arg)
       }
@@ -124,7 +124,7 @@ module.exports = function (argv, {options, parameters}) {
       return argv
     }, [])
 
-    argv.forEach((arg) => {
+    argv.forEach(function (arg) {
       if (arg.startsWith('-') && !arg.startsWith('---')) {
         throw new Error('unknown option ' + arg.split('=')[0])
       }
@@ -138,7 +138,7 @@ module.exports = function (argv, {options, parameters}) {
       throw new Error('too many arguments')
     }
 
-    parameters.forEach((definition, key) => {
+    parameters.forEach(function (definition, key) {
       const property = definition.property
       const remainingKeys = parameters.length - 1 - key
 

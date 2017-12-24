@@ -15,7 +15,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
     let usage = [name]
 
     if (options.length) {
-      usage = usage.concat(options.map((definition) => {
+      usage = usage.concat(options.map(function (definition) {
         const valPart = definition.type !== Boolean
           ? '=<' + (definition.type ? definition.type.name : 'String') + '>'
           : ''
@@ -25,7 +25,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
     }
 
     if (parameters.length) {
-      usage = usage.concat(parameters.map((definition) => {
+      usage = usage.concat(parameters.map(function (definition) {
         return wrapUsage('<' + definition.key + '>', definition)
       }))
     }
@@ -52,11 +52,11 @@ module.exports = function (name, description, {options, parameters, commands}) {
 
     console.error('')
 
-    const longestParameter = longest(parameters.map((definition) => {
+    const longestParameter = longest(parameters.map(function (definition) {
       return definition.key
     }))
 
-    parameters.forEach((definition) => {
+    parameters.forEach(function (definition) {
       const description = [spaces(longestParameter - definition.key.length) + definition.key]
 
       if (definition.description) {
@@ -78,11 +78,11 @@ module.exports = function (name, description, {options, parameters, commands}) {
 
     console.error('')
 
-    const longestOption = longest(options.map((definition) => {
+    const longestOption = longest(options.map(function (definition) {
       return getSignature(definition)
     })) + 1
 
-    options.forEach((definition) => {
+    options.forEach(function (definition) {
       const signature = getSignature(definition)
       const description = [spaces(longestOption - signature.length) + signature]
 
@@ -107,7 +107,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
 
     console.error('')
 
-    commands.forEach((command) => {
+    commands.forEach(function (command) {
       console.error(command.name + (command.description ? '  ' + spaces(longestCommand - command.name.length) + chalk.gray(command.description != null ? command.description : '') : ''))
     })
   }

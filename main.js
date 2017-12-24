@@ -21,7 +21,7 @@ module.exports = function sergeant (name, description, define) {
 
   const action = define({option, parameter, command})
 
-  return (argv) => {
+  return function (argv) {
     const filtered = argv.filter((arg) => arg !== '-' && !arg.startsWith('-'))
     const command = commands.find((command) => command.name === filtered[0])
 

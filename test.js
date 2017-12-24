@@ -240,7 +240,7 @@ test('test ./parse - with errors', function (t) {
 
   const globals = {
     console: {
-      error: function (message) {
+      error (message) {
         messages.push(message)
       }
     },
@@ -342,7 +342,7 @@ test('test ./help', function (t) {
 
   const globals = {
     console: {
-      error: function (message) {
+      error (message) {
         messages.push(message)
       }
     },
@@ -483,7 +483,7 @@ test('test ./error', function (t) {
       this.stack = stack
     },
     console: {
-      error: function (message) {
+      error (message) {
         messages.push(message)
       }
     }
@@ -725,20 +725,20 @@ test('test ./command - api errors', function (t) {
 test('test ./command - sub commands', function (t) {
   mockery.enable(mockerySettings)
 
-  mockery.registerMock('./parse', () => { return {} })
+  mockery.registerMock('./parse', function () { return {} })
 
   const command = require('./main')
 
   t.plan(2)
 
   const testCommand = command('test-command', function ({option, parameter, command}) {
-    command('sub-command', 'a sub command', () => {
+    command('sub-command', 'a sub command', function () {
       return function () {
         t.ok(true)
       }
     })
 
-    command('sub-command-b', () => {
+    command('sub-command-b', function () {
       return function () {
         t.ok(true)
       }
