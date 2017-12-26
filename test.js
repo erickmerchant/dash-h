@@ -333,6 +333,8 @@ test('test ./parse - with errors', function (t) {
   ], messages)
 
   mockery.disable()
+
+  mockery.deregisterAll()
 })
 
 test('test ./help', function (t) {
@@ -467,6 +469,8 @@ test('test ./help', function (t) {
   ], messages)
 
   mockery.disable()
+
+  mockery.deregisterAll()
 })
 
 test('test ./error', function (t) {
@@ -511,6 +515,8 @@ test('test ./error', function (t) {
   ], messages)
 
   mockery.disable()
+
+  mockery.deregisterAll()
 })
 
 test('test ./command - no help. no errors', function (t) {
@@ -564,6 +570,8 @@ test('test ./command - no help. no errors', function (t) {
   testCommand(['testing'])
 
   mockery.disable()
+
+  mockery.deregisterAll()
 })
 
 test('test ./command - help', function (t) {
@@ -621,6 +629,8 @@ test('test ./command - help', function (t) {
   testCommand(['testing'])
 
   mockery.disable()
+
+  mockery.deregisterAll()
 })
 
 test('test ./command - thrown error', function (t) {
@@ -653,6 +663,8 @@ test('test ./command - thrown error', function (t) {
   testCommand(['testing'])
 
   mockery.disable()
+
+  mockery.deregisterAll()
 })
 
 test('test ./command - rejected promise', function (t) {
@@ -685,6 +697,8 @@ test('test ./command - rejected promise', function (t) {
   testCommand(['testing'])
 
   mockery.disable()
+
+  mockery.deregisterAll()
 })
 
 test('test ./command - api errors', function (t) {
@@ -754,4 +768,6 @@ test('test ./command - sub commands', function (t) {
   testCommand(['sub-command-b'])
 
   mockery.disable()
+
+  mockery.deregisterAll()
 })
