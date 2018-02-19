@@ -144,93 +144,93 @@ test('test ./parse', function (t) {
 
   // test multiple param beginning
   t.deepEquals({'test0': [1, 2, 3, 4, 5, 6, 7], 'test1': 8, 'test2': 9},
-  parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
-    options: [],
-    parameters: [{
-      type: Number,
-      key: 'test0',
-      multiple: true
-    },
-    {
-      type: Number,
-      key: 'test1'
-    },
-    {
-      type: Number,
-      key: 'test2'
-    }]
-  }))
+    parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+      options: [],
+      parameters: [{
+        type: Number,
+        key: 'test0',
+        multiple: true
+      },
+      {
+        type: Number,
+        key: 'test1'
+      },
+      {
+        type: Number,
+        key: 'test2'
+      }]
+    }))
 
   // test multiple param middle. No type
   t.deepEquals({'test0': 1, 'test1': ['2', '3', '4', '5', '6', '7', '8'], 'test2': 9},
-  parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
-    options: [],
-    parameters: [{
-      type: Number,
-      key: 'test0'
-    },
-    {
-      key: 'test1',
-      multiple: true
-    },
-    {
-      type: Number,
-      key: 'test2'
-    }]
-  }))
+    parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+      options: [],
+      parameters: [{
+        type: Number,
+        key: 'test0'
+      },
+      {
+        key: 'test1',
+        multiple: true
+      },
+      {
+        type: Number,
+        key: 'test2'
+      }]
+    }))
 
   // test multiple param end
   t.deepEquals({'test0': 1, 'test1': 2, 'test2': [3, 4, 5, 6, 7, 8, 9]},
-  parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
-    options: [],
-    parameters: [{
-      type: Number,
-      key: 'test0'
-    },
-    {
-      type: Number,
-      key: 'test1'
-    },
-    {
-      type: Number,
-      key: 'test2',
-      multiple: true
-    }]
-  }))
+    parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+      options: [],
+      parameters: [{
+        type: Number,
+        key: 'test0'
+      },
+      {
+        type: Number,
+        key: 'test1'
+      },
+      {
+        type: Number,
+        key: 'test2',
+        multiple: true
+      }]
+    }))
 
   const DEFAULT = Symbol('DEFAULT')
 
   // test default with type
   t.deepEquals({testOption: DEFAULT, testParameter: DEFAULT},
-  parse([], {
-    options: [{
-      key: 'test-option',
-      default: {
-        value: DEFAULT
-      },
-      type: String
-    }],
-    parameters: [{
-      key: 'test-parameter',
-      default: {
-        value: DEFAULT
-      },
-      type: String
-    }]
-  }))
+    parse([], {
+      options: [{
+        key: 'test-option',
+        default: {
+          value: DEFAULT
+        },
+        type: String
+      }],
+      parameters: [{
+        key: 'test-parameter',
+        default: {
+          value: DEFAULT
+        },
+        type: String
+      }]
+    }))
 
   // test camel-casing
   t.deepEquals({testOption: 'a string', testParameter: 'another string'},
-  parse(['--test-option', 'a string', 'another string'], {
-    options: [{
-      key: 'test-option',
-      type: String
-    }],
-    parameters: [{
-      key: 'test-parameter',
-      type: String
-    }]
-  }))
+    parse(['--test-option', 'a string', 'another string'], {
+      options: [{
+        key: 'test-option',
+        type: String
+      }],
+      parameters: [{
+        key: 'test-parameter',
+        type: String
+      }]
+    }))
 })
 
 test('test ./parse - with errors', function (t) {
