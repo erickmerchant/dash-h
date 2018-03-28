@@ -96,37 +96,34 @@ test('test ./parse', function (t) {
     }]
   }))
 
-  // test non-empty default
-  t.deepEquals({aaA: ['', ' ']}, parse(['-a'], {
+  // test empty
+  t.deepEquals({aaA: ['']}, parse(['-a'], {
     parameters: [],
     options: [{
       key: 'aa-a',
       aliases: ['a'],
       type: String,
-      multiple: true,
-      default: { value: ['', ' '] }
+      multiple: true
     }]
   }))
 
-  // test non-empty default
-  t.deepEquals({aaA: ''}, parse(['-a'], {
-    parameters: [],
-    options: [{
-      key: 'aa-a',
-      aliases: ['a'],
-      type: String,
-      multiple: true,
-      default: { value: '' }
-    }]
-  }))
-
-  // test default with equals
+  // test empty with equals
   t.deepEquals({aaA: ''}, parse(['--aa-a='], {
     parameters: [],
     options: [{
       key: 'aa-a',
+      aliases: ['a']
+    }]
+  }))
+
+  // test default
+  t.deepEquals({aaA: ''}, parse([''], {
+    parameters: [],
+    options: [{
+      key: 'aa-a',
       aliases: ['a'],
-      default: { value: 'abc' }
+      type: String,
+      default: { value: '' }
     }]
   }))
 

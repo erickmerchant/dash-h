@@ -70,6 +70,8 @@ module.exports = function (argv, {options, parameters}) {
               vals.push(argv[i + 1])
 
               toBeDeleted.push(i + 1)
+            } else {
+              vals.push('')
             }
           } else {
             vals.push(true)
