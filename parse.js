@@ -71,7 +71,7 @@ module.exports = function (argv, {options, parameters}) {
 
               toBeDeleted.push(i + 1)
             } else {
-              vals.push('')
+              throw new Error(addDashes(definition.key) + ' is not a boolean and requires a value')
             }
           } else {
             vals.push(true)

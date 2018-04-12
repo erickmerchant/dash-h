@@ -10,7 +10,7 @@ const mockerySettings = {
 test('test ./parse', function (t) {
   const parse = require('./parse')
 
-  t.plan(18)
+  t.plan(17)
 
   // test dashdash and parameter
   t.deepEquals({'test': '-a'}, parse(['--', '-a'], {
@@ -93,17 +93,6 @@ test('test ./parse', function (t) {
       key: 'aa-a',
       multiple: true,
       aliases: ['a']
-    }]
-  }))
-
-  // test empty
-  t.deepEquals({aaA: ['']}, parse(['-a'], {
-    parameters: [],
-    options: [{
-      key: 'aa-a',
-      aliases: ['a'],
-      type: String,
-      multiple: true
     }]
   }))
 
@@ -252,6 +241,17 @@ test('test ./parse - with errors', function (t) {
 
   t.plan(2)
 
+  // test non-boolean with value
+  parse(['-a'], {
+    parameters: [],
+    options: [{
+      key: 'aa-a',
+      aliases: ['a'],
+      type: String,
+      multiple: true
+    }]
+  })
+
   // test boolean with value
   parse(['-a=abc'], {
     parameters: [],
@@ -318,6 +318,7 @@ test('test ./parse - with errors', function (t) {
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
+    chalk.red('-a is not a boolean and requires a value'),
     chalk.red('-a is a boolean and does not accept a value'),
     chalk.red('--aaa is a boolean and does not accept a value'),
     chalk.red('unknown option -a'),
@@ -370,7 +371,7 @@ test('test ./help', function (t) {
     options: [
       {
         key: 'aaa',
-        aliases: ['aa', 'a'],
+        aliases: ['a'],
         type: Boolean,
         multiple: true,
         description: 'a Boolean'
@@ -405,7 +406,7 @@ test('test ./help', function (t) {
   help('test-command', 'a test command', {
     options: [{
       key: 'aaa',
-      aliases: ['aa', 'a'],
+      aliases: ['a'],
       type: Boolean,
       multiple: true,
       description: 'a Boolean'
@@ -422,7 +423,7 @@ test('test ./help', function (t) {
 
   t.deepEquals([
     '',
-    chalk.green('Usage:') + ' test-command [--aaa,--aa,-a...] [-b=<Number>] <p0> [<p1>...]',
+    chalk.green('Usage:') + ' test-command [--aaa...] [-b=<Number>] <p0> [<p1>...]',
     '',
     chalk.green('Parameters:'),
     '',
@@ -431,8 +432,8 @@ test('test ./help', function (t) {
     '',
     chalk.green('Options:'),
     '',
-    ' --aaa,--aa,-a  ' + chalk.gray('a Boolean'),
-    '            -b  ' + chalk.gray('a Number') + '  [default: 100]',
+    '-a, --aaa  ' + chalk.gray('a Boolean'),
+    '       -b  ' + chalk.gray('a Number') + '  [default: 100]',
     '',
     '',
     'a test command',
@@ -440,7 +441,7 @@ test('test ./help', function (t) {
     chalk.green('Usage:'),
     '',
     'test-command <p0>',
-    'test-command <command> [--help,-h]',
+    'test-command <command> [--help]',
     '',
     chalk.green('Parameters:'),
     '',
@@ -454,11 +455,11 @@ test('test ./help', function (t) {
     '',
     'a test command',
     '',
-    chalk.green('Usage:') + ' test-command [--aaa,--aa,-a...]',
+    chalk.green('Usage:') + ' test-command [--aaa...]',
     '',
     chalk.green('Options:'),
     '',
-    ' --aaa,--aa,-a  ' + chalk.gray('a Boolean'),
+    '-a, --aaa  ' + chalk.gray('a Boolean'),
     '',
     '',
     'a test command',

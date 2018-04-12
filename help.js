@@ -20,7 +20,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
           ? '=<' + (definition.type ? definition.type.name : 'String') + '>'
           : ''
 
-        return wrapUsage(getSignature(definition) + valPart, definition)
+        return wrapUsage(addDashes(definition.key) + valPart, definition)
       }))
     }
 
@@ -39,7 +39,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
 
       console.error(usage.join(' '))
 
-      console.error(name + ' <command> [--help,-h]')
+      console.error(name + ' <command> [--help]')
     } else {
       console.error(chalk.green('Usage:') + ' ' + usage.join(' '))
     }
@@ -80,7 +80,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
 
     const longestOption = longest(options.map(function (definition) {
       return getSignature(definition)
-    })) + 1
+    }))
 
     options.forEach(function (definition) {
       const signature = getSignature(definition)
@@ -123,7 +123,7 @@ function getSignature (definition) {
   let signature = addDashes(definition.key)
 
   if (definition.aliases != null && definition.aliases.length) {
-    signature += ',' + definition.aliases.map((k) => addDashes(k)).join(',')
+    signature = definition.aliases.map((k) => addDashes(k)).join(', ') + ', ' + signature
   }
 
   return signature
