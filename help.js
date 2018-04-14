@@ -17,7 +17,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
     if (options.length) {
       usage = usage.concat(options.map(function (definition) {
         const valPart = definition.type !== Boolean
-          ? '=<' + (definition.type ? definition.type.name : 'String') + '>'
+          ? ' <' + (definition.units ? definition.units : 'val') + '>'
           : ''
 
         return wrapUsage(addDashes(definition.key) + valPart, definition)
@@ -116,7 +116,9 @@ module.exports = function (name, description, {options, parameters, commands}) {
 }
 
 function wrapUsage (usage, {required, multiple}) {
-  return (required !== true ? '[' : '') + usage + (multiple === true ? '...' : '') + (required !== true ? ']' : '')
+  const opt = usage.startsWith('-')
+
+  return (required !== true ? '[' : (opt ? '(' : '')) + usage + (multiple === true ? '...' : '') + (required !== true ? ']' : (opt ? ')' : ''))
 }
 
 function getSignature (definition) {

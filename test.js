@@ -379,6 +379,7 @@ test('test ./help', function (t) {
       {
         key: 'b',
         type: Number,
+        required: true,
         description: 'a Number',
         default: { value: 100 }
       }
@@ -423,7 +424,7 @@ test('test ./help', function (t) {
 
   t.deepEquals([
     '',
-    chalk.green('Usage:') + ' test-command [--aaa...] [-b=<Number>] <p0> [<p1>...]',
+    chalk.green('Usage:') + ' test-command [--aaa...] (-b <val>) <p0> [<p1>...]',
     '',
     chalk.green('Parameters:'),
     '',
