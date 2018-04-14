@@ -424,7 +424,7 @@ test('test ./help', function (t) {
 
   t.deepEquals([
     '',
-    chalk.green('Usage:') + ' test-command [--aaa...] (-b <val>) <p0> [<p1>...]',
+    chalk.green('Usage:') + ' test-command [--aaa]... (-b <val>) <p0> [<p1>]...',
     '',
     chalk.green('Parameters:'),
     '',
@@ -456,7 +456,7 @@ test('test ./help', function (t) {
     '',
     'a test command',
     '',
-    chalk.green('Usage:') + ' test-command [--aaa...]',
+    chalk.green('Usage:') + ' test-command [--aaa]...',
     '',
     chalk.green('Options:'),
     '',

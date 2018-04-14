@@ -118,7 +118,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
 function wrapUsage (usage, {required, multiple}) {
   const opt = usage.startsWith('-')
 
-  return (required !== true ? '[' : (opt ? '(' : '')) + usage + (multiple === true ? '...' : '') + (required !== true ? ']' : (opt ? ')' : ''))
+  return (required !== true ? '[' : (opt ? '(' : '')) + usage + (required !== true ? ']' : (opt ? ')' : '')) + (multiple === true ? '...' : '')
 }
 
 function getSignature (definition) {
