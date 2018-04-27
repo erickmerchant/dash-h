@@ -10,7 +10,7 @@ const mockerySettings = {
 test('test ./parse', function (t) {
   const parse = require('./parse')
 
-  t.plan(17)
+  t.plan(18)
 
   // test dashdash and parameter
   t.deepEquals({'test': '-a'}, parse(['--', '-a'], {
@@ -45,7 +45,6 @@ test('test ./parse', function (t) {
     parameters: [],
     options: [{
       key: 'aa-a',
-      type: Boolean,
       aliases: ['a']
     }]
   }))
@@ -54,6 +53,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
     parameters: [],
     options: [{
+      type: String,
       key: 'aa-a',
       aliases: ['a']
     }]
@@ -63,12 +63,12 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
     parameters: [],
     options: [{
+      type: String,
       key: 'aa-a',
       aliases: ['a']
     },
     {
-      key: 'b',
-      type: Boolean
+      key: 'b'
     }]
   }))
 
@@ -77,12 +77,10 @@ test('test ./parse', function (t) {
     parameters: [],
     options: [{
       key: 'aa-a',
-      type: Boolean,
       aliases: ['a']
     },
     {
-      key: 'b',
-      type: Boolean
+      key: 'b'
     }]
   }))
 
@@ -90,6 +88,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     parameters: [],
     options: [{
+      type: String,
       key: 'aa-a',
       multiple: true,
       aliases: ['a']
@@ -100,6 +99,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: ''}, parse(['--aa-a='], {
     parameters: [],
     options: [{
+      type: String,
       key: 'aa-a',
       aliases: ['a']
     }]
@@ -112,7 +112,17 @@ test('test ./parse', function (t) {
       key: 'aa-a',
       aliases: ['a'],
       type: String,
-      default: { value: '' }
+      default: ''
+    }]
+  }))
+
+  // test not
+  t.deepEquals({bbB: false}, parse(['--bb-b'], {
+    parameters: [],
+    options: [{
+      key: 'bb-b',
+      aliases: ['b'],
+      default: true
     }]
   }))
 
@@ -124,7 +134,7 @@ test('test ./parse', function (t) {
     },
     {
       key: '1',
-      default: { value: 'yes' }
+      default: 'yes'
     }]
   }))
 
@@ -191,16 +201,12 @@ test('test ./parse', function (t) {
     parse([], {
       options: [{
         key: 'test-option',
-        default: {
-          value: DEFAULT
-        },
+        default: DEFAULT,
         type: String
       }],
       parameters: [{
         key: 'test-parameter',
-        default: {
-          value: DEFAULT
-        },
+        default: DEFAULT,
         type: String
       }]
     }))
@@ -256,8 +262,7 @@ test('test ./parse - with errors', function (t) {
   parse(['-a=abc'], {
     parameters: [],
     options: [{
-      key: 'a',
-      type: Boolean
+      key: 'a'
     }]
   })
 
@@ -265,8 +270,7 @@ test('test ./parse - with errors', function (t) {
   parse(['--aaa=abc'], {
     parameters: [],
     options: [{
-      key: 'aaa',
-      type: Boolean
+      key: 'aaa'
     }]
   })
 
@@ -365,23 +369,22 @@ test('test ./help', function (t) {
       {
         key: 'p1',
         multiple: true,
-        default: { value: ['a', 'b'] }
+        default: ['a', 'b']
       }
     ],
     options: [
       {
         key: 'aaa',
         aliases: ['a'],
-        type: Boolean,
         multiple: true,
         description: 'a Boolean'
       },
       {
         key: 'b',
-        type: Number,
+        type: function val (v) { return Number(v) },
         required: true,
         description: 'a Number',
-        default: { value: 100 }
+        default: 100
       }
     ],
     commands: []
@@ -408,7 +411,6 @@ test('test ./help', function (t) {
     options: [{
       key: 'aaa',
       aliases: ['a'],
-      type: Boolean,
       multiple: true,
       description: 'a Boolean'
     }],
@@ -429,7 +431,7 @@ test('test ./help', function (t) {
     chalk.green('Parameters:'),
     '',
     'p0  ' + chalk.gray('the description'),
-    'p1  ' + '[default: "a", "b"]',
+    'p1  ' + '[default: ["a","b"]]',
     '',
     chalk.green('Options:'),
     '',
@@ -535,8 +537,7 @@ test('test ./command - no help. no errors', function (t) {
         {
           key: 'help',
           aliases: [ 'h' ],
-          description: 'get help',
-          type: Boolean
+          description: 'get help'
         },
         {
           key: 'bbb',
@@ -598,8 +599,7 @@ test('test ./command - help', function (t) {
         {
           key: 'help',
           aliases: [ 'h' ],
-          description: 'get help',
-          type: Boolean
+          description: 'get help'
         },
         {
           key: 'bbb',
@@ -708,7 +708,7 @@ test('test ./command - api errors', function (t) {
   t.throws(() => command('test-command', function ({option}) {
     option('a', {
       multiple: true,
-      default: { value: 'a' }
+      default: 'a'
     })
 
     return function () {
@@ -717,7 +717,7 @@ test('test ./command - api errors', function (t) {
 
   t.throws(() => command('test-command', function ({option}) {
     option('a', {
-      default: { value: ['a'] }
+      default: ['a']
     })
 
     return function () {
@@ -726,8 +726,7 @@ test('test ./command - api errors', function (t) {
 
   t.throws(() => command('test-command', function ({option}) {
     option('aa', {
-      type: Boolean,
-      default: { value: true }
+      default: true
     })
 
     return function () {

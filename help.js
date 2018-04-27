@@ -1,6 +1,6 @@
 const chalk = require('chalk')
 const { console, process } = require('./src/globals')
-const { addDashes, longest, spaces, quoteString } = require('./src/helpers')
+const { addDashes, longest, spaces } = require('./src/helpers')
 
 module.exports = function (name, description, {options, parameters, commands}) {
   process.exitCode = 1
@@ -16,8 +16,8 @@ module.exports = function (name, description, {options, parameters, commands}) {
 
     if (options.length) {
       usage = usage.concat(options.map(function (definition) {
-        const valPart = definition.type !== Boolean
-          ? ' <' + (definition.units ? definition.units : 'val') + '>'
+        const valPart = definition.type != null
+          ? ' <' + definition.type.name + '>'
           : ''
 
         return wrapUsage(addDashes(definition.key) + valPart, definition)
@@ -64,7 +64,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       }
 
       if (definition.default) {
-        description.push('[default: ' + quoteString(definition.default.text || definition.default.value) + ']')
+        description.push('[default: ' + JSON.stringify(definition.default) + ']')
       }
 
       console.error(description.join('  '))
@@ -91,7 +91,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       }
 
       if (definition.default) {
-        description.push('[default: ' + quoteString(definition.default.text || definition.default.value) + ']')
+        description.push('[default: ' + JSON.stringify(definition.default) + ']')
       }
 
       console.error(description.join('  '))

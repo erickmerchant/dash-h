@@ -65,7 +65,7 @@ module.exports = function (argv, {options, parameters}) {
         let vals = []
 
         if (argv[i] === search) {
-          if (definition.type !== Boolean) {
+          if (definition.type != null) {
             if (argv[i + 1] != null && (!argv[i + 1].startsWith('-') || argv[i + 1].startsWith('---') || argv[i + 1] === '-')) {
               vals.push(argv[i + 1])
 
@@ -74,12 +74,16 @@ module.exports = function (argv, {options, parameters}) {
               throw new Error(addDashes(definition.key) + ' is not a boolean and requires a value')
             }
           } else {
-            vals.push(true)
+            if (definition.default != null) {
+              vals.push(!definition.default)
+            } else {
+              vals.push(true)
+            }
           }
 
           toBeDeleted.push(i)
         } else if (argv[i].startsWith(search + '=')) {
-          if (definition.type !== Boolean) {
+          if (definition.type != null) {
             vals.push(argv[i].substr(argv[i].indexOf('=') + 1))
 
             toBeDeleted.push(i)
@@ -109,7 +113,7 @@ module.exports = function (argv, {options, parameters}) {
 
       if (args[property] == null) {
         if (definition.default != null) {
-          args[property] = definition.default.value
+          args[property] = definition.default
         }
 
         if (definition.required === true && args['help'] !== true) {
@@ -146,7 +150,7 @@ module.exports = function (argv, {options, parameters}) {
 
       if (!remainder.length) {
         if (definition.default != null) {
-          args[property] = definition.default.value
+          args[property] = definition.default
         }
 
         if (definition.required === true && args['help'] !== true) {

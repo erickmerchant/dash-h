@@ -1,17 +1,7 @@
-module.exports = { addDashes, quoteString, longest, spaces, camelCaseFromDash }
+module.exports = { addDashes, longest, spaces, camelCaseFromDash }
 
 function addDashes (key) {
   return (key.length === 1 ? '-' : '--') + key
-}
-
-function quoteString (value) {
-  if (Array.isArray(value)) {
-    return value.map(quoteString).join(', ')
-  }
-
-  const quote = (typeof value === 'string' ? '"' : '')
-
-  return quote + value + quote
 }
 
 function longest (arr) {

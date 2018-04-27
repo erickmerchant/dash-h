@@ -14,7 +14,6 @@ module.exports = function sergeant (name, description, define) {
   const commands = []
 
   option('help', {
-    type: Boolean,
     aliases: ['h'],
     description: 'get help'
   })
@@ -78,16 +77,16 @@ module.exports = function sergeant (name, description, define) {
     definition = Object.assign(definition, {key})
 
     if (definition.default != null) {
-      if (definition.multiple && !Array.isArray(definition.default.value)) {
+      if (definition.multiple && !Array.isArray(definition.default)) {
         throw new Error('the default of ' + key + ' should be an array')
       }
 
-      if (!definition.multiple && Array.isArray(definition.default.value)) {
+      if (!definition.multiple && Array.isArray(definition.default)) {
         throw new Error('the default of ' + key + ' should not be an array')
       }
     }
 
-    if (definition.type != null && definition.type === Boolean && definition.default != null && definition.default.value !== false) {
+    if (definition.type == null && definition.default != null && definition.default !== false) {
       throw new Error('the default of ' + key + ' should be false')
     }
 
