@@ -66,14 +66,14 @@ module.exports = function sergeant (name, description, define) {
   }
 
   function option (key, definition) {
-    options.push(getDefinition(key, definition))
+    options.push(getDefinition(key, definition, true))
   }
 
   function parameter (key, definition) {
     parameters.push(getDefinition(key, definition))
   }
 
-  function getDefinition (key, definition) {
+  function getDefinition (key, definition, isFlag = false) {
     definition = Object.assign(definition, {key})
 
     if (definition.default != null) {
@@ -86,7 +86,7 @@ module.exports = function sergeant (name, description, define) {
       }
     }
 
-    if (definition.type == null && definition.default != null && definition.default !== false) {
+    if (isFlag && definition.type == null && definition.default != null && definition.default !== false) {
       throw new Error('the default of ' + key + ' should be false')
     }
 
