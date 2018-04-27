@@ -22,6 +22,6 @@
     "tape": "^4.9.0"
   },
   "dependencies": {
-    "chalk": "^2.3.2"
+    "chalk": "^2.4.1"
   }
 }
