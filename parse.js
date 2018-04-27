@@ -74,11 +74,7 @@ module.exports = function (argv, {options, parameters}) {
               throw new Error(addDashes(definition.key) + ' is not a boolean and requires a value')
             }
           } else {
-            if (definition.default != null) {
-              vals.push(!definition.default)
-            } else {
-              vals.push(true)
-            }
+            vals.push(true)
           }
 
           toBeDeleted.push(i)
