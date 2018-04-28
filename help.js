@@ -63,8 +63,8 @@ module.exports = function (name, description, {options, parameters, commands}) {
         description.push(chalk.gray(definition.description))
       }
 
-      if (definition.default) {
-        description.push('[default: ' + JSON.stringify(definition.default) + ']')
+      if (definition.type != null && definition.type() != null) {
+        description.push('[default: ' + JSON.stringify(definition.type()) + ']')
       }
 
       console.error(description.join('  '))
@@ -90,8 +90,8 @@ module.exports = function (name, description, {options, parameters, commands}) {
         description.push(chalk.gray(definition.description))
       }
 
-      if (definition.default) {
-        description.push('[default: ' + JSON.stringify(definition.default) + ']')
+      if (definition.type != null && definition.type() != null) {
+        description.push('[default: ' + JSON.stringify(definition.type()) + ']')
       }
 
       console.error(description.join('  '))

@@ -10,7 +10,7 @@ const mockerySettings = {
 test('test ./parse', function (t) {
   const parse = require('./parse')
 
-  t.plan(17)
+  t.plan(18)
 
   // test dashdash and parameter
   t.deepEquals({'test': '-a'}, parse(['--', '-a'], {
@@ -24,7 +24,7 @@ test('test ./parse', function (t) {
   t.deepEquals({'test': 123}, parse(['--', '123'], {
     options: [],
     parameters: [{
-      type: Number,
+      type: function (val) { return Number(val) },
       key: 'test'
     }]
   }))
@@ -53,7 +53,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
     parameters: [],
     options: [{
-      type: String,
+      type: function (val) { return val },
       key: 'aa-a',
       aliases: ['a']
     }]
@@ -63,7 +63,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
     parameters: [],
     options: [{
-      type: String,
+      type: function (val) { return val },
       key: 'aa-a',
       aliases: ['a']
     },
@@ -88,7 +88,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     parameters: [],
     options: [{
-      type: String,
+      type: function (val) { return val },
       key: 'aa-a',
       multiple: true,
       aliases: ['a']
@@ -99,7 +99,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: ''}, parse(['--aa-a='], {
     parameters: [],
     options: [{
-      type: String,
+      type: function (val) { return val },
       key: 'aa-a',
       aliases: ['a']
     }]
@@ -111,8 +111,22 @@ test('test ./parse', function (t) {
     options: [{
       key: 'aa-a',
       aliases: ['a'],
-      type: String,
-      default: ''
+      type: function (val) {
+        if (val == null) {
+          return ''
+        }
+
+        return String(val)
+      }
+    }]
+  }))
+
+  // test default flag
+  t.deepEquals({aaA: false}, parse([''], {
+    parameters: [],
+    options: [{
+      key: 'aa-a',
+      aliases: ['a']
     }]
   }))
 
@@ -124,7 +138,13 @@ test('test ./parse', function (t) {
     },
     {
       key: '1',
-      default: 'yes'
+      type: function (val) {
+        if (val == null) {
+          return 'yes'
+        }
+
+        return String(val)
+      }
     }]
   }))
 
@@ -133,16 +153,16 @@ test('test ./parse', function (t) {
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
-        type: Number,
+        type: function (val) { return val.map((v) => Number(v)) },
         key: 'test0',
         multiple: true
       },
       {
-        type: Number,
+        type: function (val) { return Number(val) },
         key: 'test1'
       },
       {
-        type: Number,
+        type: function (val) { return Number(val) },
         key: 'test2'
       }]
     }))
@@ -152,7 +172,7 @@ test('test ./parse', function (t) {
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
-        type: Number,
+        type: function (val) { return Number(val) },
         key: 'test0'
       },
       {
@@ -160,7 +180,7 @@ test('test ./parse', function (t) {
         multiple: true
       },
       {
-        type: Number,
+        type: function (val) { return Number(val) },
         key: 'test2'
       }]
     }))
@@ -170,15 +190,15 @@ test('test ./parse', function (t) {
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
-        type: Number,
+        type: function (val) { return Number(val) },
         key: 'test0'
       },
       {
-        type: Number,
+        type: function (val) { return Number(val) },
         key: 'test1'
       },
       {
-        type: Number,
+        type: function (val) { return val.map((v) => Number(v)) },
         key: 'test2',
         multiple: true
       }]
@@ -186,18 +206,24 @@ test('test ./parse', function (t) {
 
   const DEFAULT = Symbol('DEFAULT')
 
+  function FN_DEFAULT (val) {
+    if (val == null) {
+      return DEFAULT
+    }
+
+    return String(val)
+  }
+
   // test default with type
   t.deepEquals({testOption: DEFAULT, testParameter: DEFAULT},
     parse([], {
       options: [{
         key: 'test-option',
-        default: DEFAULT,
-        type: String
+        type: FN_DEFAULT
       }],
       parameters: [{
         key: 'test-parameter',
-        default: DEFAULT,
-        type: String
+        type: FN_DEFAULT
       }]
     }))
 
@@ -206,11 +232,11 @@ test('test ./parse', function (t) {
     parse(['--test-option', 'a string', 'another string'], {
       options: [{
         key: 'test-option',
-        type: String
+        type: function (val) { return val }
       }],
       parameters: [{
         key: 'test-parameter',
-        type: String
+        type: function (val) { return val }
       }]
     }))
 })
@@ -243,7 +269,7 @@ test('test ./parse - with errors', function (t) {
     options: [{
       key: 'aa-a',
       aliases: ['a'],
-      type: String,
+      type: function (val) { return val },
       multiple: true
     }]
   })
@@ -292,7 +318,7 @@ test('test ./parse - with errors', function (t) {
   parse(['--aaa=123', '--aaa=456'], {
     parameters: [],
     options: [{
-      type: Number,
+      type: function (val) { return Number(val) },
       key: 'aaa'
     }]
   })
@@ -359,7 +385,13 @@ test('test ./help', function (t) {
       {
         key: 'p1',
         multiple: true,
-        default: ['a', 'b']
+        type: function (val) {
+          if (val == null) {
+            return ['a', 'b']
+          }
+
+          return val
+        }
       }
     ],
     options: [
@@ -371,10 +403,15 @@ test('test ./help', function (t) {
       },
       {
         key: 'b',
-        type: function val (v) { return Number(v) },
         required: true,
         description: 'a Number',
-        default: 100
+        type: function val (val) {
+          if (val == null) {
+            return 100
+          }
+
+          return Number(val)
+        }
       }
     ],
     commands: []
@@ -688,40 +725,6 @@ test('test ./command - rejected promise', function (t) {
   mockery.disable()
 
   mockery.deregisterAll()
-})
-
-test('test ./command - api errors', function (t) {
-  const command = require('./main')
-
-  t.plan(3)
-
-  t.throws(() => command('test-command', function ({option}) {
-    option('a', {
-      multiple: true,
-      default: 'a'
-    })
-
-    return function () {
-    }
-  }), /the default of a should be an array/)
-
-  t.throws(() => command('test-command', function ({option}) {
-    option('a', {
-      default: ['a']
-    })
-
-    return function () {
-    }
-  }), /the default of a should not be an array/)
-
-  t.throws(() => command('test-command', function ({option}) {
-    option('aa', {
-      default: true
-    })
-
-    return function () {
-    }
-  }), /the default of aa should be false/)
 })
 
 test('test ./command - sub commands', function (t) {

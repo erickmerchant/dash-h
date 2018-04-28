@@ -89,10 +89,6 @@ module.exports = function (argv, {options, parameters}) {
         }
 
         if (vals != null && vals.length) {
-          if (definition.type != null) {
-            vals = vals.map((val) => definition.type(val))
-          }
-
           if (definition.multiple === true) {
             args[property] = args[property] != null ? args[property].concat(vals) : vals
           } else if (args[property] != null) {
@@ -108,13 +104,21 @@ module.exports = function (argv, {options, parameters}) {
       const property = definition.property
 
       if (args[property] == null) {
-        if (definition.default != null) {
-          args[property] = definition.default
-        }
+        if (definition.type != null) {
+          const _default = definition.type()
 
-        if (definition.required === true && args['help'] !== true) {
+          if (_default != null) {
+            args[property] = _default
+          } else if (definition.required === true && args['help'] !== true) {
+            throw new Error(addDashes(definition.key) + ' is required')
+          }
+        } else if (definition.required !== true) {
+          args[property] = false
+        } else if (definition.required === true && args['help'] !== true) {
           throw new Error(addDashes(definition.key) + ' is required')
         }
+      } else if (definition.type != null) {
+        args[property] = definition.type(args[property])
       }
     })
 
@@ -145,20 +149,24 @@ module.exports = function (argv, {options, parameters}) {
       const remainingKeys = parameters.length - 1 - key
 
       if (!remainder.length) {
-        if (definition.default != null) {
-          args[property] = definition.default
-        }
+        if (definition.type != null) {
+          const _default = definition.type()
 
-        if (definition.required === true && args['help'] !== true) {
+          if (_default != null) {
+            args[property] = _default
+          } else if (definition.required === true && args['help'] !== true) {
+            throw new Error(definition.key + ' is required')
+          }
+        } else if (definition.required === true && args['help'] !== true) {
           throw new Error(definition.key + ' is required')
         }
       } else if (definition.multiple === true) {
         args[property] = remainder.splice(0, remainder.length - remainingKeys)
 
-        if (definition.type) {
-          args[property] = args[property].map((v) => definition.type(v))
+        if (definition.type != null) {
+          args[property] = definition.type(args[property])
         }
-      } else if (definition.type) {
+      } else if (definition.type != null) {
         args[property] = definition.type(remainder.shift())
       } else {
         args[property] = remainder.shift()

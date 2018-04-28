@@ -66,30 +66,10 @@ module.exports = function sergeant (name, description, define) {
   }
 
   function option (key, definition) {
-    options.push(getDefinition(key, definition, true))
+    options.push(Object.assign(definition, {key}))
   }
 
   function parameter (key, definition) {
-    parameters.push(getDefinition(key, definition))
-  }
-
-  function getDefinition (key, definition, isFlag = false) {
-    definition = Object.assign(definition, {key})
-
-    if (definition.default != null) {
-      if (definition.multiple && !Array.isArray(definition.default)) {
-        throw new Error('the default of ' + key + ' should be an array')
-      }
-
-      if (!definition.multiple && Array.isArray(definition.default)) {
-        throw new Error('the default of ' + key + ' should not be an array')
-      }
-    }
-
-    if (isFlag && definition.type == null && definition.default != null && definition.default !== false) {
-      throw new Error('the default of ' + key + ' should be false')
-    }
-
-    return definition
+    parameters.push(Object.assign(definition, {key}))
   }
 }

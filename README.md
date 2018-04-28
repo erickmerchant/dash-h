@@ -16,14 +16,12 @@ command('hello', function ({option, parameter, command}) {
 
   option('loud', {
     description: 'say it loud',
-    default: false,
     aliases: ['l']
   })
 
   command('world', function ({option}) {
     option('loud', {
       description: 'say it loud',,
-      default: false,
       aliases: ['l']
     })
 
@@ -95,11 +93,10 @@ It's passed args which are all the options and parameters when run.
 
 ### definition
 
-__{aliases, default, description, multiple, required, type}__
+__{aliases, description, multiple, required, type}__
 
 - aliases: Optional. An array of strings, each an alias.
-- default: Optional. The default value if none is given.
 - description: A short description
 - multiple: Optional. A boolean. If true then multiple values are accepted.
 - required: Optional. A boolean. If true it is required.
-- type: A function like Number. The value is passed to it to cast it to that type.
+- type: A function that should return the default if no value is given.
