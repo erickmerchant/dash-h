@@ -1,5 +1,4 @@
 module.exports = {
   process,
-  console,
-  Error
+  console
 }

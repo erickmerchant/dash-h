@@ -510,10 +510,6 @@ test('test ./error', function (t) {
     process: {
       exitCode: 0
     },
-    Error: function Error (message, stack) {
-      this.message = message
-      this.stack = stack
-    },
     console: {
       error (message) {
         messages.push(message)
@@ -525,9 +521,17 @@ test('test ./error', function (t) {
 
   const error = require('./error')
 
-  error(new globals.Error('testing errors', ['testing errors', 'at thing (file.js:123:45)', 'at another'].join('\n')))
+  const error1 = new Error('testing errors')
 
-  error(new globals.Error('testing errors'))
+  error1.stack = ['Error: testing errors', 'at thing (file.js:123:45)', 'at another'].join('\n')
+
+  error(error1)
+
+  const error2 = new Error('testing errors')
+
+  error2.stack = null
+
+  error(error2)
 
   error()
 
@@ -536,10 +540,10 @@ test('test ./error', function (t) {
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
-    chalk.red('testing errors'),
+    chalk.red('Error: testing errors'),
     chalk.gray('at thing ') + '(file.js:123:45)',
     chalk.gray('at another'),
-    chalk.red('testing errors')
+    chalk.red('Error: testing errors')
   ], messages)
 
   mockery.disable()

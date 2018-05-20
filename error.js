@@ -1,5 +1,5 @@
 const chalk = require('chalk')
-const { process, console, Error } = require('./src/globals')
+const { process, console } = require('./src/globals')
 
 module.exports = function (error) {
   process.exitCode = 1
@@ -14,7 +14,7 @@ module.exports = function (error) {
         console.error(chalk.gray(parts[1]) + (parts[2] != null ? parts[2] : ''))
       })
     } else {
-      console.error(chalk.red(error.message))
+      console.error(chalk.red(error.toString()))
     }
   }
 }
