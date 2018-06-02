@@ -24,7 +24,7 @@ test('test ./parse', function (t) {
   t.deepEquals({'test': 123}, parse(['--', '123'], {
     options: [],
     parameters: [{
-      type: function (val) { return Number(val) },
+      type (val) { return Number(val) },
       key: 'test'
     }]
   }))
@@ -53,7 +53,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
     parameters: [],
     options: [{
-      type: function (val) { return val },
+      type (val) { return val },
       key: 'aa-a',
       aliases: ['a']
     }]
@@ -63,7 +63,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
     parameters: [],
     options: [{
-      type: function (val) { return val },
+      type (val) { return val },
       key: 'aa-a',
       aliases: ['a']
     },
@@ -88,7 +88,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     parameters: [],
     options: [{
-      type: function (val) { return val },
+      type (val) { return val },
       key: 'aa-a',
       multiple: true,
       aliases: ['a']
@@ -99,7 +99,7 @@ test('test ./parse', function (t) {
   t.deepEquals({aaA: ''}, parse(['--aa-a='], {
     parameters: [],
     options: [{
-      type: function (val) { return val },
+      type (val) { return val },
       key: 'aa-a',
       aliases: ['a']
     }]
@@ -111,7 +111,7 @@ test('test ./parse', function (t) {
     options: [{
       key: 'aa-a',
       aliases: ['a'],
-      type: function (val) {
+      type (val) {
         if (val == null) {
           return ''
         }
@@ -138,7 +138,7 @@ test('test ./parse', function (t) {
     },
     {
       key: '1',
-      type: function (val) {
+      type (val) {
         if (val == null) {
           return 'yes'
         }
@@ -153,16 +153,16 @@ test('test ./parse', function (t) {
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
-        type: function (val) { return val.map((v) => Number(v)) },
+        type (val) { return val.map((v) => Number(v)) },
         key: 'test0',
         multiple: true
       },
       {
-        type: function (val) { return Number(val) },
+        type (val) { return Number(val) },
         key: 'test1'
       },
       {
-        type: function (val) { return Number(val) },
+        type (val) { return Number(val) },
         key: 'test2'
       }]
     }))
@@ -172,7 +172,7 @@ test('test ./parse', function (t) {
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
-        type: function (val) { return Number(val) },
+        type (val) { return Number(val) },
         key: 'test0'
       },
       {
@@ -180,7 +180,7 @@ test('test ./parse', function (t) {
         multiple: true
       },
       {
-        type: function (val) { return Number(val) },
+        type (val) { return Number(val) },
         key: 'test2'
       }]
     }))
@@ -190,15 +190,15 @@ test('test ./parse', function (t) {
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
-        type: function (val) { return Number(val) },
+        type (val) { return Number(val) },
         key: 'test0'
       },
       {
-        type: function (val) { return Number(val) },
+        type (val) { return Number(val) },
         key: 'test1'
       },
       {
-        type: function (val) { return val.map((v) => Number(v)) },
+        type (val) { return val.map((v) => Number(v)) },
         key: 'test2',
         multiple: true
       }]
@@ -232,11 +232,11 @@ test('test ./parse', function (t) {
     parse(['--test-option', 'a string', 'another string'], {
       options: [{
         key: 'test-option',
-        type: function (val) { return val }
+        type (val) { return val }
       }],
       parameters: [{
         key: 'test-parameter',
-        type: function (val) { return val }
+        type (val) { return val }
       }]
     }))
 })
@@ -269,7 +269,7 @@ test('test ./parse - with errors', function (t) {
     options: [{
       key: 'aa-a',
       aliases: ['a'],
-      type: function (val) { return val },
+      type (val) { return val },
       multiple: true
     }]
   })
@@ -318,7 +318,7 @@ test('test ./parse - with errors', function (t) {
   parse(['--aaa=123', '--aaa=456'], {
     parameters: [],
     options: [{
-      type: function (val) { return Number(val) },
+      type (val) { return Number(val) },
       key: 'aaa'
     }]
   })
@@ -385,7 +385,7 @@ test('test ./help', function (t) {
       {
         key: 'p1',
         multiple: true,
-        type: function (val) {
+        type (val) {
           if (val == null) {
             return ['a', 'b']
           }
