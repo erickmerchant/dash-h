@@ -56,7 +56,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       return definition.key
     }))
 
-    parameters.forEach(function (definition) {
+    for (let definition of parameters) {
       const description = [spaces(longestParameter - definition.key.length) + definition.key]
 
       if (definition.description) {
@@ -68,7 +68,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       }
 
       console.error(description.join('  '))
-    })
+    }
   }
 
   if (options.length) {
@@ -82,7 +82,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       return getSignature(definition)
     }))
 
-    options.forEach(function (definition) {
+    for (let definition of options) {
       const signature = getSignature(definition)
       const description = [spaces(longestOption - signature.length) + signature]
 
@@ -95,7 +95,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       }
 
       console.error(description.join('  '))
-    })
+    }
   }
 
   if (commands.length) {
@@ -107,9 +107,9 @@ module.exports = function (name, description, {options, parameters, commands}) {
 
     console.error('')
 
-    commands.forEach(function (command) {
+    for (let command of commands) {
       console.error(command.name + (command.description ? '  ' + spaces(longestCommand - command.name.length) + chalk.gray(command.description != null ? command.description : '') : ''))
-    })
+    }
   }
 
   console.error('')

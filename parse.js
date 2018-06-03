@@ -13,9 +13,9 @@ module.exports = function (argv, {options, parameters}) {
       options.push(definition)
 
       if (definition.aliases) {
-        definition.aliases.forEach(function (alias) {
+        for (let alias of definition.aliases) {
           options.push(Object.assign({}, definition, {key: alias, alias: true}))
-        })
+        }
       }
 
       return options
@@ -59,7 +59,7 @@ module.exports = function (argv, {options, parameters}) {
     const toBeDeleted = []
 
     for (let i = 0; i < argv.length; i++) {
-      options.forEach(function (definition) {
+      for (let definition of options) {
         const search = addDashes(definition.key)
         const property = definition.property
         let vals = []
@@ -97,10 +97,10 @@ module.exports = function (argv, {options, parameters}) {
             args[property] = vals.pop()
           }
         }
-      })
+      }
     }
 
-    options.filter((option) => options.alias !== true).forEach(function (definition) {
+    for (let definition of options.filter((option) => options.alias !== true)) {
       const property = definition.property
 
       if (args[property] == null) {
@@ -120,7 +120,7 @@ module.exports = function (argv, {options, parameters}) {
       } else if (definition.type != null) {
         args[property] = definition.type(args[property])
       }
-    })
+    }
 
     argv = argv.reduce(function (argv, arg, i) {
       if (!toBeDeleted.includes(i)) {
@@ -130,11 +130,11 @@ module.exports = function (argv, {options, parameters}) {
       return argv
     }, [])
 
-    argv.forEach(function (arg) {
+    for (let arg of argv) {
       if (arg.startsWith('-') && !arg.startsWith('---')) {
         throw new Error('unknown option ' + arg.split('=')[0])
       }
-    })
+    }
 
     const remainder = argv.concat(afterDashDash).filter((arg) => arg !== '')
 
@@ -144,9 +144,11 @@ module.exports = function (argv, {options, parameters}) {
       throw new Error('too many arguments')
     }
 
-    parameters.forEach(function (definition, key) {
+    let remainingKeys = parameters.length
+
+    for (let definition of parameters) {
       const property = definition.property
-      const remainingKeys = parameters.length - 1 - key
+      remainingKeys -= 1
 
       if (!remainder.length) {
         if (definition.type != null) {
@@ -171,7 +173,7 @@ module.exports = function (argv, {options, parameters}) {
       } else {
         args[property] = remainder.shift()
       }
-    })
+    }
 
     return args
   } catch (error) {
