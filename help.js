@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const { console, process } = require('./src/globals')
 const { addDashes, longest, spaces } = require('./src/helpers')
 
-module.exports = function (name, description, {options, parameters, commands}) {
+module.exports = async function (name, description, {options, parameters, commands}) {
   process.exitCode = 1
 
   if (description) {
@@ -56,19 +56,23 @@ module.exports = function (name, description, {options, parameters, commands}) {
       return definition.key
     }))
 
-    parameters.forEach(function (definition) {
+    for (let definition of parameters) {
       const description = [spaces(longestParameter - definition.key.length) + definition.key]
 
       if (definition.description) {
         description.push(chalk.gray(definition.description))
       }
 
-      if (definition.type != null && definition.type() != null) {
-        description.push('[default: ' + JSON.stringify(definition.type()) + ']')
+      if (definition.type != null) {
+        const _default = await definition.type()
+
+        if (_default != null) {
+          description.push('[default: ' + JSON.stringify(_default) + ']')
+        }
       }
 
       console.error(description.join('  '))
-    })
+    }
   }
 
   if (options.length) {
@@ -82,7 +86,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       return getSignature(definition)
     }))
 
-    options.forEach(function (definition) {
+    for (let definition of options) {
       const signature = getSignature(definition)
       const description = [spaces(longestOption - signature.length) + signature]
 
@@ -90,12 +94,16 @@ module.exports = function (name, description, {options, parameters, commands}) {
         description.push(chalk.gray(definition.description))
       }
 
-      if (definition.type != null && definition.type() != null) {
-        description.push('[default: ' + JSON.stringify(definition.type()) + ']')
+      if (definition.type != null) {
+        const _default = await definition.type()
+
+        if (_default != null) {
+          description.push('[default: ' + JSON.stringify(_default) + ']')
+        }
       }
 
       console.error(description.join('  '))
-    })
+    }
   }
 
   if (commands.length) {
@@ -107,9 +115,9 @@ module.exports = function (name, description, {options, parameters, commands}) {
 
     console.error('')
 
-    commands.forEach(function (command) {
+    for (let command of commands) {
       console.error(command.name + (command.description ? '  ' + spaces(longestCommand - command.name.length) + chalk.gray(command.description != null ? command.description : '') : ''))
-    })
+    }
   }
 
   console.error('')

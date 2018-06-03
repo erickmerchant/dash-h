@@ -20,7 +20,7 @@ module.exports = function sergeant (name, description, define) {
 
   const action = define({option, parameter, command})
 
-  return function (argv) {
+  return async function (argv) {
     const filtered = argv.filter((arg) => arg !== '-' && !arg.startsWith('-'))
     const command = commands.find((command) => command.name === filtered[0])
 
@@ -31,7 +31,7 @@ module.exports = function sergeant (name, description, define) {
 
       command.action(argv)
     } else {
-      const args = parse(argv, {options, parameters})
+      const args = await parse(argv, {options, parameters})
 
       try {
         if (args != null) {

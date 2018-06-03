@@ -10,9 +10,9 @@ module.exports = function (error) {
 
       console.error(chalk.red(stack.shift()))
 
-      stack.map((line) => line.match(/^(.*?)(\(.*\))?$/)).forEach(function (parts) {
+      for (let parts of stack.map((line) => line.match(/^(.*?)(\(.*\))?$/))) {
         console.error(chalk.gray(parts[1]) + (parts[2] != null ? parts[2] : ''))
-      })
+      }
     } else {
       console.error(chalk.red(error.toString()))
     }

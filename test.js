@@ -7,13 +7,13 @@ const mockerySettings = {
   warnOnUnregistered: false
 }
 
-test('test ./parse', function (t) {
+test('test ./parse', async function (t) {
   const parse = require('./parse')
 
   t.plan(18)
 
   // test dashdash and parameter
-  t.deepEquals({'test': '-a'}, parse(['--', '-a'], {
+  t.deepEquals({'test': '-a'}, await parse(['--', '-a'], {
     options: [],
     parameters: [{
       key: 'test'
@@ -21,7 +21,7 @@ test('test ./parse', function (t) {
   }))
 
   // test dashdash and parameter with type
-  t.deepEquals({'test': 123}, parse(['--', '123'], {
+  t.deepEquals({'test': 123}, await parse(['--', '123'], {
     options: [],
     parameters: [{
       type (val) { return Number(val) },
@@ -30,7 +30,7 @@ test('test ./parse', function (t) {
   }))
 
   // test non-required parameter
-  t.deepEquals({}, parse([], {
+  t.deepEquals({}, await parse([], {
     options: [],
     parameters: [{
       key: 'test'
@@ -38,10 +38,10 @@ test('test ./parse', function (t) {
   }))
 
   // test empty
-  t.deepEquals({}, parse([''], {options: [], parameters: []}))
+  t.deepEquals({}, await parse([''], {options: [], parameters: []}))
 
   // test short
-  t.deepEquals({aaA: true}, parse(['-a'], {
+  t.deepEquals({aaA: true}, await parse(['-a'], {
     parameters: [],
     options: [{
       key: 'aa-a',
@@ -50,7 +50,7 @@ test('test ./parse', function (t) {
   }))
 
   // test short with value
-  t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
+  t.deepEquals({aaA: 'bcd'}, await parse(['-a=bcd'], {
     parameters: [],
     options: [{
       type (val) { return val },
@@ -60,7 +60,7 @@ test('test ./parse', function (t) {
   }))
 
   // test multiple short with value
-  t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
+  t.deepEquals({aaA: 'bcd', b: true}, await parse(['-ba=bcd'], {
     parameters: [],
     options: [{
       type (val) { return val },
@@ -73,7 +73,7 @@ test('test ./parse', function (t) {
   }))
 
   // test multiple short
-  t.deepEquals({aaA: true, b: true}, parse(['-ba'], {
+  t.deepEquals({aaA: true, b: true}, await parse(['-ba'], {
     parameters: [],
     options: [{
       key: 'aa-a',
@@ -85,7 +85,7 @@ test('test ./parse', function (t) {
   }))
 
   // test multiple, ---, and -
-  t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
+  t.deepEquals({aaA: ['bcd', '---', '-']}, await parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     parameters: [],
     options: [{
       type (val) { return val },
@@ -96,7 +96,7 @@ test('test ./parse', function (t) {
   }))
 
   // test empty with equals
-  t.deepEquals({aaA: ''}, parse(['--aa-a='], {
+  t.deepEquals({aaA: ''}, await parse(['--aa-a='], {
     parameters: [],
     options: [{
       type (val) { return val },
@@ -106,7 +106,7 @@ test('test ./parse', function (t) {
   }))
 
   // test default
-  t.deepEquals({aaA: ''}, parse([''], {
+  t.deepEquals({aaA: ''}, await parse([''], {
     parameters: [],
     options: [{
       key: 'aa-a',
@@ -122,7 +122,7 @@ test('test ./parse', function (t) {
   }))
 
   // test default flag
-  t.deepEquals({aaA: false}, parse([''], {
+  t.deepEquals({aaA: false}, await parse([''], {
     parameters: [],
     options: [{
       key: 'aa-a',
@@ -131,7 +131,7 @@ test('test ./parse', function (t) {
   }))
 
   // test default parameter
-  t.deepEquals({'0': 'testing', '1': 'yes'}, parse(['testing'], {
+  t.deepEquals({'0': 'testing', '1': 'yes'}, await parse(['testing'], {
     options: [],
     parameters: [{
       key: '0'
@@ -150,7 +150,7 @@ test('test ./parse', function (t) {
 
   // test multiple param beginning
   t.deepEquals({'test0': [1, 2, 3, 4, 5, 6, 7], 'test1': 8, 'test2': 9},
-    parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+    await parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
         type (val) { return val.map((v) => Number(v)) },
@@ -169,7 +169,7 @@ test('test ./parse', function (t) {
 
   // test multiple param middle. No type
   t.deepEquals({'test0': 1, 'test1': ['2', '3', '4', '5', '6', '7', '8'], 'test2': 9},
-    parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+    await parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
         type (val) { return Number(val) },
@@ -187,7 +187,7 @@ test('test ./parse', function (t) {
 
   // test multiple param end
   t.deepEquals({'test0': 1, 'test1': 2, 'test2': [3, 4, 5, 6, 7, 8, 9]},
-    parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
+    await parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
         type (val) { return Number(val) },
@@ -216,7 +216,7 @@ test('test ./parse', function (t) {
 
   // test default with type
   t.deepEquals({testOption: DEFAULT, testParameter: DEFAULT},
-    parse([], {
+    await parse([], {
       options: [{
         key: 'test-option',
         type: FN_DEFAULT
@@ -229,7 +229,7 @@ test('test ./parse', function (t) {
 
   // test camel-casing
   t.deepEquals({testOption: 'a string', testParameter: 'another string'},
-    parse(['--test-option', 'a string', 'another string'], {
+    await parse(['--test-option', 'a string', 'another string'], {
       options: [{
         key: 'test-option',
         type (val) { return val }
@@ -241,7 +241,7 @@ test('test ./parse', function (t) {
     }))
 })
 
-test('test ./parse - with errors', function (t) {
+test('test ./parse - with errors', async function (t) {
   mockery.enable(mockerySettings)
 
   const messages = []
@@ -264,7 +264,7 @@ test('test ./parse - with errors', function (t) {
   t.plan(2)
 
   // test non-boolean with value
-  parse(['-a'], {
+  await parse(['-a'], {
     parameters: [],
     options: [{
       key: 'aa-a',
@@ -275,7 +275,7 @@ test('test ./parse - with errors', function (t) {
   })
 
   // test boolean with value
-  parse(['-a=abc'], {
+  await parse(['-a=abc'], {
     parameters: [],
     options: [{
       key: 'a'
@@ -283,7 +283,7 @@ test('test ./parse - with errors', function (t) {
   })
 
   // test boolean with value
-  parse(['--aaa=abc'], {
+  await parse(['--aaa=abc'], {
     parameters: [],
     options: [{
       key: 'aaa'
@@ -291,13 +291,13 @@ test('test ./parse - with errors', function (t) {
   })
 
   // test unknown
-  parse(['-a'], {options: [], parameters: []})
+  await parse(['-a'], {options: [], parameters: []})
 
   // test unknown
-  parse(['--aaa'], {options: [], parameters: []})
+  await parse(['--aaa'], {options: [], parameters: []})
 
   // test required
-  parse([''], {
+  await parse([''], {
     parameters: [],
     options: [{
       key: 'a',
@@ -306,7 +306,7 @@ test('test ./parse - with errors', function (t) {
   })
 
   // test required
-  parse([''], {
+  await parse([''], {
     parameters: [],
     options: [{
       key: 'aaa',
@@ -315,7 +315,7 @@ test('test ./parse - with errors', function (t) {
   })
 
   // test non multiple multiple
-  parse(['--aaa=123', '--aaa=456'], {
+  await parse(['--aaa=123', '--aaa=456'], {
     parameters: [],
     options: [{
       type (val) { return Number(val) },
@@ -324,7 +324,7 @@ test('test ./parse - with errors', function (t) {
   })
 
   // test required parameter
-  parse([], {
+  await parse([], {
     options: [],
     parameters: [{
       key: 'test',
@@ -333,7 +333,7 @@ test('test ./parse - with errors', function (t) {
   })
 
   // test too many arguments
-  parse(['--', '-a'], {options: [], parameters: []})
+  await parse(['--', '-a'], {options: [], parameters: []})
 
   t.equals(globals.process.exitCode, 1)
 
@@ -355,7 +355,7 @@ test('test ./parse - with errors', function (t) {
   mockery.deregisterAll()
 })
 
-test('test ./help', function (t) {
+test('test ./help', async function (t) {
   mockery.enable(mockerySettings)
 
   const messages = []
@@ -375,7 +375,7 @@ test('test ./help', function (t) {
 
   const help = require('./help')
 
-  help('test-command', '', {
+  await help('test-command', '', {
     parameters: [
       {
         key: 'p0',
@@ -417,7 +417,7 @@ test('test ./help', function (t) {
     commands: []
   })
 
-  help('test-command', 'a test command', {
+  await help('test-command', 'a test command', {
     parameters: [{
       key: 'p0',
       required: true
@@ -434,7 +434,7 @@ test('test ./help', function (t) {
     ]
   })
 
-  help('test-command', 'a test command', {
+  await help('test-command', 'a test command', {
     options: [{
       key: 'aaa',
       aliases: ['a'],
@@ -445,7 +445,7 @@ test('test ./help', function (t) {
     commands: []
   })
 
-  help('test-command', 'a test command', {options: [], parameters: [], commands: []})
+  await help('test-command', 'a test command', {options: [], parameters: [], commands: []})
 
   t.plan(2)
 
