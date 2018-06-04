@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const { console, process } = require('./src/globals')
 const { addDashes, longest, spaces } = require('./src/helpers')
 
-module.exports = async function (name, description, {options, parameters, commands}) {
+module.exports = function (name, description, {options, parameters, commands}) {
   process.exitCode = 1
 
   if (description) {
@@ -64,7 +64,7 @@ module.exports = async function (name, description, {options, parameters, comman
       }
 
       if (definition.type != null) {
-        const _default = await definition.type()
+        const _default = definition.type()
 
         if (_default != null) {
           description.push('[default: ' + JSON.stringify(_default) + ']')
@@ -95,7 +95,7 @@ module.exports = async function (name, description, {options, parameters, comman
       }
 
       if (definition.type != null) {
-        const _default = await definition.type()
+        const _default = definition.type()
 
         if (_default != null) {
           description.push('[default: ' + JSON.stringify(_default) + ']')

@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const { console, process } = require('./src/globals')
 const { addDashes, camelCaseFromDash } = require('./src/helpers')
 
-module.exports = async function (argv, {options, parameters}) {
+module.exports = function (argv, {options, parameters}) {
   try {
     argv = argv.slice(0)
     const args = {}
@@ -105,7 +105,7 @@ module.exports = async function (argv, {options, parameters}) {
 
       if (args[property] == null) {
         if (definition.type != null) {
-          const _default = await definition.type()
+          const _default = definition.type()
 
           if (_default != null) {
             args[property] = _default
@@ -118,7 +118,7 @@ module.exports = async function (argv, {options, parameters}) {
           throw new Error(addDashes(definition.key) + ' is required')
         }
       } else if (definition.type != null) {
-        args[property] = await definition.type(args[property])
+        args[property] = definition.type(args[property])
       }
     }
 
@@ -152,7 +152,7 @@ module.exports = async function (argv, {options, parameters}) {
 
       if (!remainder.length) {
         if (definition.type != null) {
-          const _default = await definition.type()
+          const _default = definition.type()
 
           if (_default != null) {
             args[property] = _default
@@ -166,10 +166,10 @@ module.exports = async function (argv, {options, parameters}) {
         args[property] = remainder.splice(0, remainder.length - remainingKeys)
 
         if (definition.type != null) {
-          args[property] = await definition.type(args[property])
+          args[property] = definition.type(args[property])
         }
       } else if (definition.type != null) {
-        args[property] = await definition.type(remainder.shift())
+        args[property] = definition.type(remainder.shift())
       } else {
         args[property] = remainder.shift()
       }
