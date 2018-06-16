@@ -12,38 +12,24 @@ module.exports = function (name, description, {options, parameters, commands}) {
   }
 
   if (parameters.length || options.length) {
-    let usage = [name]
-
-    if (options.length) {
-      usage = usage.concat(options.map(function (definition) {
-        const valPart = definition.type != null
-          ? ' <' + definition.type.name + '>'
-          : ''
-
-        return wrapUsage(addDashes(definition.key) + valPart, definition)
-      }))
-    }
-
-    if (parameters.length) {
-      usage = usage.concat(parameters.map(function (definition) {
-        return wrapUsage('<' + definition.key + '>', definition)
-      }))
-    }
+    const usages = getUsages(name, {options, parameters, commands})
 
     console.error('')
 
-    if (commands.length) {
+    if (usages.length > 1) {
       console.error(chalk.green('Usage:'))
 
       console.error('')
 
-      console.error(usage.join(' '))
-
-      console.error(name + ' <command> [--help]')
+      for (const usage of usages) {
+        console.error(usage)
+      }
     } else {
-      console.error(chalk.green('Usage:') + ' ' + usage.join(' '))
+      console.error(chalk.green('Usage:') + ' ' + usages[0])
     }
   }
+
+  parameters = getNested('parameters', {parameters, commands})
 
   if (parameters.length) {
     console.error('')
@@ -56,7 +42,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
       return definition.key
     }))
 
-    for (let definition of parameters) {
+    for (const definition of parameters) {
       const description = [spaces(longestParameter - definition.key.length) + definition.key]
 
       if (definition.description) {
@@ -75,6 +61,8 @@ module.exports = function (name, description, {options, parameters, commands}) {
     }
   }
 
+  options = getNested('options', {options, commands})
+
   if (options.length) {
     console.error('')
 
@@ -83,11 +71,11 @@ module.exports = function (name, description, {options, parameters, commands}) {
     console.error('')
 
     const longestOption = longest(options.map(function (definition) {
-      return getSignature(definition)
+      return getOptionWithDashesAndAliases(definition)
     }))
 
-    for (let definition of options) {
-      const signature = getSignature(definition)
+    for (const definition of options) {
+      const signature = getOptionWithDashesAndAliases(definition)
       const description = [spaces(longestOption - signature.length) + signature]
 
       if (definition.description) {
@@ -106,30 +94,56 @@ module.exports = function (name, description, {options, parameters, commands}) {
     }
   }
 
-  if (commands.length) {
-    const longestCommand = longest(commands.map((command) => command.name))
-
-    console.error('')
-
-    console.error(chalk.green('Commands:'))
-
-    console.error('')
-
-    for (let command of commands) {
-      console.error(command.name + (command.description ? '  ' + spaces(longestCommand - command.name.length) + chalk.gray(command.description != null ? command.description : '') : ''))
-    }
-  }
-
   console.error('')
 }
 
-function wrapUsage (usage, {required, multiple}) {
+function getUsages (name, {options, parameters, commands}) {
+  let usage = [name]
+
+  if (options && options.length) {
+    usage = usage.concat(options.map(function (definition) {
+      const valPart = definition.type != null
+        ? ' <' + definition.type.name + '>'
+        : ''
+
+      return getWithBracketsParensAndEllipsis(addDashes(definition.key) + valPart, definition)
+    }))
+  }
+
+  if (parameters && parameters.length) {
+    usage = usage.concat(parameters.map(function (definition) {
+      return getWithBracketsParensAndEllipsis('<' + definition.key + '>', definition)
+    }))
+  }
+
+  let usages = [usage.join(' ')]
+
+  if (commands) {
+    for (const command of commands) {
+      usages = usages.concat(getUsages(name + ' ' + command.name, command.action))
+    }
+  }
+
+  return usages
+}
+
+function getNested (id, obj) {
+  if (obj.commands) {
+    for (const command of obj.commands) {
+      obj[id] = obj[id].concat(getNested(id, command.action).filter((a) => obj[id].find((b) => b.key !== a.key)))
+    }
+  }
+
+  return obj[id]
+}
+
+function getWithBracketsParensAndEllipsis (usage, {required, multiple}) {
   const opt = usage.startsWith('-')
 
   return (required !== true ? '[' : (opt ? '(' : '')) + usage + (required !== true ? ']' : (opt ? ')' : '')) + (multiple === true ? '...' : '')
 }
 
-function getSignature (definition) {
+function getOptionWithDashesAndAliases (definition) {
   let signature = addDashes(definition.key)
 
   if (definition.aliases != null && definition.aliases.length) {

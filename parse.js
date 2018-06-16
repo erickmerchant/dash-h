@@ -13,7 +13,7 @@ module.exports = function (argv, {options, parameters}) {
       options.push(definition)
 
       if (definition.aliases) {
-        for (let alias of definition.aliases) {
+        for (const alias of definition.aliases) {
           options.push(Object.assign({}, definition, {key: alias, alias: true}))
         }
       }
@@ -59,10 +59,10 @@ module.exports = function (argv, {options, parameters}) {
     const toBeDeleted = []
 
     for (let i = 0; i < argv.length; i++) {
-      for (let definition of options) {
+      for (const definition of options) {
         const search = addDashes(definition.key)
         const property = definition.property
-        let vals = []
+        const vals = []
 
         if (argv[i] === search) {
           if (definition.type != null) {
@@ -100,7 +100,7 @@ module.exports = function (argv, {options, parameters}) {
       }
     }
 
-    for (let definition of options.filter((option) => options.alias !== true)) {
+    for (const definition of options.filter((option) => options.alias !== true)) {
       const property = definition.property
 
       if (args[property] == null) {
@@ -130,7 +130,7 @@ module.exports = function (argv, {options, parameters}) {
       return argv
     }, [])
 
-    for (let arg of argv) {
+    for (const arg of argv) {
       if (arg.startsWith('-') && !arg.startsWith('---')) {
         throw new Error('unknown option ' + arg.split('=')[0])
       }
@@ -146,7 +146,7 @@ module.exports = function (argv, {options, parameters}) {
 
     let remainingKeys = parameters.length
 
-    for (let definition of parameters) {
+    for (const definition of parameters) {
       const property = definition.property
       remainingKeys -= 1
 

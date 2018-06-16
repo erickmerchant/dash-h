@@ -1,28 +1,18 @@
 const parse = require('./parse')
 const error = require('./error')
 const help = require('./help')
+const assert = require('assert')
 
-module.exports = function sergeant (name, description, define) {
+module.exports = function sergeant (name, description, define, parent = {}) {
   if (define == null) {
     define = description
 
     description = null
   }
 
-  const options = []
-  const parameters = []
-  const commands = []
-
-  option('help', {
-    aliases: ['h'],
-    description: 'get help'
-  })
-
-  const action = define({option, parameter, command})
-
-  return function (argv) {
+  function cli (argv) {
     const filtered = argv.filter((arg) => arg !== '-' && !arg.startsWith('-'))
-    const command = commands.find((command) => command.name === filtered[0])
+    const command = cli.commands.find((command) => command.name === filtered[0])
 
     if (filtered[0] != null && command != null) {
       const index0 = argv.indexOf(filtered[0])
@@ -31,12 +21,12 @@ module.exports = function sergeant (name, description, define) {
 
       command.action(argv)
     } else {
-      const args = parse(argv, {options, parameters})
+      const args = parse(argv, {options: cli.options, parameters: cli.parameters})
 
       try {
         if (args != null) {
           if (args.help === true || action == null) {
-            help(name, description, {options, parameters, commands})
+            help(name, description, {options: cli.options, parameters: cli.parameters, commands: cli.commands})
           } else if (action != null) {
             const result = action(args)
 
@@ -51,6 +41,27 @@ module.exports = function sergeant (name, description, define) {
     }
   }
 
+  cli.name = name
+
+  cli.options = []
+
+  cli.parameters = []
+
+  cli.commands = []
+
+  const option = getAppender('options')
+
+  const parameter = getAppender('parameters')
+
+  option('help', {
+    aliases: ['h'],
+    description: 'get help'
+  })
+
+  const action = define({option, parameter, command})
+
+  return cli
+
   function command (subname, description, define) {
     if (define == null) {
       define = description
@@ -58,18 +69,26 @@ module.exports = function sergeant (name, description, define) {
       description = null
     }
 
-    commands.push({
+    cli.commands.push({
       name: subname,
-      action: sergeant(name + ' ' + subname, description, define),
+      action: sergeant(name + ' ' + subname, description, define, cli),
       description
     })
   }
 
-  function option (key, definition) {
-    options.push(Object.assign(definition, {key}))
-  }
+  function getAppender (id) {
+    return function (key, definition) {
+      const current = Object.assign(definition, {key})
 
-  function parameter (key, definition) {
-    parameters.push(Object.assign(definition, {key}))
+      if (parent[id] != null) {
+        const prev = parent[id].find((option) => option.key === key)
+
+        if (prev != null) {
+          assert.deepStrictEqual(current, prev, 'the defintion of ' + key + ' can not be changed')
+        }
+      }
+
+      cli[id].push(current)
+    }
   }
 }

@@ -420,16 +420,48 @@ test('test ./help', function (t) {
   help('test-command', 'a test command', {
     parameters: [{
       key: 'p0',
+      description: 'the description',
       required: true
     }],
-    options: [],
+    options: [{
+      key: 'aaa',
+      aliases: ['a'],
+      description: 'a Boolean'
+    }],
     commands: [
       {
-        name: 'sub-command-b'
-      },
-      {
-        name: 'sub-command',
-        description: 'a sub command'
+        name: 'sub',
+        description: 'a sub command',
+        action: {
+          parameters: [{
+            key: 'p1',
+            description: 'the description',
+            required: true
+          }],
+          options: [{
+            key: 'bbb',
+            aliases: ['b'],
+            description: 'a Boolean'
+          }],
+          commands: [
+            {
+              name: 'sub-sub',
+              description: 'a sub sub command',
+              action: {
+                parameters: [{
+                  key: 'p2',
+                  description: 'the description',
+                  required: true
+                }],
+                options: [{
+                  key: 'ccc',
+                  aliases: ['c'],
+                  description: 'a Boolean'
+                }]
+              }
+            }
+          ]
+        }
       }
     ]
   })
@@ -470,17 +502,21 @@ test('test ./help', function (t) {
     '',
     chalk.green('Usage:'),
     '',
-    'test-command <p0>',
-    'test-command <command> [--help]',
+    'test-command [--aaa] <p0>',
+    'test-command sub [--bbb] <p1>',
+    'test-command sub sub-sub [--ccc] <p2>',
     '',
     chalk.green('Parameters:'),
     '',
-    'p0',
+    'p0  ' + chalk.gray('the description'),
+    'p1  ' + chalk.gray('the description'),
+    'p2  ' + chalk.gray('the description'),
     '',
-    chalk.green('Commands:'),
+    chalk.green('Options:'),
     '',
-    'sub-command-b',
-    'sub-command    ' + chalk.gray('a sub command'),
+    '-a, --aaa  ' + chalk.gray('a Boolean'),
+    '-b, --bbb  ' + chalk.gray('a Boolean'),
+    '-c, --ccc  ' + chalk.gray('a Boolean'),
     '',
     '',
     'a test command',
