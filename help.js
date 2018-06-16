@@ -130,11 +130,11 @@ function getUsages (name, {options, parameters, commands}) {
 function getNested (id, obj) {
   if (obj.commands) {
     for (const command of obj.commands) {
-      obj[id] = obj[id].concat(getNested(id, command.action).filter((a) => obj[id].find((b) => b.key !== a.key)))
+      obj[id] = obj[id].concat(getNested(id, command.action))
     }
   }
 
-  return obj[id]
+  return obj[id].filter((a, i) => obj[id].findIndex((b) => a.key === b.key) === i)
 }
 
 function getWithBracketsParensAndEllipsis (usage, {required, multiple}) {
