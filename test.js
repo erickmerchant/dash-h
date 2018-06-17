@@ -402,7 +402,8 @@ test('test ./help', function (t) {
         description: 'a Boolean'
       },
       {
-        key: 'b',
+        key: 'bbb',
+        aliases: ['b'],
         required: true,
         description: 'a Number',
         type: function val (val) {
@@ -485,17 +486,17 @@ test('test ./help', function (t) {
 
   t.deepEquals([
     '',
-    chalk.green('Usage:') + ' test-command [--aaa]... (-b <val>) <p0> [<p1>]...',
+    chalk.green('Usage:') + ' test-command [--aaa]... (--bbb <val>) <p0> [<p1>]...',
     '',
     chalk.green('Parameters:'),
     '',
-    'p0  ' + chalk.gray('the description'),
-    'p1  ' + '[default: ["a","b"]]',
+    '<p0>  the description',
+    '<p1>  ' + chalk.gray('[default: ["a","b"]]'),
     '',
     chalk.green('Options:'),
     '',
-    '-a, --aaa  ' + chalk.gray('a Boolean'),
-    '       -b  ' + chalk.gray('a Number') + '  [default: 100]',
+    '-a, --aaa              a Boolean',
+    '-b <val>, --bbb <val>  a Number ' + chalk.gray('[default: 100]'),
     '',
     '',
     'a test command',
@@ -508,15 +509,15 @@ test('test ./help', function (t) {
     '',
     chalk.green('Parameters:'),
     '',
-    'p0  ' + chalk.gray('the description'),
-    'p1  ' + chalk.gray('the description'),
-    'p2  ' + chalk.gray('the description'),
+    '<p0>  the description',
+    '<p1>  the description',
+    '<p2>  the description',
     '',
     chalk.green('Options:'),
     '',
-    '-a, --aaa  ' + chalk.gray('a Boolean'),
-    '-b, --bbb  ' + chalk.gray('a Boolean'),
-    '-c, --ccc  ' + chalk.gray('a Boolean'),
+    '-a, --aaa  a Boolean',
+    '-b, --bbb  a Boolean',
+    '-c, --ccc  a Boolean',
     '',
     '',
     'a test command',
@@ -525,7 +526,7 @@ test('test ./help', function (t) {
     '',
     chalk.green('Options:'),
     '',
-    '-a, --aaa  ' + chalk.gray('a Boolean'),
+    '-a, --aaa  a Boolean',
     '',
     '',
     'a test command',
@@ -577,8 +578,8 @@ test('test ./error', function (t) {
 
   t.deepEquals([
     chalk.red('Error: testing errors'),
-    chalk.gray('at thing ') + '(file.js:123:45)',
-    chalk.gray('at another'),
+    'at thing ' + chalk.gray('(file.js:123:45)'),
+    'at another',
     chalk.red('Error: testing errors')
   ], messages)
 

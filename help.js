@@ -43,21 +43,21 @@ module.exports = function (name, description, {options, parameters, commands}) {
     }))
 
     for (const definition of parameters) {
-      const description = [spaces(longestParameter - definition.key.length) + definition.key]
+      const description = ['<' + definition.key + '>' + spaces(longestParameter - definition.key.length) + '  ']
 
       if (definition.description) {
-        description.push(chalk.gray(definition.description))
+        description.push(definition.description)
       }
 
       if (definition.type != null) {
         const _default = definition.type()
 
         if (_default != null) {
-          description.push('[default: ' + JSON.stringify(_default) + ']')
+          description.push((definition.description ? ' ' : '') + chalk.gray('[default: ' + JSON.stringify(_default) + ']'))
         }
       }
 
-      console.error(description.join('  '))
+      console.error(description.join(''))
     }
   }
 
@@ -76,21 +76,21 @@ module.exports = function (name, description, {options, parameters, commands}) {
 
     for (const definition of options) {
       const signature = getOptionWithDashesAndAliases(definition)
-      const description = [spaces(longestOption - signature.length) + signature]
+      const description = [signature + spaces(longestOption - signature.length) + '  ']
 
       if (definition.description) {
-        description.push(chalk.gray(definition.description))
+        description.push(definition.description)
       }
 
       if (definition.type != null) {
         const _default = definition.type()
 
         if (_default != null) {
-          description.push('[default: ' + JSON.stringify(_default) + ']')
+          description.push((definition.description ? ' ' : '') + chalk.gray('[default: ' + JSON.stringify(_default) + ']'))
         }
       }
 
-      console.error(description.join('  '))
+      console.error(description.join(''))
     }
   }
 
@@ -144,10 +144,13 @@ function getWithBracketsParensAndEllipsis (usage, {required, multiple}) {
 }
 
 function getOptionWithDashesAndAliases (definition) {
-  let signature = addDashes(definition.key)
+  let val = definition.type != null
+    ? ' <' + definition.type.name + '>'
+    : ''
+  let signature = addDashes(definition.key) + val
 
   if (definition.aliases != null && definition.aliases.length) {
-    signature = definition.aliases.map((k) => addDashes(k)).join(', ') + ', ' + signature
+    signature = definition.aliases.map((k) => addDashes(k) + val).join(', ') + ', ' + signature
   }
 
   return signature
