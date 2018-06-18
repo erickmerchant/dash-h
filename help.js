@@ -71,11 +71,11 @@ module.exports = function (name, description, {options, parameters, commands}) {
     console.error('')
 
     const longestOption = longest(options.map(function (definition) {
-      return getOptionWithDashesAndAliases(definition)
+      return getOptionSignature(definition)
     }))
 
     for (const definition of options) {
-      const signature = getOptionWithDashesAndAliases(definition)
+      const signature = getOptionSignature(definition)
       const description = [signature + spaces(longestOption - signature.length) + '  ']
 
       if (definition.description) {
@@ -106,13 +106,13 @@ function getUsages (name, {options, parameters, commands}) {
         ? ' <' + definition.type.name + '>'
         : ''
 
-      return getWithBracketsParensAndEllipsis(addDashes(definition.key) + valPart, definition)
+      return wrapUsage(addDashes(definition.key) + valPart, definition)
     }))
   }
 
   if (parameters && parameters.length) {
     usage = usage.concat(parameters.map(function (definition) {
-      return getWithBracketsParensAndEllipsis('<' + definition.key + '>', definition)
+      return wrapUsage('<' + definition.key + '>', definition)
     }))
   }
 
@@ -137,13 +137,13 @@ function getNested (id, obj) {
   return obj[id].filter((a, i) => obj[id].findIndex((b) => a.key === b.key) === i)
 }
 
-function getWithBracketsParensAndEllipsis (usage, {required, multiple}) {
+function wrapUsage (usage, {required, multiple}) {
   const opt = usage.startsWith('-')
 
   return (required !== true ? '[' : (opt ? '(' : '')) + usage + (required !== true ? ']' : (opt ? ')' : '')) + (multiple === true ? '...' : '')
 }
 
-function getOptionWithDashesAndAliases (definition) {
+function getOptionSignature (definition) {
   let val = definition.type != null
     ? ' <' + definition.type.name + '>'
     : ''
