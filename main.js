@@ -3,30 +3,32 @@ const error = require('./error')
 const help = require('./help')
 // const assert = require('assert')
 
-module.exports = function sergeant (name, description, define) {
+module.exports = function sergeant (title, description, define) {
   if (define == null) {
     define = description
 
     description = null
   }
 
-  function cli (argv) {
+  function cli (argv, path = []) {
+    path = path.concat([ title ])
+
     const filtered = argv.filter((arg) => arg !== '-' && !arg.startsWith('-'))
-    const command = cli.commands.find((command) => command.name === filtered[0])
+    const command = cli.commands.find((command) => command.title === filtered[0])
 
     if (filtered[0] != null && command != null) {
       const index0 = argv.indexOf(filtered[0])
 
       argv.splice(index0, 1)
 
-      command.action(argv)
+      command(argv, path)
     } else {
       const args = parse(argv, {options: cli.options, parameters: cli.parameters})
 
       try {
         if (args != null) {
           if (args.help === true || action == null) {
-            help(name, description, {options: cli.options, parameters: cli.parameters, commands: cli.commands})
+            help(path.join(' '), description, {options: cli.options, parameters: cli.parameters, commands: cli.commands})
           } else if (action != null) {
             const result = action(args)
 
@@ -41,7 +43,9 @@ module.exports = function sergeant (name, description, define) {
     }
   }
 
-  cli.name = name
+  cli.title = title
+
+  cli.description = description
 
   cli.options = []
 
@@ -58,18 +62,14 @@ module.exports = function sergeant (name, description, define) {
 
   return cli
 
-  function command (subname, description, define) {
+  function command (subtitle, description, define) {
     if (define == null) {
       define = description
 
       description = null
     }
 
-    cli.commands.push({
-      name: subname,
-      action: sergeant(name + ' ' + subname, description, define),
-      description
-    })
+    cli.commands.push(sergeant(subtitle, description, define))
   }
 
   function option (key, definition) {

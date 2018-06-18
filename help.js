@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const { console, process } = require('./src/globals')
 const { addDashes, longest, spaces } = require('./src/helpers')
 
-module.exports = function (name, description, {options, parameters, commands}) {
+module.exports = function (title, description, {options, parameters, commands}) {
   process.exitCode = 1
 
   if (description) {
@@ -12,7 +12,7 @@ module.exports = function (name, description, {options, parameters, commands}) {
   }
 
   if (parameters.length || options.length) {
-    const usages = getUsages(name, {options, parameters, commands})
+    const usages = getUsages(title, {options, parameters, commands})
 
     console.error('')
 
@@ -97,8 +97,8 @@ module.exports = function (name, description, {options, parameters, commands}) {
   console.error('')
 }
 
-function getUsages (name, {options, parameters, commands}) {
-  let usage = [name]
+function getUsages (title, {options, parameters, commands}) {
+  let usage = [title]
 
   if (options && options.length) {
     usage = usage.concat(options.map(function (definition) {
@@ -120,7 +120,7 @@ function getUsages (name, {options, parameters, commands}) {
 
   if (commands) {
     for (const command of commands) {
-      usages = usages.concat(getUsages(name + ' ' + command.name, command.action))
+      usages = usages.concat(getUsages(title + ' ' + command.title, command))
     }
   }
 
@@ -130,7 +130,7 @@ function getUsages (name, {options, parameters, commands}) {
 function getNested (id, obj) {
   if (obj.commands) {
     for (const command of obj.commands) {
-      obj[id] = obj[id].concat(getNested(id, command.action))
+      obj[id] = obj[id].concat(getNested(id, command))
     }
   }
 

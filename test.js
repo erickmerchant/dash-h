@@ -431,38 +431,34 @@ test('test ./help', function (t) {
     }],
     commands: [
       {
-        name: 'sub',
+        title: 'sub',
         description: 'a sub command',
-        action: {
-          parameters: [{
-            key: 'p1',
-            description: 'the description',
-            required: true
-          }],
-          options: [{
-            key: 'bbb',
-            aliases: ['b'],
-            description: 'a Boolean'
-          }],
-          commands: [
-            {
-              name: 'sub-sub',
-              description: 'a sub sub command',
-              action: {
-                parameters: [{
-                  key: 'p2',
-                  description: 'the description',
-                  required: true
-                }],
-                options: [{
-                  key: 'ccc',
-                  aliases: ['c'],
-                  description: 'a Boolean'
-                }]
-              }
-            }
-          ]
-        }
+        parameters: [{
+          key: 'p1',
+          description: 'the description',
+          required: true
+        }],
+        options: [{
+          key: 'bbb',
+          aliases: ['b'],
+          description: 'a Boolean'
+        }],
+        commands: [
+          {
+            title: 'sub-sub',
+            description: 'a sub sub command',
+            parameters: [{
+              key: 'p2',
+              description: 'the description',
+              required: true
+            }],
+            options: [{
+              key: 'ccc',
+              aliases: ['c'],
+              description: 'a Boolean'
+            }]
+          }
+        ]
       }
     ]
   })
