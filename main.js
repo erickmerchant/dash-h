@@ -1,9 +1,9 @@
 const parse = require('./parse')
 const error = require('./error')
 const help = require('./help')
-const assert = require('assert')
+// const assert = require('assert')
 
-module.exports = function sergeant (name, description, define, parent = {}) {
+module.exports = function sergeant (name, description, define) {
   if (define == null) {
     define = description
 
@@ -49,16 +49,12 @@ module.exports = function sergeant (name, description, define, parent = {}) {
 
   cli.commands = []
 
-  const option = getAppender('options')
-
-  const parameter = getAppender('parameters')
+  const action = define({option, parameter, command})
 
   option('help', {
     aliases: ['h'],
     description: 'get help'
   })
-
-  const action = define({option, parameter, command})
 
   return cli
 
@@ -71,24 +67,20 @@ module.exports = function sergeant (name, description, define, parent = {}) {
 
     cli.commands.push({
       name: subname,
-      action: sergeant(name + ' ' + subname, description, define, cli),
+      action: sergeant(name + ' ' + subname, description, define),
       description
     })
   }
 
-  function getAppender (id) {
-    return function (key, definition) {
-      const current = Object.assign(definition, {key})
+  function option (key, definition) {
+    const current = Object.assign(definition, {key})
 
-      if (parent[id] != null) {
-        const prev = parent[id].find((option) => option.key === key)
+    cli.options.push(current)
+  }
 
-        if (prev != null) {
-          assert.deepStrictEqual(current, prev, 'the defintion of ' + key + ' can not be changed')
-        }
-      }
+  function parameter (key, definition) {
+    const current = Object.assign(definition, {key})
 
-      cli[id].push(current)
-    }
+    cli.parameters.push(current)
   }
 }

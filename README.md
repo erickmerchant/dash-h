@@ -26,24 +26,22 @@ command('hello', function ({option, parameter, command}) {
     })
 
     return function (args) {
-      args.name = 'world'
-
-      say(args)
+      say('world', args.loud)
     }
   })
 
   return function (args) {
     assert.notEqual(args.name, 'world', 'use hello world')
 
-    say(args)
+    say(args.name, args.loud)
   }
 })(process.argv.slice(2))
 
-function say (args) {
-  let message = `hello ${args.name}!`
+function say (name, loud = false) {
+  let message = `hello ${name}!`
 
-  if (args.loud) {
-    message = message.toUpperCase()
+  if (loud) {
+    message = message.toUpperCase() + '!'
   }
 
   console.log(message)

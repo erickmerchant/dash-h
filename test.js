@@ -603,13 +603,13 @@ test('test ./command - no help. no errors', function (t) {
     t.deepEquals({
       options: [
         {
+          key: 'bbb',
+          testing: true
+        },
+        {
           key: 'help',
           aliases: [ 'h' ],
           description: 'get help'
-        },
-        {
-          key: 'bbb',
-          testing: true
         }
       ],
       parameters: [{
@@ -665,13 +665,13 @@ test('test ./command - help', function (t) {
     t.deepEquals({
       options: [
         {
+          key: 'bbb',
+          testing: true
+        },
+        {
           key: 'help',
           aliases: [ 'h' ],
           description: 'get help'
-        },
-        {
-          key: 'bbb',
-          testing: true
         }
       ],
       parameters: [{
