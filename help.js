@@ -11,25 +11,18 @@ module.exports = function (title, description, {options, parameters, commands}) 
     console.error(description)
   }
 
-  if (parameters.length || options.length) {
-    const usages = getUsages(title, {options, parameters, commands})
+  console.error('')
 
-    console.error('')
+  console.error(chalk.green('Usage:') + ' ' + getUsage(title, {options, parameters}))
 
-    if (usages.length > 1) {
-      console.error(chalk.green('Usage:'))
-
-      console.error('')
-
-      for (const usage of usages) {
-        console.error(usage)
-      }
-    } else {
-      console.error(chalk.green('Usage:') + ' ' + usages[0])
-    }
-  }
-
-  parameters = getNested('parameters', {parameters, commands})
+  const longestArg = longest([
+    ...parameters.map(function (definition) {
+      return '<' + definition.key + '>'
+    }),
+    ...options.map(function (definition) {
+      return getOptionSignature(definition)
+    })
+  ])
 
   if (parameters.length) {
     console.error('')
@@ -38,30 +31,24 @@ module.exports = function (title, description, {options, parameters, commands}) 
 
     console.error('')
 
-    const longestParameter = longest(parameters.map(function (definition) {
-      return definition.key
-    }))
-
     for (const definition of parameters) {
-      const description = ['<' + definition.key + '>' + spaces(longestParameter - definition.key.length) + '  ']
+      let line = '<' + definition.key + '>' + spaces(longestArg - definition.key.length - 2) + '  '
 
       if (definition.description) {
-        description.push(definition.description)
+        line += chalk.gray(definition.description) + ' '
       }
 
       if (definition.type != null) {
         const _default = definition.type()
 
         if (_default != null) {
-          description.push((definition.description ? ' ' : '') + chalk.gray('[default: ' + JSON.stringify(_default) + ']'))
+          line += chalk.gray('[default: ' + JSON.stringify(_default) + ']')
         }
       }
 
-      console.error(description.join(''))
+      console.error(line.trim())
     }
   }
-
-  options = getNested('options', {options, commands})
 
   if (options.length) {
     console.error('')
@@ -70,34 +57,38 @@ module.exports = function (title, description, {options, parameters, commands}) 
 
     console.error('')
 
-    const longestOption = longest(options.map(function (definition) {
-      return getOptionSignature(definition)
-    }))
-
     for (const definition of options) {
       const signature = getOptionSignature(definition)
-      const description = [signature + spaces(longestOption - signature.length) + '  ']
+      let line = signature + spaces(longestArg - signature.length) + '  '
 
       if (definition.description) {
-        description.push(definition.description)
+        line += chalk.gray(definition.description) + ' '
       }
 
       if (definition.type != null) {
         const _default = definition.type()
 
         if (_default != null) {
-          description.push((definition.description ? ' ' : '') + chalk.gray('[default: ' + JSON.stringify(_default) + ']'))
+          line += chalk.gray('[default: ' + JSON.stringify(_default) + ']')
         }
       }
 
-      console.error(description.join(''))
+      console.error(line.trim())
     }
+  }
+
+  if (commands.length) {
+    console.error('')
+
+    console.error(chalk.green('Commands:'))
+
+    commandList(title, commands)
   }
 
   console.error('')
 }
 
-function getUsages (title, {options, parameters, commands}) {
+function getUsage (title, {options, parameters}) {
   let usage = [title]
 
   if (options && options.length) {
@@ -116,25 +107,7 @@ function getUsages (title, {options, parameters, commands}) {
     }))
   }
 
-  let usages = [usage.join(' ')]
-
-  if (commands) {
-    for (const command of commands) {
-      usages = usages.concat(getUsages(title + ' ' + command.title, command))
-    }
-  }
-
-  return usages
-}
-
-function getNested (id, obj) {
-  if (obj.commands) {
-    for (const command of obj.commands) {
-      obj[id] = obj[id].concat(getNested(id, command))
-    }
-  }
-
-  return obj[id].filter((a, i) => obj[id].findIndex((b) => a.key === b.key) === i)
+  return usage.join(' ')
 }
 
 function wrapUsage (usage, {required, multiple}) {
@@ -154,4 +127,20 @@ function getOptionSignature (definition) {
   }
 
   return signature
+}
+
+function commandList (title, commands) {
+  for (const command of commands) {
+    console.error('')
+
+    console.error(getUsage(title + ' ' + command.title, command))
+
+    if (command.description) {
+      console.error('')
+
+      console.error('  ' + chalk.gray(command.description))
+    }
+
+    commandList(title + ' ' + command.title, command.commands)
+  }
 }

@@ -3,16 +3,16 @@ const error = require('./error')
 const help = require('./help')
 // const assert = require('assert')
 
-module.exports = function sergeant (title, description, define) {
+module.exports = function sergeant (path, description, define) {
+  const title = path.split(' ').reverse()[0]
+
   if (define == null) {
     define = description
 
     description = null
   }
 
-  function cli (argv, path = []) {
-    path = path.concat([ title ])
-
+  function cli (argv) {
     const filtered = argv.filter((arg) => arg !== '-' && !arg.startsWith('-'))
     const command = cli.commands.find((command) => command.title === filtered[0])
 
@@ -21,14 +21,14 @@ module.exports = function sergeant (title, description, define) {
 
       argv.splice(index0, 1)
 
-      command(argv, path)
+      command(argv)
     } else {
       const args = parse(argv, {options: cli.options, parameters: cli.parameters})
 
       try {
         if (args != null) {
           if (args.help === true || action == null) {
-            help(path.join(' '), description, {options: cli.options, parameters: cli.parameters, commands: cli.commands})
+            help(path, description, {options: cli.options, parameters: cli.parameters, commands: cli.commands})
           } else if (action != null) {
             const result = action(args)
 
@@ -69,7 +69,7 @@ module.exports = function sergeant (title, description, define) {
       description = null
     }
 
-    cli.commands.push(sergeant(subtitle, description, define))
+    cli.commands.push(sergeant(path.split(' ').concat([ subtitle ]).join(' '), description, define))
   }
 
   function option (key, definition) {
