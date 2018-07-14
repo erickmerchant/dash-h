@@ -56,7 +56,7 @@ module.exports = function sergeant (path, description, define) {
   const action = define({option, parameter, command})
 
   option('help', {
-    aliases: ['h'],
+    alias: 'h',
     description: 'get help'
   })
 

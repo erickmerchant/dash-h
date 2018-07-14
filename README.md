@@ -16,13 +16,13 @@ command('hello', function ({option, parameter, command}) {
 
   option('loud', {
     description: 'say it loud',
-    aliases: ['l']
+    alias: 'l'
   })
 
   command('world', function ({option}) {
     option('loud', {
       description: 'say it loud',,
-      aliases: ['l']
+      alias: 'l'
     })
 
     return function (args) {
@@ -91,9 +91,9 @@ It's passed args which are all the options and parameters when run.
 
 ### definition
 
-__{aliases, description, multiple, required, type}__
+__{alias, description, multiple, required, type}__
 
-- aliases: Optional. An array of strings, each an alias.
+- alias: Optional. A short alias for the option.
 - description: A short description
 - multiple: Optional. A boolean. If true then multiple values are accepted.
 - required: Optional. A boolean. If true it is required.

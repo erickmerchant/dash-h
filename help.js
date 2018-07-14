@@ -35,14 +35,14 @@ module.exports = function (title, description, {options, parameters, commands}) 
       let line = '<' + definition.key + '>' + spaces(longestArg - definition.key.length - 2) + '  '
 
       if (definition.description) {
-        line += chalk.gray(definition.description) + ' '
+        line += definition.description + ' '
       }
 
       if (definition.type != null) {
         const _default = definition.type()
 
         if (_default != null) {
-          line += chalk.gray('[default: ' + JSON.stringify(_default) + ']')
+          line += '[default: ' + JSON.stringify(_default) + ']'
         }
       }
 
@@ -62,14 +62,14 @@ module.exports = function (title, description, {options, parameters, commands}) 
       let line = signature + spaces(longestArg - signature.length) + '  '
 
       if (definition.description) {
-        line += chalk.gray(definition.description) + ' '
+        line += definition.description + ' '
       }
 
       if (definition.type != null) {
         const _default = definition.type()
 
         if (_default != null) {
-          line += chalk.gray('[default: ' + JSON.stringify(_default) + ']')
+          line += '[default: ' + JSON.stringify(_default) + ']'
         }
       }
 
@@ -97,7 +97,7 @@ function getUsage (title, {options, parameters}) {
         ? ' <' + definition.type.name + '>'
         : ''
 
-      return wrapUsage(addDashes(definition.key) + valPart, definition)
+      return wrapUsage(addDashes(definition.alias != null ? definition.alias : definition.key) + valPart, definition)
     }))
   }
 
@@ -122,8 +122,8 @@ function getOptionSignature (definition) {
     : ''
   let signature = addDashes(definition.key) + val
 
-  if (definition.aliases != null && definition.aliases.length) {
-    signature = definition.aliases.map((k) => addDashes(k) + val).join(', ') + ', ' + signature
+  if (definition.alias != null) {
+    signature = addDashes(definition.alias) + val + ', ' + signature
   }
 
   return signature
@@ -138,7 +138,7 @@ function commandList (title, commands) {
     if (command.description) {
       console.error('')
 
-      console.error('  ' + chalk.gray(command.description))
+      console.error('  ' + command.description)
     }
 
     commandList(title + ' ' + command.title, command.commands)

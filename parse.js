@@ -12,10 +12,8 @@ module.exports = function (argv, {options, parameters}) {
 
       options.push(definition)
 
-      if (definition.aliases) {
-        for (const alias of definition.aliases) {
-          options.push(Object.assign({}, definition, {key: alias, alias: true}))
-        }
+      if (definition.alias) {
+        options.push(Object.assign({}, definition, {key: definition.alias, alias: true}))
       }
 
       return options

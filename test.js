@@ -45,7 +45,7 @@ test('test ./parse', function (t) {
     parameters: [],
     options: [{
       key: 'aa-a',
-      aliases: ['a']
+      alias: 'a'
     }]
   }))
 
@@ -55,7 +55,7 @@ test('test ./parse', function (t) {
     options: [{
       type (val) { return val },
       key: 'aa-a',
-      aliases: ['a']
+      alias: 'a'
     }]
   }))
 
@@ -65,7 +65,7 @@ test('test ./parse', function (t) {
     options: [{
       type (val) { return val },
       key: 'aa-a',
-      aliases: ['a']
+      alias: 'a'
     },
     {
       key: 'b'
@@ -77,7 +77,7 @@ test('test ./parse', function (t) {
     parameters: [],
     options: [{
       key: 'aa-a',
-      aliases: ['a']
+      alias: 'a'
     },
     {
       key: 'b'
@@ -91,7 +91,7 @@ test('test ./parse', function (t) {
       type (val) { return val },
       key: 'aa-a',
       multiple: true,
-      aliases: ['a']
+      alias: 'a'
     }]
   }))
 
@@ -101,7 +101,7 @@ test('test ./parse', function (t) {
     options: [{
       type (val) { return val },
       key: 'aa-a',
-      aliases: ['a']
+      alias: 'a'
     }]
   }))
 
@@ -110,7 +110,7 @@ test('test ./parse', function (t) {
     parameters: [],
     options: [{
       key: 'aa-a',
-      aliases: ['a'],
+      alias: 'a',
       type (val) {
         if (val == null) {
           return ''
@@ -126,7 +126,7 @@ test('test ./parse', function (t) {
     parameters: [],
     options: [{
       key: 'aa-a',
-      aliases: ['a']
+      alias: 'a'
     }]
   }))
 
@@ -268,7 +268,7 @@ test('test ./parse - with errors', function (t) {
     parameters: [],
     options: [{
       key: 'aa-a',
-      aliases: ['a'],
+      alias: 'a',
       type (val) { return val },
       multiple: true
     }]
@@ -397,13 +397,13 @@ test('test ./help', function (t) {
     options: [
       {
         key: 'aaa',
-        aliases: ['a'],
+        alias: 'a',
         multiple: true,
         description: 'a Boolean'
       },
       {
         key: 'bbb',
-        aliases: ['b'],
+        alias: 'b',
         required: true,
         description: 'a Number',
         type: function val (val) {
@@ -426,7 +426,7 @@ test('test ./help', function (t) {
     }],
     options: [{
       key: 'aaa',
-      aliases: ['a'],
+      alias: 'a',
       description: 'a Boolean'
     }],
     commands: [
@@ -440,7 +440,7 @@ test('test ./help', function (t) {
         }],
         options: [{
           key: 'bbb',
-          aliases: ['b'],
+          alias: 'b',
           description: 'a Boolean'
         }],
         commands: [
@@ -455,7 +455,7 @@ test('test ./help', function (t) {
             }],
             options: [{
               key: 'ccc',
-              aliases: ['c'],
+              alias: 'c',
               description: 'a Boolean'
             }]
           }
@@ -467,7 +467,7 @@ test('test ./help', function (t) {
   help('test-command', 'a test command', {
     options: [{
       key: 'aaa',
-      aliases: ['a'],
+      alias: 'a',
       multiple: true,
       description: 'a Boolean'
     }],
@@ -483,49 +483,49 @@ test('test ./help', function (t) {
 
   t.deepEquals([
     '',
-    chalk.green('Usage:') + ' test-command [--aaa]... (--bbb <val>) <p0> [<p1>]...',
+    chalk.green('Usage:') + ' test-command [-a]... (-b <val>) <p0> [<p1>]...',
     '',
     chalk.green('Parameters:'),
     '',
-    '<p0>                   ' + chalk.gray('the description'),
-    '<p1>                   ' + chalk.gray('[default: ["a","b"]]'),
+    '<p0>                   the description',
+    '<p1>                   [default: ["a","b"]]',
     '',
     chalk.green('Options:'),
     '',
-    '-a, --aaa              ' + chalk.gray('a Boolean'),
-    '-b <val>, --bbb <val>  ' + chalk.gray('a Number') + ' ' + chalk.gray('[default: 100]'),
+    '-a, --aaa              a Boolean',
+    '-b <val>, --bbb <val>  a Number [default: 100]',
     '',
     '',
     'a test command',
     '',
-    chalk.green('Usage:') + ' test-command [--aaa] <p0>',
+    chalk.green('Usage:') + ' test-command [-a] <p0>',
     '',
     chalk.green('Parameters:'),
     '',
-    '<p0>       ' + chalk.gray('the description'),
+    '<p0>       the description',
     '',
     chalk.green('Options:'),
     '',
-    '-a, --aaa  ' + chalk.gray('a Boolean'),
+    '-a, --aaa  a Boolean',
     '',
     chalk.green('Commands:'),
     '',
-    'test-command sub [--bbb] <p1>',
+    'test-command sub [-b] <p1>',
     '',
-    '  ' + chalk.gray('a sub command'),
+    '  a sub command',
     '',
-    'test-command sub sub-sub [--ccc] <p2>',
+    'test-command sub sub-sub [-c] <p2>',
     '',
-    '  ' + chalk.gray('a sub sub command'),
+    '  a sub sub command',
     '',
     '',
     'a test command',
     '',
-    chalk.green('Usage:') + ' test-command [--aaa]...',
+    chalk.green('Usage:') + ' test-command [-a]...',
     '',
     chalk.green('Options:'),
     '',
-    '-a, --aaa  ' + chalk.gray('a Boolean'),
+    '-a, --aaa  a Boolean',
     '',
     '',
     'a test command',
@@ -579,7 +579,7 @@ test('test ./error', function (t) {
 
   t.deepEquals([
     chalk.red('Error: testing errors'),
-    'at thing ' + chalk.gray('(file.js:123:45)'),
+    'at thing (file.js:123:45)',
     'at another',
     chalk.red('Error: testing errors')
   ], messages)
@@ -609,7 +609,7 @@ test('test ./command - no help. no errors', function (t) {
         },
         {
           key: 'help',
-          aliases: [ 'h' ],
+          alias: 'h',
           description: 'get help'
         }
       ],
@@ -671,7 +671,7 @@ test('test ./command - help', function (t) {
         },
         {
           key: 'help',
-          aliases: [ 'h' ],
+          alias: 'h',
           description: 'get help'
         }
       ],
