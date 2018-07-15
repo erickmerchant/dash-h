@@ -15,14 +15,16 @@ module.exports = function (title, description, {options, parameters, commands}) 
 
   console.error(chalk.green('Usage:') + ' ' + getUsage(title, {options, parameters}))
 
-  const longestArg = longest([
-    ...parameters.map(function (definition) {
+  const longestArg = longest(
+    parameters.map(function (definition) {
       return '<' + definition.key + '>'
-    }),
-    ...options.map(function (definition) {
-      return getOptionSignature(definition)
     })
-  ])
+      .concat(
+        options.map(function (definition) {
+          return getOptionSignature(definition)
+        })
+      )
+  )
 
   if (parameters.length) {
     console.error('')
