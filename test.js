@@ -406,7 +406,7 @@ test('test ./help', function (t) {
         alias: 'b',
         required: true,
         description: 'a Number',
-        type: function val (val) {
+        type (val) {
           if (val == null) {
             return 100
           }
@@ -483,7 +483,7 @@ test('test ./help', function (t) {
 
   t.deepEquals([
     '',
-    chalk.green('Usage:') + ' test-command [-a]... (-b <val>) <p0> [<p1>]...',
+    chalk.green('Usage:') + ' test-command [-a]... (-b <bbb>) <p0> [<p1>]...',
     '',
     chalk.green('Parameters:'),
     '',
@@ -493,7 +493,7 @@ test('test ./help', function (t) {
     chalk.green('Options:'),
     '',
     '-a, --aaa              a Boolean',
-    '-b <val>, --bbb <val>  a Number [default: 100]',
+    '-b <bbb>, --bbb <bbb>  a Number [default: 100]',
     '',
     '',
     'a test command',

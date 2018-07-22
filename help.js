@@ -96,7 +96,7 @@ function getUsage (title, {options, parameters}) {
   if (options && options.length) {
     usage = usage.concat(options.map(function (definition) {
       const valPart = definition.type != null
-        ? ' <' + definition.type.name + '>'
+        ? ' <' + definition.key + '>'
         : ''
 
       return wrapUsage(addDashes(definition.alias != null ? definition.alias : definition.key) + valPart, definition)
@@ -120,7 +120,7 @@ function wrapUsage (usage, {required, multiple}) {
 
 function getOptionSignature (definition) {
   let val = definition.type != null
-    ? ' <' + definition.type.name + '>'
+    ? ' <' + definition.key + '>'
     : ''
   let signature = addDashes(definition.key) + val
 
