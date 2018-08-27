@@ -1,11 +1,6 @@
 const test = require('tape')
-const mockery = require('mockery')
 const chalk = require('chalk')
-const mockerySettings = {
-  useCleanCache: true,
-  warnOnReplace: false,
-  warnOnUnregistered: false
-}
+const proxyquire = require('proxyquire').noPreserveCache()
 
 test('test ./parse', function (t) {
   const parse = require('./parse')
@@ -242,8 +237,6 @@ test('test ./parse', function (t) {
 })
 
 test('test ./parse - with errors', function (t) {
-  mockery.enable(mockerySettings)
-
   const messages = []
 
   const globals = {
@@ -257,9 +250,9 @@ test('test ./parse - with errors', function (t) {
     }
   }
 
-  mockery.registerMock('./src/globals', globals)
-
-  const parse = require('./parse')
+  const parse = proxyquire('./parse', {
+    './src/globals': globals
+  })
 
   t.plan(2)
 
@@ -349,15 +342,9 @@ test('test ./parse - with errors', function (t) {
     chalk.red('test is required'),
     chalk.red('too many arguments')
   ], messages)
-
-  mockery.disable()
-
-  mockery.deregisterAll()
 })
 
 test('test ./help', function (t) {
-  mockery.enable(mockerySettings)
-
   const messages = []
 
   const globals = {
@@ -371,9 +358,9 @@ test('test ./help', function (t) {
     }
   }
 
-  mockery.registerMock('./src/globals', globals)
-
-  const help = require('./help')
+  const help = proxyquire('./help', {
+    './src/globals': globals
+  })
 
   help('test-command', '', {
     parameters: [
@@ -533,15 +520,9 @@ test('test ./help', function (t) {
     chalk.green('Usage:') + ' test-command',
     ''
   ], messages)
-
-  mockery.disable()
-
-  mockery.deregisterAll()
 })
 
 test('test ./error', function (t) {
-  mockery.enable(mockerySettings)
-
   const messages = []
 
   const globals = {
@@ -555,9 +536,9 @@ test('test ./error', function (t) {
     }
   }
 
-  mockery.registerMock('./src/globals', globals)
-
-  const error = require('./error')
+  const error = proxyquire('./error', {
+    './src/globals': globals
+  })
 
   const error1 = new Error('testing errors')
 
@@ -583,18 +564,12 @@ test('test ./error', function (t) {
     'at another',
     chalk.red('Error: testing errors')
   ], messages)
-
-  mockery.disable()
-
-  mockery.deregisterAll()
 })
 
 test('test ./command - no help. no errors', function (t) {
-  mockery.enable(mockerySettings)
-
-  mockery.registerMock('./parse', mockedParse)
-
-  const command = require('./main')
+  const command = proxyquire('./main', {
+    './parse': mockedParse
+  })
 
   t.plan(3)
 
@@ -637,20 +612,13 @@ test('test ./command - no help. no errors', function (t) {
   })
 
   testCommand(['testing'])
-
-  mockery.disable()
-
-  mockery.deregisterAll()
 })
 
 test('test ./command - help', function (t) {
-  mockery.enable(mockerySettings)
-
-  mockery.registerMock('./parse', mockedParse)
-
-  mockery.registerMock('./help', mockedHelp)
-
-  const command = require('./main')
+  const command = proxyquire('./main', {
+    './parse': mockedParse,
+    './help': mockedHelp
+  })
 
   t.plan(2)
 
@@ -695,20 +663,13 @@ test('test ./command - help', function (t) {
   })
 
   testCommand(['testing'])
-
-  mockery.disable()
-
-  mockery.deregisterAll()
 })
 
 test('test ./command - thrown error', function (t) {
-  mockery.enable(mockerySettings)
-
-  mockery.registerMock('./parse', mockedParse)
-
-  mockery.registerMock('./error', mockedError)
-
-  const command = require('./main')
+  const command = proxyquire('./main', {
+    './parse': mockedParse,
+    './error': mockedError
+  })
 
   const ourError = new Error('testing errors')
 
@@ -729,20 +690,13 @@ test('test ./command - thrown error', function (t) {
   })
 
   testCommand(['testing'])
-
-  mockery.disable()
-
-  mockery.deregisterAll()
 })
 
 test('test ./command - rejected promise', function (t) {
-  mockery.enable(mockerySettings)
-
-  mockery.registerMock('./parse', mockedParse)
-
-  mockery.registerMock('./error', mockedError)
-
-  const command = require('./main')
+  const command = proxyquire('./main', {
+    './parse': mockedParse,
+    './error': mockedError
+  })
 
   const ourError = new Error('testing errors')
 
@@ -763,18 +717,12 @@ test('test ./command - rejected promise', function (t) {
   })
 
   testCommand(['testing'])
-
-  mockery.disable()
-
-  mockery.deregisterAll()
 })
 
 test('test ./command - sub commands', function (t) {
-  mockery.enable(mockerySettings)
-
-  mockery.registerMock('./parse', function () { return {} })
-
-  const command = require('./main')
+  const command = proxyquire('./main', {
+    './parse': function () { return {} }
+  })
 
   t.plan(2)
 
@@ -799,8 +747,4 @@ test('test ./command - sub commands', function (t) {
   testCommand(['sub-command'])
 
   testCommand(['sub-command-b'])
-
-  mockery.disable()
-
-  mockery.deregisterAll()
 })
