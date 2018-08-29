@@ -2,25 +2,25 @@ const chalk = require('chalk')
 const { console, process } = require('./src/globals')
 const { addDashes, camelCaseFromDash } = require('./src/helpers')
 
-module.exports = function (argv, {options, parameters}) {
+module.exports = function (argv, { options, parameters }) {
   try {
     argv = argv.slice(0)
     const args = {}
 
     options = options.reduce(function (options, definition) {
-      definition = Object.assign({}, definition, {property: camelCaseFromDash(definition.key)})
+      definition = Object.assign({}, definition, { property: camelCaseFromDash(definition.key) })
 
       options.push(definition)
 
       if (definition.alias) {
-        options.push(Object.assign({}, definition, {key: definition.alias, alias: true}))
+        options.push(Object.assign({}, definition, { key: definition.alias, alias: true }))
       }
 
       return options
     }, [])
 
     parameters = parameters.reduce(function (parameters, definition) {
-      definition = Object.assign({}, definition, {property: camelCaseFromDash(definition.key)})
+      definition = Object.assign({}, definition, { property: camelCaseFromDash(definition.key) })
 
       parameters.push(definition)
 

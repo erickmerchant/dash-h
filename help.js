@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const { console, process } = require('./src/globals')
 const { addDashes, longest, spaces } = require('./src/helpers')
 
-module.exports = function (title, description, {options, parameters, commands}) {
+module.exports = function (title, description, { options, parameters, commands }) {
   process.exitCode = 1
 
   if (description) {
@@ -13,7 +13,7 @@ module.exports = function (title, description, {options, parameters, commands}) 
 
   console.error('')
 
-  console.error(chalk.green('Usage:') + ' ' + getUsage(title, {options, parameters}))
+  console.error(chalk.green('Usage:') + ' ' + getUsage(title, { options, parameters }))
 
   const longestArg = longest(
     parameters.map(function (definition) {
@@ -90,7 +90,7 @@ module.exports = function (title, description, {options, parameters, commands}) 
   console.error('')
 }
 
-function getUsage (title, {options, parameters}) {
+function getUsage (title, { options, parameters }) {
   let usage = [title]
 
   if (options && options.length) {
@@ -112,7 +112,7 @@ function getUsage (title, {options, parameters}) {
   return usage.join(' ')
 }
 
-function wrapUsage (usage, {required, multiple}) {
+function wrapUsage (usage, { required, multiple }) {
   const opt = usage.startsWith('-')
 
   return (required !== true ? '[' : (opt ? '(' : '')) + usage + (required !== true ? ']' : (opt ? ')' : '')) + (multiple === true ? '...' : '')

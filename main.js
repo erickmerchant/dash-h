@@ -23,12 +23,12 @@ module.exports = function sergeant (path, description, define) {
 
       command(argv)
     } else {
-      const args = parse(argv, {options: cli.options, parameters: cli.parameters})
+      const args = parse(argv, { options: cli.options, parameters: cli.parameters })
 
       try {
         if (args != null) {
           if (args.help === true || action == null) {
-            help(path, description, {options: cli.options, parameters: cli.parameters, commands: cli.commands})
+            help(path, description, { options: cli.options, parameters: cli.parameters, commands: cli.commands })
           } else if (action != null) {
             const result = action(args)
 
@@ -53,7 +53,7 @@ module.exports = function sergeant (path, description, define) {
 
   cli.commands = []
 
-  const action = define({option, parameter, command})
+  const action = define({ option, parameter, command })
 
   option('help', {
     alias: 'h',
@@ -73,13 +73,13 @@ module.exports = function sergeant (path, description, define) {
   }
 
   function option (key, definition) {
-    const current = Object.assign(definition, {key})
+    const current = Object.assign(definition, { key })
 
     cli.options.push(current)
   }
 
   function parameter (key, definition) {
-    const current = Object.assign(definition, {key})
+    const current = Object.assign(definition, { key })
 
     cli.parameters.push(current)
   }
