@@ -1,7 +1,7 @@
 const chalk = require('chalk')
 const { process, console } = require('./src/globals')
 
-module.exports = function (error) {
+module.exports = (error) => {
   process.exitCode = 1
 
   if (typeof error === 'object' && error instanceof Error) {

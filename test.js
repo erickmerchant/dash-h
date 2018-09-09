@@ -2,7 +2,7 @@ const test = require('tape')
 const chalk = require('chalk')
 const proxyquire = require('proxyquire').noPreserveCache()
 
-test('test ./parse', function (t) {
+test('test ./parse', (t) => {
   const parse = require('./parse')
 
   t.plan(18)
@@ -236,7 +236,7 @@ test('test ./parse', function (t) {
     }))
 })
 
-test('test ./parse - with errors', function (t) {
+test('test ./parse - with errors', (t) => {
   const messages = []
 
   const globals = {
@@ -344,7 +344,7 @@ test('test ./parse - with errors', function (t) {
   ], messages)
 })
 
-test('test ./help', function (t) {
+test('test ./help', (t) => {
   const messages = []
 
   const globals = {
@@ -522,7 +522,7 @@ test('test ./help', function (t) {
   ], messages)
 })
 
-test('test ./error', function (t) {
+test('test ./error', (t) => {
   const messages = []
 
   const globals = {
@@ -566,7 +566,7 @@ test('test ./error', function (t) {
   ], messages)
 })
 
-test('test ./command - no help. no errors', function (t) {
+test('test ./command - no help. no errors', (t) => {
   const command = proxyquire('./main', {
     './parse': mockedParse
   })
@@ -597,7 +597,7 @@ test('test ./command - no help. no errors', function (t) {
     return {}
   }
 
-  const testCommand = command('test-command', function ({ option, parameter }) {
+  const testCommand = command('test-command', ({ option, parameter }) => {
     parameter('aaa', {
       testing: true
     })
@@ -606,7 +606,7 @@ test('test ./command - no help. no errors', function (t) {
       testing: true
     })
 
-    return function () {
+    return () => {
       t.ok(true)
     }
   })
@@ -614,7 +614,7 @@ test('test ./command - no help. no errors', function (t) {
   testCommand(['testing'])
 })
 
-test('test ./command - help', function (t) {
+test('test ./command - help', (t) => {
   const command = proxyquire('./main', {
     './parse': mockedParse,
     './help': mockedHelp
@@ -651,7 +651,7 @@ test('test ./command - help', function (t) {
     }, definitions)
   }
 
-  const testCommand = command('test-command', function ({ parameter, option }) {
+  const testCommand = command('test-command', ({ parameter, option }) => {
     parameter('aaa', {
       testing: true
     })
@@ -659,13 +659,14 @@ test('test ./command - help', function (t) {
     option('bbb', {
       testing: true
     })
-    return function () {}
+
+    return () => {}
   })
 
   testCommand(['testing'])
 })
 
-test('test ./command - thrown error', function (t) {
+test('test ./command - thrown error', (t) => {
   const command = proxyquire('./main', {
     './parse': mockedParse,
     './error': mockedError
@@ -683,16 +684,14 @@ test('test ./command - thrown error', function (t) {
     t.deepEquals(ourError, error)
   }
 
-  const testCommand = command('test-command', function () {
-    return function () {
-      throw ourError
-    }
+  const testCommand = command('test-command', () => () => {
+    throw ourError
   })
 
   testCommand(['testing'])
 })
 
-test('test ./command - rejected promise', function (t) {
+test('test ./command - rejected promise', (t) => {
   const command = proxyquire('./main', {
     './parse': mockedParse,
     './error': mockedError
@@ -710,36 +709,30 @@ test('test ./command - rejected promise', function (t) {
     t.deepEquals(ourError, error)
   }
 
-  const testCommand = command('test-command', function () {
-    return function () {
-      return Promise.reject(ourError)
-    }
+  const testCommand = command('test-command', () => async () => {
+    throw ourError
   })
 
   testCommand(['testing'])
 })
 
-test('test ./command - sub commands', function (t) {
+test('test ./command - sub commands', (t) => {
   const command = proxyquire('./main', {
-    './parse': function () { return {} }
+    './parse' () { return {} }
   })
 
   t.plan(2)
 
-  const testCommand = command('test-command', function ({ option, parameter, command }) {
-    command('sub-command', 'a sub command', function () {
-      return function () {
-        t.ok(true)
-      }
+  const testCommand = command('test-command', ({ option, parameter, command }) => {
+    command('sub-command', 'a sub command', () => () => {
+      t.ok(true)
     })
 
-    command('sub-command-b', function () {
-      return function () {
-        t.ok(true)
-      }
+    command('sub-command-b', () => () => {
+      t.ok(true)
     })
 
-    return function () {
+    return () => {
       t.ok(false)
     }
   })

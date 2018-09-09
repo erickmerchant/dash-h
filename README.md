@@ -8,7 +8,7 @@ A CLI solution with simple argument parsing and built in help messages.
 const command = require('sergeant')
 const assert = require('assert')
 
-command('hello', function ({option, parameter, command}) {
+command('hello', ({option, parameter, command}) => {
   parameter('name', {
     description: 'the name',
     required: true
@@ -19,18 +19,18 @@ command('hello', function ({option, parameter, command}) {
     alias: 'l'
   })
 
-  command('world', function ({option}) {
+  command('world', ({option}) => {
     option('loud', {
       description: 'say it loud',,
       alias: 'l'
     })
 
-    return function (args) {
+    return (args) => {
       say('world', args.loud)
     }
   })
 
-  return function (args) {
+  return (args) => {
     assert.notEqual(args.name, 'world', 'use hello world')
 
     say(args.name, args.loud)

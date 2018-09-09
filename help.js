@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const { console, process } = require('./src/globals')
 const { addDashes, longest, spaces } = require('./src/helpers')
 
-module.exports = function (title, description, { options, parameters, commands }) {
+module.exports = (title, description, { options, parameters, commands }) => {
   process.exitCode = 1
 
   if (description) {
@@ -16,11 +16,11 @@ module.exports = function (title, description, { options, parameters, commands }
   console.error(chalk.green('Usage:') + ' ' + getUsage(title, { options, parameters }))
 
   const longestArg = longest(
-    parameters.map(function (definition) {
+    parameters.map((definition) => {
       return '<' + definition.key + '>'
     })
       .concat(
-        options.map(function (definition) {
+        options.map((definition) => {
           return getOptionSignature(definition)
         })
       )
@@ -94,7 +94,7 @@ function getUsage (title, { options, parameters }) {
   let usage = [title]
 
   if (options && options.length) {
-    usage = usage.concat(options.map(function (definition) {
+    usage = usage.concat(options.map((definition) => {
       const valPart = definition.type != null
         ? ' <' + definition.key + '>'
         : ''
@@ -104,7 +104,7 @@ function getUsage (title, { options, parameters }) {
   }
 
   if (parameters && parameters.length) {
-    usage = usage.concat(parameters.map(function (definition) {
+    usage = usage.concat(parameters.map((definition) => {
       return wrapUsage('<' + definition.key + '>', definition)
     }))
   }

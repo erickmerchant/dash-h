@@ -2,12 +2,12 @@ const chalk = require('chalk')
 const { console, process } = require('./src/globals')
 const { addDashes, camelCaseFromDash } = require('./src/helpers')
 
-module.exports = function (argv, { options, parameters }) {
+module.exports = (argv, { options, parameters }) => {
   try {
     argv = argv.slice(0)
     const args = {}
 
-    options = options.reduce(function (options, definition) {
+    options = options.reduce((options, definition) => {
       definition = Object.assign({}, definition, { property: camelCaseFromDash(definition.key) })
 
       options.push(definition)
@@ -19,7 +19,7 @@ module.exports = function (argv, { options, parameters }) {
       return options
     }, [])
 
-    parameters = parameters.reduce(function (parameters, definition) {
+    parameters = parameters.reduce((parameters, definition) => {
       definition = Object.assign({}, definition, { property: camelCaseFromDash(definition.key) })
 
       parameters.push(definition)
@@ -36,7 +36,7 @@ module.exports = function (argv, { options, parameters }) {
       argv = argv.slice(0, indexOfDashDash)
     }
 
-    argv = argv.reduce(function (argv, arg) {
+    argv = argv.reduce((argv, arg) => {
       if (arg !== '-' && arg.startsWith('-') && !arg.startsWith('--')) {
         if (arg.indexOf('=') > -1) {
           argv.push('-' + arg.substr(arg.indexOf('=') - 1))
@@ -120,7 +120,7 @@ module.exports = function (argv, { options, parameters }) {
       }
     }
 
-    argv = argv.reduce(function (argv, arg, i) {
+    argv = argv.reduce((argv, arg, i) => {
       if (!toBeDeleted.includes(i)) {
         argv.push(arg)
       }
