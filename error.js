@@ -10,8 +10,8 @@ module.exports = (error) => {
 
       console.error(chalk.red(stack.shift()))
 
-      for (const parts of stack.map((line) => line.match(/^(.*?)(\(.*\))?$/))) {
-        console.error(parts[1] + (parts[2] != null ? parts[2] : ''))
+      for (const line of stack) {
+        console.error(line)
       }
     } else {
       console.error(chalk.red(error.toString()))
