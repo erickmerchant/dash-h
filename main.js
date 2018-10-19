@@ -30,11 +30,9 @@ module.exports = function sergeant (path, description, define) {
           if (args.help === true || action == null) {
             help(path, description, { options: cli.options, parameters: cli.parameters, commands: cli.commands })
           } else if (action != null) {
-            const result = action(args)
-
-            if (typeof result === 'object' && result instanceof Promise) {
-              result.catch(error)
-            }
+            Promise.resolve()
+              .then(() => action(args))
+              .catch(error)
           }
         }
       } catch (e) {

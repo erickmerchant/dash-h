@@ -119,7 +119,7 @@ function wrapUsage (usage, { required, multiple }) {
 }
 
 function getOptionSignature (definition) {
-  let val = definition.type != null
+  const val = definition.type != null
     ? ' <' + definition.key + '>'
     : ''
   let signature = addDashes(definition.key) + val

@@ -61,29 +61,29 @@ module.exports = (argv, { options, parameters }) => {
         const search = addDashes(definition.key)
         const property = definition.property
         const vals = []
+        const isSearch = argv[i] === search
+        const nextIsValid = argv[i + 1] != null && (!argv[i + 1].startsWith('-') || argv[i + 1].startsWith('---') || argv[i + 1] === '-')
+        const isBoolean = definition.type == null
+        const hasValue = argv[i].startsWith(search + '=')
 
-        if (argv[i] === search) {
-          if (definition.type != null) {
-            if (argv[i + 1] != null && (!argv[i + 1].startsWith('-') || argv[i + 1].startsWith('---') || argv[i + 1] === '-')) {
-              vals.push(argv[i + 1])
+        if (isSearch && !isBoolean && nextIsValid) {
+          vals.push(argv[i + 1])
 
-              toBeDeleted.push(i + 1)
-            } else {
-              throw new Error(addDashes(definition.key) + ' is not a boolean and requires a value')
-            }
-          } else {
-            vals.push(true)
-          }
+          toBeDeleted.push(i + 1)
 
           toBeDeleted.push(i)
-        } else if (argv[i].startsWith(search + '=')) {
-          if (definition.type != null) {
-            vals.push(argv[i].substr(argv[i].indexOf('=') + 1))
+        } else if (isSearch && isBoolean && !nextIsValid) {
+          vals.push(true)
 
-            toBeDeleted.push(i)
-          } else {
-            throw new Error(addDashes(definition.key) + ' is a boolean and does not accept a value')
-          }
+          toBeDeleted.push(i)
+        } else if (!isBoolean && hasValue) {
+          vals.push(argv[i].substr(argv[i].indexOf('=') + 1))
+
+          toBeDeleted.push(i)
+        } else if (isSearch && !isBoolean) {
+          throw new Error(addDashes(definition.key) + ' is not a boolean and requires a value')
+        } else if ((isSearch || hasValue) && isBoolean) {
+          throw new Error(addDashes(definition.key) + ' is a boolean and does not accept a value')
         }
 
         if (vals != null && vals.length) {
