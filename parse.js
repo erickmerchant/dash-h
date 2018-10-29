@@ -62,27 +62,27 @@ module.exports = (argv, { options, parameters }) => {
         const property = definition.property
         const vals = []
         const isSearch = argv[i] === search
+        const isSearchWithValue = argv[i].startsWith(search + '=')
         const nextIsValid = argv[i + 1] != null && (!argv[i + 1].startsWith('-') || argv[i + 1].startsWith('---') || argv[i + 1] === '-')
         const isBoolean = definition.type == null
-        const hasValue = argv[i].startsWith(search + '=')
 
-        if (isSearch && !isBoolean && nextIsValid) {
+        if (isSearch && isBoolean) {
+          vals.push(true)
+
+          toBeDeleted.push(i)
+        } else if (isSearch && nextIsValid && !isBoolean) {
           vals.push(argv[i + 1])
 
           toBeDeleted.push(i + 1)
 
           toBeDeleted.push(i)
-        } else if (isSearch && isBoolean && !nextIsValid) {
-          vals.push(true)
-
-          toBeDeleted.push(i)
-        } else if (!isBoolean && hasValue) {
+        } else if (isSearchWithValue && !isBoolean) {
           vals.push(argv[i].substr(argv[i].indexOf('=') + 1))
 
           toBeDeleted.push(i)
         } else if (isSearch && !isBoolean) {
           throw new Error(addDashes(definition.key) + ' is not a boolean and requires a value')
-        } else if ((isSearch || hasValue) && isBoolean) {
+        } else if (isSearchWithValue && isBoolean) {
           throw new Error(addDashes(definition.key) + ' is a boolean and does not accept a value')
         }
 
