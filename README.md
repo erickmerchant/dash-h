@@ -49,51 +49,11 @@ function say (name, loud = false) {
 
 ```
 
-## API Reference
+## Options and Parameters
 
-### command
+These are the possible properties of options and parameters.
 
-__command(name, description, define)__
-
-- name: A string. The name of your command
-- description: A string. A short description. Optional
-- [define](#define): A function to define your command
-
-### define
-
-__define({[option, parameter, command})__
-
-- [option](#option)
-- [parameter](#parameter)
-- [command](#command)
-
-It should return a function to call when the command is run. See [action](#action)
-
-### option
-
-__option(key, definition)__
-
-- key: The name of the option
-- [definition](#definition): An object that defines your option
-
-### parameter
-
-__parameter(key, definition)__
-
-- key: The name of the parameter
-- [definition](#definition): An object that defines your parameter
-
-### action
-
-__action(args)__
-
-It's passed args which are all the options and parameters when run.
-
-### definition
-
-__{alias, description, multiple, required, type}__
-
-- alias: Optional. A short alias for the option.
+- alias: Optional. A short alias for the option. (options only)
 - description: A short description
 - multiple: Optional. A boolean. If true then multiple values are accepted.
 - required: Optional. A boolean. If true it is required.
