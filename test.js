@@ -567,7 +567,7 @@ test('test ./error', (t) => {
 })
 
 test('test ./command - no help. no errors', (t) => {
-  const command = proxyquire('./main', {
+  const command = proxyquire('./', {
     './parse': mockedParse
   })
 
@@ -615,7 +615,7 @@ test('test ./command - no help. no errors', (t) => {
 })
 
 test('test ./command - help', (t) => {
-  const command = proxyquire('./main', {
+  const command = proxyquire('./', {
     './parse': mockedParse,
     './help': mockedHelp
   })
@@ -667,7 +667,7 @@ test('test ./command - help', (t) => {
 })
 
 test('test ./command - thrown error', (t) => {
-  const command = proxyquire('./main', {
+  const command = proxyquire('./', {
     './parse': mockedParse,
     './error': mockedError
   })
@@ -692,7 +692,7 @@ test('test ./command - thrown error', (t) => {
 })
 
 test('test ./command - rejected promise', (t) => {
-  const command = proxyquire('./main', {
+  const command = proxyquire('./', {
     './parse': mockedParse,
     './error': mockedError
   })
@@ -717,7 +717,7 @@ test('test ./command - rejected promise', (t) => {
 })
 
 test('test ./command - sub commands', (t) => {
-  const command = proxyquire('./main', {
+  const command = proxyquire('./', {
     './parse' () { return {} }
   })
 
