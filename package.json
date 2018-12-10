@@ -11,7 +11,7 @@
     "url": "git+https://erickmerchant@github.com/erickmerchant/sergeant.git"
   },
   "author": "Erick Merchant <erickmerchant@gmail.com>",
-  "license": "MIT",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/erickmerchant/sergeant/issues"
   },
