@@ -201,7 +201,7 @@ test('test ./parse', (t) => {
 
   const DEFAULT = Symbol('DEFAULT')
 
-  function FN_DEFAULT (val) {
+  const FN_DEFAULT = (val) => {
     if (val == null) {
       return DEFAULT
     }
@@ -567,13 +567,7 @@ test('test ./error', (t) => {
 })
 
 test('test ./command - no help. no errors', (t) => {
-  const command = proxyquire('./', {
-    './parse': mockedParse
-  })
-
-  t.plan(3)
-
-  function mockedParse (argv, definitions) {
+  const mockedParse = (argv, definitions) => {
     t.deepEquals(['testing'], argv)
 
     t.deepEquals({
@@ -597,6 +591,12 @@ test('test ./command - no help. no errors', (t) => {
     return {}
   }
 
+  const command = proxyquire('./', {
+    './parse': mockedParse
+  })
+
+  t.plan(3)
+
   const testCommand = command('test-command', ({ option, parameter }) => {
     parameter('aaa', {
       testing: true
@@ -615,20 +615,13 @@ test('test ./command - no help. no errors', (t) => {
 })
 
 test('test ./command - help', (t) => {
-  const command = proxyquire('./', {
-    './parse': mockedParse,
-    './help': mockedHelp
-  })
-
-  t.plan(2)
-
-  function mockedParse (argv, definitions) {
+  const mockedParse = (argv, definitions) => {
     return {
       help: true
     }
   }
 
-  function mockedHelp (name, description, definitions) {
+  const mockedHelp = (name, description, definitions) => {
     t.equals('test-command', name)
 
     t.deepEquals({
@@ -651,6 +644,13 @@ test('test ./command - help', (t) => {
     }, definitions)
   }
 
+  const command = proxyquire('./', {
+    './parse': mockedParse,
+    './help': mockedHelp
+  })
+
+  t.plan(2)
+
   const testCommand = command('test-command', ({ parameter, option }) => {
     parameter('aaa', {
       testing: true
@@ -667,6 +667,14 @@ test('test ./command - help', (t) => {
 })
 
 test('test ./command - thrown error', (t) => {
+  const mockedParse = () => {
+    return {}
+  }
+
+  const mockedError = (error) => {
+    t.deepEquals(ourError, error)
+  }
+
   const command = proxyquire('./', {
     './parse': mockedParse,
     './error': mockedError
@@ -675,14 +683,6 @@ test('test ./command - thrown error', (t) => {
   const ourError = new Error('testing errors')
 
   t.plan(1)
-
-  function mockedParse () {
-    return {}
-  }
-
-  function mockedError (error) {
-    t.deepEquals(ourError, error)
-  }
 
   const testCommand = command('test-command', () => () => {
     throw ourError
@@ -692,6 +692,14 @@ test('test ./command - thrown error', (t) => {
 })
 
 test('test ./command - rejected promise', (t) => {
+  const mockedParse = () => {
+    return {}
+  }
+
+  const mockedError = (error) => {
+    t.deepEquals(ourError, error)
+  }
+
   const command = proxyquire('./', {
     './parse': mockedParse,
     './error': mockedError
@@ -700,14 +708,6 @@ test('test ./command - rejected promise', (t) => {
   const ourError = new Error('testing errors')
 
   t.plan(1)
-
-  function mockedParse () {
-    return {}
-  }
-
-  function mockedError (error) {
-    t.deepEquals(ourError, error)
-  }
 
   const testCommand = command('test-command', () => async () => {
     throw ourError

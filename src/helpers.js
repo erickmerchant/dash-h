@@ -1,22 +1,22 @@
-module.exports = { addDashes, longest, spaces, camelCaseFromDash }
-
-function addDashes (key) {
+const addDashes = (key) => {
   return (key.length === 1 ? '-' : '--') + key
 }
 
-function longest (arr) {
+const longest = (arr) => {
   return arr.reduce((longest, item) => {
     return item.length > longest ? item.length : longest
   }, 0)
 }
 
-function spaces (number) {
+const spaces = (number) => {
   return ' '.repeat(number)
 }
 
-function camelCaseFromDash (key) {
+const camelCaseFromDash = (key) => {
   const split = key.split('-').filter((part) => part !== '')
   const property = split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')
 
   return property
 }
+
+module.exports = { addDashes, longest, spaces, camelCaseFromDash }

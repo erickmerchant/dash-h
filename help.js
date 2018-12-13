@@ -2,6 +2,63 @@ const chalk = require('chalk')
 const { console, process } = require('./src/globals')
 const { addDashes, longest, spaces } = require('./src/helpers')
 
+const getUsage = (title, { options, parameters }) => {
+  let usage = [title]
+
+  if (options && options.length) {
+    usage = usage.concat(options.map((definition) => {
+      const valPart = definition.type != null
+        ? ' <' + definition.key + '>'
+        : ''
+
+      return wrapUsage(addDashes(definition.alias != null ? definition.alias : definition.key) + valPart, definition)
+    }))
+  }
+
+  if (parameters && parameters.length) {
+    usage = usage.concat(parameters.map((definition) => {
+      return wrapUsage('<' + definition.key + '>', definition)
+    }))
+  }
+
+  return usage.join(' ')
+}
+
+const wrapUsage = (usage, { required, multiple }) => {
+  const opt = usage.startsWith('-')
+
+  return (required !== true ? '[' : (opt ? '(' : '')) + usage + (required !== true ? ']' : (opt ? ')' : '')) + (multiple === true ? '...' : '')
+}
+
+const getOptionSignature = (definition) => {
+  const val = definition.type != null
+    ? ' <' + definition.key + '>'
+    : ''
+  let signature = addDashes(definition.key) + val
+
+  if (definition.alias != null) {
+    signature = addDashes(definition.alias) + val + ', ' + signature
+  }
+
+  return signature
+}
+
+const commandList = (title, commands) => {
+  for (const command of commands) {
+    console.error('')
+
+    console.error(getUsage(title + ' ' + command.title, command))
+
+    if (command.description) {
+      console.error('')
+
+      console.error('  ' + command.description)
+    }
+
+    commandList(title + ' ' + command.title, command.commands)
+  }
+}
+
 module.exports = (title, description, { options, parameters, commands }) => {
   process.exitCode = 1
 
@@ -88,61 +145,4 @@ module.exports = (title, description, { options, parameters, commands }) => {
   }
 
   console.error('')
-}
-
-function getUsage (title, { options, parameters }) {
-  let usage = [title]
-
-  if (options && options.length) {
-    usage = usage.concat(options.map((definition) => {
-      const valPart = definition.type != null
-        ? ' <' + definition.key + '>'
-        : ''
-
-      return wrapUsage(addDashes(definition.alias != null ? definition.alias : definition.key) + valPart, definition)
-    }))
-  }
-
-  if (parameters && parameters.length) {
-    usage = usage.concat(parameters.map((definition) => {
-      return wrapUsage('<' + definition.key + '>', definition)
-    }))
-  }
-
-  return usage.join(' ')
-}
-
-function wrapUsage (usage, { required, multiple }) {
-  const opt = usage.startsWith('-')
-
-  return (required !== true ? '[' : (opt ? '(' : '')) + usage + (required !== true ? ']' : (opt ? ')' : '')) + (multiple === true ? '...' : '')
-}
-
-function getOptionSignature (definition) {
-  const val = definition.type != null
-    ? ' <' + definition.key + '>'
-    : ''
-  let signature = addDashes(definition.key) + val
-
-  if (definition.alias != null) {
-    signature = addDashes(definition.alias) + val + ', ' + signature
-  }
-
-  return signature
-}
-
-function commandList (title, commands) {
-  for (const command of commands) {
-    console.error('')
-
-    console.error(getUsage(title + ' ' + command.title, command))
-
-    if (command.description) {
-      console.error('')
-
-      console.error('  ' + command.description)
-    }
-
-    commandList(title + ' ' + command.title, command.commands)
-  }
 }
