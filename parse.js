@@ -107,12 +107,12 @@ module.exports = (argv, { options, parameters }) => {
 
           if (_default != null) {
             args[property] = _default
-          } else if (definition.required === true && args['help'] !== true) {
+          } else if (definition.required === true && args.help !== true) {
             throw new Error(addDashes(definition.key) + ' is required')
           }
         } else if (definition.required !== true) {
           args[property] = false
-        } else if (definition.required === true && args['help'] !== true) {
+        } else if (definition.required === true && args.help !== true) {
           throw new Error(addDashes(definition.key) + ' is required')
         }
       } else if (definition.type != null) {
@@ -154,10 +154,10 @@ module.exports = (argv, { options, parameters }) => {
 
           if (_default != null) {
             args[property] = _default
-          } else if (definition.required === true && args['help'] !== true) {
+          } else if (definition.required === true && args.help !== true) {
             throw new Error(definition.key + ' is required')
           }
-        } else if (definition.required === true && args['help'] !== true) {
+        } else if (definition.required === true && args.help !== true) {
           throw new Error(definition.key + ' is required')
         }
       } else if (definition.multiple === true) {
