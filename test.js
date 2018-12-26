@@ -1,5 +1,5 @@
 const test = require('tape')
-const chalk = require('chalk')
+const kleur = require('kleur')
 const proxyquire = require('proxyquire').noPreserveCache()
 
 test('test ./parse', (t) => {
@@ -331,16 +331,16 @@ test('test ./parse - with errors', (t) => {
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
-    chalk.red('-a is not a boolean and requires a value'),
-    chalk.red('-a is a boolean and does not accept a value'),
-    chalk.red('--aaa is a boolean and does not accept a value'),
-    chalk.red('unknown option -a'),
-    chalk.red('unknown option --aaa'),
-    chalk.red('-a is required'),
-    chalk.red('--aaa is required'),
-    chalk.red('--aaa does not accept multiple values'),
-    chalk.red('test is required'),
-    chalk.red('too many arguments')
+    kleur.red('-a is not a boolean and requires a value'),
+    kleur.red('-a is a boolean and does not accept a value'),
+    kleur.red('--aaa is a boolean and does not accept a value'),
+    kleur.red('unknown option -a'),
+    kleur.red('unknown option --aaa'),
+    kleur.red('-a is required'),
+    kleur.red('--aaa is required'),
+    kleur.red('--aaa does not accept multiple values'),
+    kleur.red('test is required'),
+    kleur.red('too many arguments')
   ], messages)
 })
 
@@ -470,14 +470,14 @@ test('test ./help', (t) => {
 
   t.deepEquals([
     '',
-    chalk.green('Usage:') + ' test-command [-a]... (-b <bbb>) <p0> [<p1>]...',
+    kleur.green('Usage:') + ' test-command [-a]... (-b <bbb>) <p0> [<p1>]...',
     '',
-    chalk.green('Parameters:'),
+    kleur.green('Parameters:'),
     '',
     '<p0>                   the description',
     '<p1>                   [default: ["a","b"]]',
     '',
-    chalk.green('Options:'),
+    kleur.green('Options:'),
     '',
     '-a, --aaa              a Boolean',
     '-b <bbb>, --bbb <bbb>  a Number [default: 100]',
@@ -485,17 +485,17 @@ test('test ./help', (t) => {
     '',
     'a test command',
     '',
-    chalk.green('Usage:') + ' test-command [-a] <p0>',
+    kleur.green('Usage:') + ' test-command [-a] <p0>',
     '',
-    chalk.green('Parameters:'),
+    kleur.green('Parameters:'),
     '',
     '<p0>       the description',
     '',
-    chalk.green('Options:'),
+    kleur.green('Options:'),
     '',
     '-a, --aaa  a Boolean',
     '',
-    chalk.green('Commands:'),
+    kleur.green('Commands:'),
     '',
     'test-command sub [-b] <p1>',
     '',
@@ -508,16 +508,16 @@ test('test ./help', (t) => {
     '',
     'a test command',
     '',
-    chalk.green('Usage:') + ' test-command [-a]...',
+    kleur.green('Usage:') + ' test-command [-a]...',
     '',
-    chalk.green('Options:'),
+    kleur.green('Options:'),
     '',
     '-a, --aaa  a Boolean',
     '',
     '',
     'a test command',
     '',
-    chalk.green('Usage:') + ' test-command',
+    kleur.green('Usage:') + ' test-command',
     ''
   ], messages)
 })
@@ -559,10 +559,10 @@ test('test ./error', (t) => {
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
-    chalk.red('Error: testing errors'),
+    kleur.red('Error: testing errors'),
     'at thing (file.js:123:45)',
     'at another',
-    chalk.red('Error: testing errors')
+    kleur.red('Error: testing errors')
   ], messages)
 })
 

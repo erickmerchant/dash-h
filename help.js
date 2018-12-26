@@ -1,4 +1,4 @@
-const chalk = require('chalk')
+const kleur = require('kleur')
 const { console, process } = require('./src/globals')
 const { addDashes, longest, spaces } = require('./src/helpers')
 
@@ -70,7 +70,7 @@ module.exports = (title, description, { options, parameters, commands }) => {
 
   console.error('')
 
-  console.error(chalk.green('Usage:') + ' ' + getUsage(title, { options, parameters }))
+  console.error(kleur.green('Usage:') + ' ' + getUsage(title, { options, parameters }))
 
   const longestArg = longest(
     parameters.map((definition) => {
@@ -86,7 +86,7 @@ module.exports = (title, description, { options, parameters, commands }) => {
   if (parameters.length) {
     console.error('')
 
-    console.error(chalk.green('Parameters:'))
+    console.error(kleur.green('Parameters:'))
 
     console.error('')
 
@@ -112,7 +112,7 @@ module.exports = (title, description, { options, parameters, commands }) => {
   if (options.length) {
     console.error('')
 
-    console.error(chalk.green('Options:'))
+    console.error(kleur.green('Options:'))
 
     console.error('')
 
@@ -139,7 +139,7 @@ module.exports = (title, description, { options, parameters, commands }) => {
   if (commands.length) {
     console.error('')
 
-    console.error(chalk.green('Commands:'))
+    console.error(kleur.green('Commands:'))
 
     commandList(title, commands)
   }

@@ -1,4 +1,4 @@
-const chalk = require('chalk')
+const kleur = require('kleur')
 const { console, process } = require('./src/globals')
 const { addDashes, camelCaseFromDash } = require('./src/helpers')
 
@@ -177,6 +177,6 @@ module.exports = (argv, { options, parameters }) => {
   } catch (error) {
     process.exitCode = 1
 
-    console.error(chalk.red(error.message))
+    console.error(kleur.red(error.message))
   }
 }
