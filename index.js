@@ -58,7 +58,7 @@ const sergeant = (path, description, define) => {
       description = null
     }
 
-    cli.commands.push(sergeant(path.split(' ').concat([ subtitle ]).join(' '), description, define))
+    cli.commands.push(sergeant(path.split(' ').concat([subtitle]).join(' '), description, define))
   }
 
   const option = (key, definition) => {

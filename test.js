@@ -144,7 +144,8 @@ test('test ./parse', (t) => {
   }))
 
   // test multiple param beginning
-  t.deepEquals({ 'test0': [1, 2, 3, 4, 5, 6, 7], 'test1': 8, 'test2': 9 },
+  t.deepEquals(
+    { 'test0': [1, 2, 3, 4, 5, 6, 7], 'test1': 8, 'test2': 9 },
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
@@ -160,10 +161,12 @@ test('test ./parse', (t) => {
         type (val) { return Number(val) },
         key: 'test2'
       }]
-    }))
+    })
+  )
 
   // test multiple param middle. No type
-  t.deepEquals({ 'test0': 1, 'test1': ['2', '3', '4', '5', '6', '7', '8'], 'test2': 9 },
+  t.deepEquals(
+    { 'test0': 1, 'test1': ['2', '3', '4', '5', '6', '7', '8'], 'test2': 9 },
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
@@ -178,10 +181,12 @@ test('test ./parse', (t) => {
         type (val) { return Number(val) },
         key: 'test2'
       }]
-    }))
+    })
+  )
 
   // test multiple param end
-  t.deepEquals({ 'test0': 1, 'test1': 2, 'test2': [3, 4, 5, 6, 7, 8, 9] },
+  t.deepEquals(
+    { 'test0': 1, 'test1': 2, 'test2': [3, 4, 5, 6, 7, 8, 9] },
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
@@ -197,7 +202,8 @@ test('test ./parse', (t) => {
         key: 'test2',
         multiple: true
       }]
-    }))
+    })
+  )
 
   const DEFAULT = Symbol('DEFAULT')
 
@@ -210,7 +216,8 @@ test('test ./parse', (t) => {
   }
 
   // test default with type
-  t.deepEquals({ testOption: DEFAULT, testParameter: DEFAULT },
+  t.deepEquals(
+    { testOption: DEFAULT, testParameter: DEFAULT },
     parse([], {
       options: [{
         key: 'test-option',
@@ -220,10 +227,12 @@ test('test ./parse', (t) => {
         key: 'test-parameter',
         type: FN_DEFAULT
       }]
-    }))
+    })
+  )
 
   // test camel-casing
-  t.deepEquals({ testOption: 'a string', testParameter: 'another string' },
+  t.deepEquals(
+    { testOption: 'a string', testParameter: 'another string' },
     parse(['--test-option', 'a string', 'another string'], {
       options: [{
         key: 'test-option',
@@ -233,7 +242,8 @@ test('test ./parse', (t) => {
         key: 'test-parameter',
         type (val) { return val }
       }]
-    }))
+    })
+  )
 })
 
 test('test ./parse - with errors', (t) => {

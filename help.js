@@ -72,16 +72,12 @@ module.exports = (title, description, { options, parameters, commands }) => {
 
   console.error(kleur.green('Usage:') + ' ' + getUsage(title, { options, parameters }))
 
-  const longestArg = longest(
-    parameters.map((definition) => {
-      return '<' + definition.key + '>'
-    })
-      .concat(
-        options.map((definition) => {
-          return getOptionSignature(definition)
-        })
-      )
-  )
+  const longestArg = longest(parameters.map((definition) => {
+    return '<' + definition.key + '>'
+  })
+    .concat(options.map((definition) => {
+      return getOptionSignature(definition)
+    })))
 
   if (parameters.length) {
     console.error('')
