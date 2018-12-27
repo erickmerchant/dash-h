@@ -8,7 +8,7 @@ const getUsage = (title, { options, parameters }) => {
   if (options && options.length) {
     usage = usage.concat(options.map((definition) => {
       const valPart = definition.type != null
-        ? ' <' + definition.key + '>'
+        ? ` <${ definition.key }>`
         : ''
 
       return wrapUsage(addDashes(definition.alias != null ? definition.alias : definition.key) + valPart, definition)
@@ -16,9 +16,7 @@ const getUsage = (title, { options, parameters }) => {
   }
 
   if (parameters && parameters.length) {
-    usage = usage.concat(parameters.map((definition) => {
-      return wrapUsage('<' + definition.key + '>', definition)
-    }))
+    usage = usage.concat(parameters.map((definition) => wrapUsage(`<${ definition.key }>`, definition)))
   }
 
   return usage.join(' ')
@@ -27,17 +25,25 @@ const getUsage = (title, { options, parameters }) => {
 const wrapUsage = (usage, { required, multiple }) => {
   const opt = usage.startsWith('-')
 
-  return (required !== true ? '[' : (opt ? '(' : '')) + usage + (required !== true ? ']' : (opt ? ')' : '')) + (multiple === true ? '...' : '')
+  let result = usage
+
+  if (!required) {
+    result = `[${ result }]`
+  } else if (opt) {
+    result = `(${ result })`
+  }
+
+  return multiple === true ? `${ result }...` : result
 }
 
 const getOptionSignature = (definition) => {
   const val = definition.type != null
-    ? ' <' + definition.key + '>'
+    ? ` <${ definition.key }>`
     : ''
   let signature = addDashes(definition.key) + val
 
   if (definition.alias != null) {
-    signature = addDashes(definition.alias) + val + ', ' + signature
+    signature = `${ addDashes(definition.alias) + val }, ${ signature }`
   }
 
   return signature
@@ -47,15 +53,15 @@ const commandList = (title, commands) => {
   for (const command of commands) {
     console.error('')
 
-    console.error(getUsage(title + ' ' + command.title, command))
+    console.error(getUsage(`${ title } ${ command.title }`, command))
 
     if (command.description) {
       console.error('')
 
-      console.error('  ' + command.description)
+      console.error(`  ${ command.description }`)
     }
 
-    commandList(title + ' ' + command.title, command.commands)
+    commandList(`${ title } ${ command.title }`, command.commands)
   }
 }
 
@@ -70,14 +76,10 @@ module.exports = (title, description, { options, parameters, commands }) => {
 
   console.error('')
 
-  console.error(kleur.green('Usage:') + ' ' + getUsage(title, { options, parameters }))
+  console.error(`${ kleur.green('Usage:') } ${ getUsage(title, { options, parameters }) }`)
 
-  const longestArg = longest(parameters.map((definition) => {
-    return '<' + definition.key + '>'
-  })
-    .concat(options.map((definition) => {
-      return getOptionSignature(definition)
-    })))
+  const longestArg = longest(parameters.map((definition) => `<${ definition.key }>`)
+    .concat(options.map((definition) => getOptionSignature(definition))))
 
   if (parameters.length) {
     console.error('')
@@ -87,17 +89,17 @@ module.exports = (title, description, { options, parameters, commands }) => {
     console.error('')
 
     for (const definition of parameters) {
-      let line = '<' + definition.key + '>' + spaces(longestArg - definition.key.length - 2) + '  '
+      let line = `<${ definition.key }>${ spaces(longestArg - definition.key.length - 2) }  `
 
       if (definition.description) {
-        line += definition.description + ' '
+        line += `${ definition.description } `
       }
 
       if (definition.type != null) {
         const _default = definition.type()
 
         if (_default != null) {
-          line += '[default: ' + JSON.stringify(_default) + ']'
+          line += `[default: ${ JSON.stringify(_default) }]`
         }
       }
 
@@ -114,17 +116,17 @@ module.exports = (title, description, { options, parameters, commands }) => {
 
     for (const definition of options) {
       const signature = getOptionSignature(definition)
-      let line = signature + spaces(longestArg - signature.length) + '  '
+      let line = `${ signature + spaces(longestArg - signature.length) }  `
 
       if (definition.description) {
-        line += definition.description + ' '
+        line += `${ definition.description } `
       }
 
       if (definition.type != null) {
         const _default = definition.type()
 
         if (_default != null) {
-          line += '[default: ' + JSON.stringify(_default) + ']'
+          line += `[default: ${ JSON.stringify(_default) }]`
         }
       }
 

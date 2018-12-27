@@ -1,16 +1,8 @@
-const addDashes = (key) => {
-  return (key.length === 1 ? '-' : '--') + key
-}
+const addDashes = (key) => (key.length === 1 ? '-' : '--') + key
 
-const longest = (arr) => {
-  return arr.reduce((longest, item) => {
-    return item.length > longest ? item.length : longest
-  }, 0)
-}
+const longest = (arr) => arr.reduce((longest, item) => (item.length > longest ? item.length : longest), 0)
 
-const spaces = (number) => {
-  return ' '.repeat(number)
-}
+const spaces = (number) => ' '.repeat(number)
 
 const camelCaseFromDash = (key) => {
   const split = key.split('-').filter((part) => part !== '')

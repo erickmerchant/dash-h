@@ -8,7 +8,7 @@ test('test ./parse', (t) => {
   t.plan(18)
 
   // test dashdash and parameter
-  t.deepEquals({ 'test': '-a' }, parse(['--', '-a'], {
+  t.deepEquals({ test: '-a' }, parse(['--', '-a'], {
     options: [],
     parameters: [{
       key: 'test'
@@ -16,7 +16,7 @@ test('test ./parse', (t) => {
   }))
 
   // test dashdash and parameter with type
-  t.deepEquals({ 'test': 123 }, parse(['--', '123'], {
+  t.deepEquals({ test: 123 }, parse(['--', '123'], {
     options: [],
     parameters: [{
       type (val) { return Number(val) },
@@ -126,7 +126,7 @@ test('test ./parse', (t) => {
   }))
 
   // test default parameter
-  t.deepEquals({ '0': 'testing', '1': 'yes' }, parse(['testing'], {
+  t.deepEquals({ 0: 'testing', 1: 'yes' }, parse(['testing'], {
     options: [],
     parameters: [{
       key: '0'
@@ -145,7 +145,7 @@ test('test ./parse', (t) => {
 
   // test multiple param beginning
   t.deepEquals(
-    { 'test0': [1, 2, 3, 4, 5, 6, 7], 'test1': 8, 'test2': 9 },
+    { test0: [1, 2, 3, 4, 5, 6, 7], test1: 8, test2: 9 },
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
@@ -166,7 +166,7 @@ test('test ./parse', (t) => {
 
   // test multiple param middle. No type
   t.deepEquals(
-    { 'test0': 1, 'test1': ['2', '3', '4', '5', '6', '7', '8'], 'test2': 9 },
+    { test0: 1, test1: ['2', '3', '4', '5', '6', '7', '8'], test2: 9 },
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
@@ -186,7 +186,7 @@ test('test ./parse', (t) => {
 
   // test multiple param end
   t.deepEquals(
-    { 'test0': 1, 'test1': 2, 'test2': [3, 4, 5, 6, 7, 8, 9] },
+    { test0: 1, test1: 2, test2: [3, 4, 5, 6, 7, 8, 9] },
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
@@ -480,7 +480,7 @@ test('test ./help', (t) => {
 
   t.deepEquals([
     '',
-    kleur.green('Usage:') + ' test-command [-a]... (-b <bbb>) <p0> [<p1>]...',
+    `${ kleur.green('Usage:') } test-command [-a]... (-b <bbb>) <p0> [<p1>]...`,
     '',
     kleur.green('Parameters:'),
     '',
@@ -495,7 +495,7 @@ test('test ./help', (t) => {
     '',
     'a test command',
     '',
-    kleur.green('Usage:') + ' test-command [-a] <p0>',
+    `${ kleur.green('Usage:') } test-command [-a] <p0>`,
     '',
     kleur.green('Parameters:'),
     '',
@@ -518,7 +518,7 @@ test('test ./help', (t) => {
     '',
     'a test command',
     '',
-    kleur.green('Usage:') + ' test-command [-a]...',
+    `${ kleur.green('Usage:') } test-command [-a]...`,
     '',
     kleur.green('Options:'),
     '',
@@ -527,7 +527,7 @@ test('test ./help', (t) => {
     '',
     'a test command',
     '',
-    kleur.green('Usage:') + ' test-command',
+    `${ kleur.green('Usage:') } test-command`,
     ''
   ], messages)
 })
@@ -625,11 +625,9 @@ test('test ./command - no help. no errors', (t) => {
 })
 
 test('test ./command - help', (t) => {
-  const mockedParse = (argv, definitions) => {
-    return {
-      help: true
-    }
-  }
+  const mockedParse = (argv, definitions) => ({
+    help: true
+  })
 
   const mockedHelp = (name, description, definitions) => {
     t.equals('test-command', name)
@@ -677,9 +675,7 @@ test('test ./command - help', (t) => {
 })
 
 test('test ./command - thrown error', (t) => {
-  const mockedParse = () => {
-    return {}
-  }
+  const mockedParse = () => ({})
 
   const mockedError = (error) => {
     t.deepEquals(ourError, error)
@@ -702,9 +698,7 @@ test('test ./command - thrown error', (t) => {
 })
 
 test('test ./command - rejected promise', (t) => {
-  const mockedParse = () => {
-    return {}
-  }
+  const mockedParse = () => ({})
 
   const mockedError = (error) => {
     t.deepEquals(ourError, error)
