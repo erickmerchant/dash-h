@@ -8,7 +8,7 @@ test('test ./parse', (t) => {
   t.plan(18)
 
   // test dashdash and parameter
-  t.deepEquals({ test: '-a' }, parse(['--', '-a'], {
+  t.deepEquals({test: '-a'}, parse(['--', '-a'], {
     options: [],
     parameters: [{
       key: 'test'
@@ -16,7 +16,7 @@ test('test ./parse', (t) => {
   }))
 
   // test dashdash and parameter with type
-  t.deepEquals({ test: 123 }, parse(['--', '123'], {
+  t.deepEquals({test: 123}, parse(['--', '123'], {
     options: [],
     parameters: [{
       type (val) { return Number(val) },
@@ -33,10 +33,10 @@ test('test ./parse', (t) => {
   }))
 
   // test empty
-  t.deepEquals({}, parse([''], { options: [], parameters: [] }))
+  t.deepEquals({}, parse([''], {options: [], parameters: []}))
 
   // test short
-  t.deepEquals({ aaA: true }, parse(['-a'], {
+  t.deepEquals({aaA: true}, parse(['-a'], {
     parameters: [],
     options: [{
       key: 'aa-a',
@@ -45,7 +45,7 @@ test('test ./parse', (t) => {
   }))
 
   // test short with value
-  t.deepEquals({ aaA: 'bcd' }, parse(['-a=bcd'], {
+  t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
     parameters: [],
     options: [{
       type (val) { return val },
@@ -55,7 +55,7 @@ test('test ./parse', (t) => {
   }))
 
   // test multiple short with value
-  t.deepEquals({ aaA: 'bcd', b: true }, parse(['-ba=bcd'], {
+  t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
     parameters: [],
     options: [{
       type (val) { return val },
@@ -68,7 +68,7 @@ test('test ./parse', (t) => {
   }))
 
   // test multiple short
-  t.deepEquals({ aaA: true, b: true }, parse(['-ba'], {
+  t.deepEquals({aaA: true, b: true}, parse(['-ba'], {
     parameters: [],
     options: [{
       key: 'aa-a',
@@ -80,7 +80,7 @@ test('test ./parse', (t) => {
   }))
 
   // test multiple, ---, and -
-  t.deepEquals({ aaA: ['bcd', '---', '-'] }, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
+  t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     parameters: [],
     options: [{
       type (val) { return val },
@@ -91,7 +91,7 @@ test('test ./parse', (t) => {
   }))
 
   // test empty with equals
-  t.deepEquals({ aaA: '' }, parse(['--aa-a='], {
+  t.deepEquals({aaA: ''}, parse(['--aa-a='], {
     parameters: [],
     options: [{
       type (val) { return val },
@@ -101,7 +101,7 @@ test('test ./parse', (t) => {
   }))
 
   // test default
-  t.deepEquals({ aaA: '' }, parse([''], {
+  t.deepEquals({aaA: ''}, parse([''], {
     parameters: [],
     options: [{
       key: 'aa-a',
@@ -117,7 +117,7 @@ test('test ./parse', (t) => {
   }))
 
   // test default flag
-  t.deepEquals({ aaA: false }, parse([''], {
+  t.deepEquals({aaA: false}, parse([''], {
     parameters: [],
     options: [{
       key: 'aa-a',
@@ -126,7 +126,7 @@ test('test ./parse', (t) => {
   }))
 
   // test default parameter
-  t.deepEquals({ 0: 'testing', 1: 'yes' }, parse(['testing'], {
+  t.deepEquals({0: 'testing', 1: 'yes'}, parse(['testing'], {
     options: [],
     parameters: [{
       key: '0'
@@ -145,7 +145,7 @@ test('test ./parse', (t) => {
 
   // test multiple param beginning
   t.deepEquals(
-    { test0: [1, 2, 3, 4, 5, 6, 7], test1: 8, test2: 9 },
+    {test0: [1, 2, 3, 4, 5, 6, 7], test1: 8, test2: 9},
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
@@ -166,7 +166,7 @@ test('test ./parse', (t) => {
 
   // test multiple param middle. No type
   t.deepEquals(
-    { test0: 1, test1: ['2', '3', '4', '5', '6', '7', '8'], test2: 9 },
+    {test0: 1, test1: ['2', '3', '4', '5', '6', '7', '8'], test2: 9},
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
@@ -186,7 +186,7 @@ test('test ./parse', (t) => {
 
   // test multiple param end
   t.deepEquals(
-    { test0: 1, test1: 2, test2: [3, 4, 5, 6, 7, 8, 9] },
+    {test0: 1, test1: 2, test2: [3, 4, 5, 6, 7, 8, 9]},
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
@@ -217,7 +217,7 @@ test('test ./parse', (t) => {
 
   // test default with type
   t.deepEquals(
-    { testOption: DEFAULT, testParameter: DEFAULT },
+    {testOption: DEFAULT, testParameter: DEFAULT},
     parse([], {
       options: [{
         key: 'test-option',
@@ -232,7 +232,7 @@ test('test ./parse', (t) => {
 
   // test camel-casing
   t.deepEquals(
-    { testOption: 'a string', testParameter: 'another string' },
+    {testOption: 'a string', testParameter: 'another string'},
     parse(['--test-option', 'a string', 'another string'], {
       options: [{
         key: 'test-option',
@@ -294,10 +294,10 @@ test('test ./parse - with errors', (t) => {
   })
 
   // test unknown
-  parse(['-a'], { options: [], parameters: [] })
+  parse(['-a'], {options: [], parameters: []})
 
   // test unknown
-  parse(['--aaa'], { options: [], parameters: [] })
+  parse(['--aaa'], {options: [], parameters: []})
 
   // test required
   parse([''], {
@@ -336,7 +336,7 @@ test('test ./parse - with errors', (t) => {
   })
 
   // test too many arguments
-  parse(['--', '-a'], { options: [], parameters: [] })
+  parse(['--', '-a'], {options: [], parameters: []})
 
   t.equals(globals.process.exitCode, 1)
 
@@ -472,7 +472,7 @@ test('test ./help', (t) => {
     commands: []
   })
 
-  help('test-command', 'a test command', { options: [], parameters: [], commands: [] })
+  help('test-command', 'a test command', {options: [], parameters: [], commands: []})
 
   t.plan(2)
 
@@ -480,7 +480,7 @@ test('test ./help', (t) => {
 
   t.deepEquals([
     '',
-    `${ kleur.green('Usage:') } test-command [-a]... (-b <bbb>) <p0> [<p1>]...`,
+    `${kleur.green('Usage:')} test-command [-a]... (-b <bbb>) <p0> [<p1>]...`,
     '',
     kleur.green('Parameters:'),
     '',
@@ -495,7 +495,7 @@ test('test ./help', (t) => {
     '',
     'a test command',
     '',
-    `${ kleur.green('Usage:') } test-command [-a] <p0>`,
+    `${kleur.green('Usage:')} test-command [-a] <p0>`,
     '',
     kleur.green('Parameters:'),
     '',
@@ -518,7 +518,7 @@ test('test ./help', (t) => {
     '',
     'a test command',
     '',
-    `${ kleur.green('Usage:') } test-command [-a]...`,
+    `${kleur.green('Usage:')} test-command [-a]...`,
     '',
     kleur.green('Options:'),
     '',
@@ -527,7 +527,7 @@ test('test ./help', (t) => {
     '',
     'a test command',
     '',
-    `${ kleur.green('Usage:') } test-command`,
+    `${kleur.green('Usage:')} test-command`,
     ''
   ], messages)
 })
@@ -607,7 +607,7 @@ test('test ./command - no help. no errors', (t) => {
 
   t.plan(3)
 
-  const testCommand = command('test-command', ({ option, parameter }) => {
+  const testCommand = command('test-command', ({option, parameter}) => {
     parameter('aaa', {
       testing: true
     })
@@ -659,7 +659,7 @@ test('test ./command - help', (t) => {
 
   t.plan(2)
 
-  const testCommand = command('test-command', ({ parameter, option }) => {
+  const testCommand = command('test-command', ({parameter, option}) => {
     parameter('aaa', {
       testing: true
     })
@@ -727,7 +727,7 @@ test('test ./command - sub commands', (t) => {
 
   t.plan(2)
 
-  const testCommand = command('test-command', ({ option, parameter, command }) => {
+  const testCommand = command('test-command', ({option, parameter, command}) => {
     command('sub-command', 'a sub command', () => () => {
       t.ok(true)
     })

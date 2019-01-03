@@ -11,4 +11,4 @@ const camelCaseFromDash = (key) => {
   return property
 }
 
-module.exports = { addDashes, longest, spaces, camelCaseFromDash }
+module.exports = {addDashes, longest, spaces, camelCaseFromDash}

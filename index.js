@@ -23,12 +23,12 @@ const sergeant = (path, description, define) => {
 
       command(argv)
     } else {
-      const args = parse(argv, { options: cli.options, parameters: cli.parameters })
+      const args = parse(argv, {options: cli.options, parameters: cli.parameters})
 
       try {
         if (args != null) {
           if (args.help === true || action == null) {
-            help(path, description, { options: cli.options, parameters: cli.parameters, commands: cli.commands })
+            help(path, description, {options: cli.options, parameters: cli.parameters, commands: cli.commands})
           } else if (action != null) {
             Promise.resolve()
               .then(() => action(args))
@@ -62,18 +62,18 @@ const sergeant = (path, description, define) => {
   }
 
   const option = (key, definition) => {
-    const current = Object.assign(definition, { key })
+    const current = Object.assign(definition, {key})
 
     cli.options.push(current)
   }
 
   const parameter = (key, definition) => {
-    const current = Object.assign(definition, { key })
+    const current = Object.assign(definition, {key})
 
     cli.parameters.push(current)
   }
 
-  const action = define({ option, parameter, command })
+  const action = define({option, parameter, command})
 
   option('help', {
     alias: 'h',
