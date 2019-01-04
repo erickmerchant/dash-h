@@ -625,9 +625,11 @@ test('test ./command - no help. no errors', (t) => {
 })
 
 test('test ./command - help', (t) => {
-  const mockedParse = (argv, definitions) => ({
-    help: true
-  })
+  const mockedParse = (argv, definitions) => {
+    return {
+      help: true
+    }
+  }
 
   const mockedHelp = (name, description, definitions) => {
     t.equals('test-command', name)
@@ -675,7 +677,7 @@ test('test ./command - help', (t) => {
 })
 
 test('test ./command - thrown error', (t) => {
-  const mockedParse = () => ({})
+  const mockedParse = () => { return {} }
 
   const mockedError = (error) => {
     t.deepEquals(ourError, error)
@@ -698,7 +700,7 @@ test('test ./command - thrown error', (t) => {
 })
 
 test('test ./command - rejected promise', (t) => {
-  const mockedParse = () => ({})
+  const mockedParse = () => { return {} }
 
   const mockedError = (error) => {
     t.deepEquals(ourError, error)
