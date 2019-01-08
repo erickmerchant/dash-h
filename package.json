@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "lint '**/*.js' && tape test.js"
+    "pretest": "lint '**/*.js'",
+    "test": "tape test.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,7 @@
   },
   "homepage": "https://github.com/erickmerchant/sergeant#README",
   "devDependencies": {
-    "@erickmerchant/lint": "^1.5.1",
+    "@erickmerchant/lint": "^1.6.0",
     "proxyquire": "^2.1.0",
     "tape": "^4.9.2"
   },

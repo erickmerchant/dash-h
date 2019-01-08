@@ -19,7 +19,7 @@ test('test ./parse', (t) => {
   t.deepEquals({test: 123}, parse(['--', '123'], {
     options: [],
     parameters: [{
-      type (val) { return Number(val) },
+      type(val) { return Number(val) },
       key: 'test'
     }]
   }))
@@ -48,7 +48,7 @@ test('test ./parse', (t) => {
   t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
     parameters: [],
     options: [{
-      type (val) { return val },
+      type(val) { return val },
       key: 'aa-a',
       alias: 'a'
     }]
@@ -58,7 +58,7 @@ test('test ./parse', (t) => {
   t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
     parameters: [],
     options: [{
-      type (val) { return val },
+      type(val) { return val },
       key: 'aa-a',
       alias: 'a'
     },
@@ -83,7 +83,7 @@ test('test ./parse', (t) => {
   t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     parameters: [],
     options: [{
-      type (val) { return val },
+      type(val) { return val },
       key: 'aa-a',
       multiple: true,
       alias: 'a'
@@ -94,7 +94,7 @@ test('test ./parse', (t) => {
   t.deepEquals({aaA: ''}, parse(['--aa-a='], {
     parameters: [],
     options: [{
-      type (val) { return val },
+      type(val) { return val },
       key: 'aa-a',
       alias: 'a'
     }]
@@ -106,7 +106,7 @@ test('test ./parse', (t) => {
     options: [{
       key: 'aa-a',
       alias: 'a',
-      type (val) {
+      type(val) {
         if (val == null) {
           return ''
         }
@@ -133,7 +133,7 @@ test('test ./parse', (t) => {
     },
     {
       key: '1',
-      type (val) {
+      type(val) {
         if (val == null) {
           return 'yes'
         }
@@ -149,16 +149,16 @@ test('test ./parse', (t) => {
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
-        type (val) { return val.map((v) => Number(v)) },
+        type(val) { return val.map((v) => Number(v)) },
         key: 'test0',
         multiple: true
       },
       {
-        type (val) { return Number(val) },
+        type(val) { return Number(val) },
         key: 'test1'
       },
       {
-        type (val) { return Number(val) },
+        type(val) { return Number(val) },
         key: 'test2'
       }]
     })
@@ -170,7 +170,7 @@ test('test ./parse', (t) => {
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
-        type (val) { return Number(val) },
+        type(val) { return Number(val) },
         key: 'test0'
       },
       {
@@ -178,7 +178,7 @@ test('test ./parse', (t) => {
         multiple: true
       },
       {
-        type (val) { return Number(val) },
+        type(val) { return Number(val) },
         key: 'test2'
       }]
     })
@@ -190,15 +190,15 @@ test('test ./parse', (t) => {
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       options: [],
       parameters: [{
-        type (val) { return Number(val) },
+        type(val) { return Number(val) },
         key: 'test0'
       },
       {
-        type (val) { return Number(val) },
+        type(val) { return Number(val) },
         key: 'test1'
       },
       {
-        type (val) { return val.map((v) => Number(v)) },
+        type(val) { return val.map((v) => Number(v)) },
         key: 'test2',
         multiple: true
       }]
@@ -236,11 +236,11 @@ test('test ./parse', (t) => {
     parse(['--test-option', 'a string', 'another string'], {
       options: [{
         key: 'test-option',
-        type (val) { return val }
+        type(val) { return val }
       }],
       parameters: [{
         key: 'test-parameter',
-        type (val) { return val }
+        type(val) { return val }
       }]
     })
   )
@@ -251,7 +251,7 @@ test('test ./parse - with errors', (t) => {
 
   const globals = {
     console: {
-      error (message) {
+      error(message) {
         messages.push(message)
       }
     },
@@ -272,7 +272,7 @@ test('test ./parse - with errors', (t) => {
     options: [{
       key: 'aa-a',
       alias: 'a',
-      type (val) { return val },
+      type(val) { return val },
       multiple: true
     }]
   })
@@ -321,7 +321,7 @@ test('test ./parse - with errors', (t) => {
   parse(['--aaa=123', '--aaa=456'], {
     parameters: [],
     options: [{
-      type (val) { return Number(val) },
+      type(val) { return Number(val) },
       key: 'aaa'
     }]
   })
@@ -359,7 +359,7 @@ test('test ./help', (t) => {
 
   const globals = {
     console: {
-      error (message) {
+      error(message) {
         messages.push(message)
       }
     },
@@ -382,7 +382,7 @@ test('test ./help', (t) => {
       {
         key: 'p1',
         multiple: true,
-        type (val) {
+        type(val) {
           if (val == null) {
             return ['a', 'b']
           }
@@ -403,7 +403,7 @@ test('test ./help', (t) => {
         alias: 'b',
         required: true,
         description: 'a Number',
-        type (val) {
+        type(val) {
           if (val == null) {
             return 100
           }
@@ -540,7 +540,7 @@ test('test ./error', (t) => {
       exitCode: 0
     },
     console: {
-      error (message) {
+      error(message) {
         messages.push(message)
       }
     }
@@ -724,7 +724,7 @@ test('test ./command - rejected promise', (t) => {
 
 test('test ./command - sub commands', (t) => {
   const command = proxyquire('./', {
-    './parse' () { return {} }
+    './parse'() { return {} }
   })
 
   t.plan(2)
