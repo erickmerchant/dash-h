@@ -1,4 +1,4 @@
-const kleur = require('kleur')
+const {green} = require('kleur')
 const {console, process} = require('./src/globals')
 const {addDashes, longest, spaces} = require('./src/helpers')
 
@@ -50,43 +50,36 @@ const getOptionSignature = (definition) => {
 }
 
 const commandList = (title, commands) => {
-  for (const command of commands) {
-    console.error('')
+  const lines = []
 
-    console.error(getUsage(`${title} ${command.title}`, command))
+  for (const command of commands) {
+    lines.push('', getUsage(`${title} ${command.title}`, command))
 
     if (command.description) {
-      console.error('')
-
-      console.error(`  ${command.description}`)
+      lines.push('', `  ${command.description}`)
     }
 
-    commandList(`${title} ${command.title}`, command.commands)
+    lines.push(...commandList(`${title} ${command.title}`, command.commands))
   }
+
+  return lines
 }
 
 module.exports = (title, description, {options, parameters, commands}) => {
   process.exitCode = 1
+  const lines = []
 
   if (description) {
-    console.error('')
-
-    console.error(description)
+    lines.push('', description)
   }
 
-  console.error('')
-
-  console.error(`${kleur.green('Usage:')} ${getUsage(title, {options, parameters})}`)
+  lines.push('', `${green('Usage:')} ${getUsage(title, {options, parameters})}`)
 
   const longestArg = longest(parameters.map((definition) => `<${definition.key}>`)
     .concat(options.map((definition) => getOptionSignature(definition))))
 
   if (parameters.length) {
-    console.error('')
-
-    console.error(kleur.green('Parameters:'))
-
-    console.error('')
+    lines.push('', green('Parameters:'), '')
 
     for (const definition of parameters) {
       let line = `<${definition.key}>${spaces(longestArg - definition.key.length - 2)}  `
@@ -103,16 +96,12 @@ module.exports = (title, description, {options, parameters, commands}) => {
         }
       }
 
-      console.error(line.trim())
+      lines.push(line.trim())
     }
   }
 
   if (options.length) {
-    console.error('')
-
-    console.error(kleur.green('Options:'))
-
-    console.error('')
+    lines.push('', green('Options:'), '')
 
     for (const definition of options) {
       const signature = getOptionSignature(definition)
@@ -130,17 +119,15 @@ module.exports = (title, description, {options, parameters, commands}) => {
         }
       }
 
-      console.error(line.trim())
+      lines.push(line.trim())
     }
   }
 
   if (commands.length) {
-    console.error('')
-
-    console.error(kleur.green('Commands:'))
-
-    commandList(title, commands)
+    lines.push('', green('Commands:'), ...commandList(title, commands))
   }
 
-  console.error('')
+  lines.push('')
+
+  console.error(lines.join('\n'))
 }

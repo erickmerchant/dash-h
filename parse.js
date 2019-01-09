@@ -1,4 +1,4 @@
-const kleur = require('kleur')
+const {red} = require('kleur')
 const {console, process} = require('./src/globals')
 const {addDashes, camelCaseFromDash} = require('./src/helpers')
 
@@ -177,6 +177,6 @@ module.exports = (argv, {options, parameters}) => {
   } catch (error) {
     process.exitCode = 1
 
-    console.error(kleur.red(error.message))
+    console.error(red(error.message))
   }
 }

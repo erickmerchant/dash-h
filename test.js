@@ -1,5 +1,6 @@
 const test = require('tape')
-const kleur = require('kleur')
+const {green, red} = require('kleur')
+const outdent = require('outdent')
 const proxyquire = require('proxyquire').noPreserveCache()
 
 test('test ./parse', (t) => {
@@ -252,7 +253,7 @@ test('test ./parse - with errors', (t) => {
   const globals = {
     console: {
       error(message) {
-        messages.push(message)
+        messages.push(message.trim())
       }
     },
     process: {
@@ -341,16 +342,16 @@ test('test ./parse - with errors', (t) => {
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
-    kleur.red('-a is not a boolean and requires a value'),
-    kleur.red('-a is a boolean and does not accept a value'),
-    kleur.red('--aaa is a boolean and does not accept a value'),
-    kleur.red('unknown option -a'),
-    kleur.red('unknown option --aaa'),
-    kleur.red('-a is required'),
-    kleur.red('--aaa is required'),
-    kleur.red('--aaa does not accept multiple values'),
-    kleur.red('test is required'),
-    kleur.red('too many arguments')
+    red('-a is not a boolean and requires a value'),
+    red('-a is a boolean and does not accept a value'),
+    red('--aaa is a boolean and does not accept a value'),
+    red('unknown option -a'),
+    red('unknown option --aaa'),
+    red('-a is required'),
+    red('--aaa is required'),
+    red('--aaa does not accept multiple values'),
+    red('test is required'),
+    red('too many arguments')
   ], messages)
 })
 
@@ -360,7 +361,7 @@ test('test ./help', (t) => {
   const globals = {
     console: {
       error(message) {
-        messages.push(message)
+        messages.push(message.trim())
       }
     },
     process: {
@@ -479,56 +480,56 @@ test('test ./help', (t) => {
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
-    '',
-    `${kleur.green('Usage:')} test-command [-a]... (-b <bbb>) <p0> [<p1>]...`,
-    '',
-    kleur.green('Parameters:'),
-    '',
-    '<p0>                   the description',
-    '<p1>                   [default: ["a","b"]]',
-    '',
-    kleur.green('Options:'),
-    '',
-    '-a, --aaa              a Boolean',
-    '-b <bbb>, --bbb <bbb>  a Number [default: 100]',
-    '',
-    '',
-    'a test command',
-    '',
-    `${kleur.green('Usage:')} test-command [-a] <p0>`,
-    '',
-    kleur.green('Parameters:'),
-    '',
-    '<p0>       the description',
-    '',
-    kleur.green('Options:'),
-    '',
-    '-a, --aaa  a Boolean',
-    '',
-    kleur.green('Commands:'),
-    '',
-    'test-command sub [-b] <p1>',
-    '',
-    '  a sub command',
-    '',
-    'test-command sub sub-sub [-c] <p2>',
-    '',
-    '  a sub sub command',
-    '',
-    '',
-    'a test command',
-    '',
-    `${kleur.green('Usage:')} test-command [-a]...`,
-    '',
-    kleur.green('Options:'),
-    '',
-    '-a, --aaa  a Boolean',
-    '',
-    '',
-    'a test command',
-    '',
-    `${kleur.green('Usage:')} test-command`,
-    ''
+    outdent`
+    ${green('Usage:')} test-command [-a]... (-b <bbb>) <p0> [<p1>]...
+
+    ${green('Parameters:')}
+
+    <p0>                   the description
+    <p1>                   [default: ["a","b"]]
+
+    ${green('Options:')}
+
+    -a, --aaa              a Boolean
+    -b <bbb>, --bbb <bbb>  a Number [default: 100]
+    `,
+    outdent`
+    a test command
+
+    ${green('Usage:')} test-command [-a] <p0>
+
+    ${green('Parameters:')}
+
+    <p0>       the description
+
+    ${green('Options:')}
+
+    -a, --aaa  a Boolean
+
+    ${green('Commands:')}
+
+    test-command sub [-b] <p1>
+
+      a sub command
+
+    test-command sub sub-sub [-c] <p2>
+
+      a sub sub command
+    `,
+    outdent`
+    a test command
+
+    ${green('Usage:')} test-command [-a]...
+
+    ${green('Options:')}
+
+    -a, --aaa  a Boolean
+    `,
+    outdent`
+    a test command
+
+    ${green('Usage:')} test-command
+    `
   ], messages)
 })
 
@@ -541,7 +542,7 @@ test('test ./error', (t) => {
     },
     console: {
       error(message) {
-        messages.push(message)
+        messages.push(message.trim())
       }
     }
   }
@@ -569,10 +570,14 @@ test('test ./error', (t) => {
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
-    kleur.red('Error: testing errors'),
-    'at thing (file.js:123:45)',
-    'at another',
-    kleur.red('Error: testing errors')
+    outdent`
+    ${red('Error: testing errors')}
+    at thing (file.js:123:45)
+    at another
+    `,
+    outdent`
+    ${red('Error: testing errors')}
+    `
   ], messages)
 })
 
