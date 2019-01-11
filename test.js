@@ -360,7 +360,7 @@ test('test ./help', (t) => {
 
   const globals = {
     console: {
-      error(message) {
+      log(message) {
         messages.push(message.trim())
       }
     },
@@ -485,13 +485,13 @@ test('test ./help', (t) => {
 
     ${green('Parameters:')}
 
-    <p0>                   the description
-    <p1>                   [default: ["a","b"]]
+     <p0>             the description
+     <p1>             [default: ["a","b"]]
 
     ${green('Options:')}
 
-    -a, --aaa              a Boolean
-    -b <bbb>, --bbb <bbb>  a Number [default: 100]
+     -a, --aaa        a Boolean
+     -b, --bbb <bbb>  a Number [default: 100]
     `,
     outdent`
     a test command
@@ -500,21 +500,16 @@ test('test ./help', (t) => {
 
     ${green('Parameters:')}
 
-    <p0>       the description
+     <p0>       the description
 
     ${green('Options:')}
 
-    -a, --aaa  a Boolean
+     -a, --aaa  a Boolean
 
     ${green('Commands:')}
 
-    test-command sub [-b] <p1>
-
-      a sub command
-
-    test-command sub sub-sub [-c] <p2>
-
-      a sub sub command
+     test-command sub [-b] <p1>
+     test-command sub sub-sub [-c] <p2>
     `,
     outdent`
     a test command
@@ -523,7 +518,7 @@ test('test ./help', (t) => {
 
     ${green('Options:')}
 
-    -a, --aaa  a Boolean
+     -a, --aaa  a Boolean
     `,
     outdent`
     a test command

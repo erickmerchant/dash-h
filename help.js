@@ -3,7 +3,7 @@ const {console, process} = require('./src/globals')
 const {addDashes, longest, spaces} = require('./src/helpers')
 
 const getUsage = (title, {options, parameters}) => {
-  let usage = [title]
+  let usage = ['', title]
 
   if (options && options.length) {
     usage = usage.concat(options.map((definition) => {
@@ -43,7 +43,7 @@ const getOptionSignature = (definition) => {
   let signature = addDashes(definition.key) + val
 
   if (definition.alias != null) {
-    signature = `${addDashes(definition.alias) + val}, ${signature}`
+    signature = `${addDashes(definition.alias)}, ${signature}`
   }
 
   return signature
@@ -53,11 +53,7 @@ const commandList = (title, commands) => {
   const lines = []
 
   for (const command of commands) {
-    lines.push('', getUsage(`${title} ${command.title}`, command))
-
-    if (command.description) {
-      lines.push('', `  ${command.description}`)
-    }
+    lines.push(getUsage(`${title} ${command.title}`, command))
 
     lines.push(...commandList(`${title} ${command.title}`, command.commands))
   }
@@ -73,7 +69,7 @@ module.exports = (title, description, {options, parameters, commands}) => {
     lines.push('', description)
   }
 
-  lines.push('', `${green('Usage:')} ${getUsage(title, {options, parameters})}`)
+  lines.push('', `${green('Usage:')}${getUsage(title, {options, parameters})}`)
 
   const longestArg = longest(parameters.map((definition) => `<${definition.key}>`)
     .concat(options.map((definition) => getOptionSignature(definition))))
@@ -82,7 +78,7 @@ module.exports = (title, description, {options, parameters, commands}) => {
     lines.push('', green('Parameters:'), '')
 
     for (const definition of parameters) {
-      let line = `<${definition.key}>${spaces(longestArg - definition.key.length - 2)}  `
+      let line = ` <${definition.key}>${spaces(longestArg - definition.key.length - 2)}  `
 
       if (definition.description) {
         line += `${definition.description} `
@@ -96,7 +92,7 @@ module.exports = (title, description, {options, parameters, commands}) => {
         }
       }
 
-      lines.push(line.trim())
+      lines.push(line.trimRight())
     }
   }
 
@@ -105,7 +101,7 @@ module.exports = (title, description, {options, parameters, commands}) => {
 
     for (const definition of options) {
       const signature = getOptionSignature(definition)
-      let line = `${signature + spaces(longestArg - signature.length)}  `
+      let line = ` ${signature + spaces(longestArg - signature.length)}  `
 
       if (definition.description) {
         line += `${definition.description} `
@@ -119,15 +115,15 @@ module.exports = (title, description, {options, parameters, commands}) => {
         }
       }
 
-      lines.push(line.trim())
+      lines.push(line.trimRight())
     }
   }
 
   if (commands.length) {
-    lines.push('', green('Commands:'), ...commandList(title, commands))
+    lines.push('', green('Commands:'), '', ...commandList(title, commands))
   }
 
   lines.push('')
 
-  console.error(lines.join('\n'))
+  console.log(lines.join('\n'))
 }
