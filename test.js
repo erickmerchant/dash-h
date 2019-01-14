@@ -473,7 +473,7 @@ test('test ./help', (t) => {
     commands: []
   })
 
-  help('test-command', 'a test command', {options: [], parameters: [], commands: []})
+  help('test-command', 'a test command'.split(' ').join('\n'), {options: [], parameters: [], commands: []})
 
   t.plan(2)
 
@@ -494,7 +494,7 @@ test('test ./help', (t) => {
      -b, --bbb <bbb>  a Number [default: 100]
     `,
     outdent`
-    a test command
+    ${green('Description:')} a test command
 
     ${green('Usage:')} test-command [-a] <p0>
 
@@ -512,7 +512,7 @@ test('test ./help', (t) => {
      test-command sub sub-sub [-c] <p2>
     `,
     outdent`
-    a test command
+    ${green('Description:')} a test command
 
     ${green('Usage:')} test-command [-a]...
 
@@ -521,7 +521,11 @@ test('test ./help', (t) => {
      -a, --aaa  a Boolean
     `,
     outdent`
-    a test command
+    ${green('Description:')}
+
+    a
+    test
+    command
 
     ${green('Usage:')} test-command
     `

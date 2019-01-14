@@ -66,7 +66,14 @@ module.exports = (title, description, {options, parameters, commands}) => {
   const lines = []
 
   if (description) {
-    lines.push('', description)
+    const trimmedDescription = description.trim()
+    const lineCount = trimmedDescription.split('\n').length
+
+    if (lineCount > 1) {
+      lines.push('', green('Description:'), '', trimmedDescription)
+    } else {
+      lines.push('', `${green('Description:')} ${trimmedDescription}`)
+    }
   }
 
   lines.push('', `${green('Usage:')}${getUsage(title, {options, parameters})}`)
