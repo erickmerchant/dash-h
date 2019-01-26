@@ -8,6 +8,16 @@ A CLI solution with simple argument parsing and built in help messages.
 const command = require('sergeant')
 const assert = require('assert')
 
+const say = (name, loud = false) => {
+  let message = `hello ${name}!`
+
+  if (loud) {
+    message = message.toUpperCase() + '!'
+  }
+
+  console.log(message)
+}
+
 command('hello', ({option, parameter, command}) => {
   parameter('name', {
     description: 'the name',
@@ -36,17 +46,6 @@ command('hello', ({option, parameter, command}) => {
     say(args.name, args.loud)
   }
 })(process.argv.slice(2))
-
-function say (name, loud = false) {
-  let message = `hello ${name}!`
-
-  if (loud) {
-    message = message.toUpperCase() + '!'
-  }
-
-  console.log(message)
-}
-
 ```
 
 ## Options and Parameters
