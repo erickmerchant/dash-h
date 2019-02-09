@@ -24,6 +24,6 @@
     "tape": "^4.9.2"
   },
   "dependencies": {
-    "kleur": "^3.0.1"
+    "kleur": "^3.0.2"
   }
 }
