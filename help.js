@@ -3,10 +3,10 @@ const {console, process} = require('./src/globals')
 const {addDashes, longest, spaces} = require('./src/helpers')
 
 const getUsage = (title, {options, parameters}) => {
-  let usage = ['', title]
+  const usage = ['', title]
 
   if (options && options.length) {
-    usage = usage.concat(options.map((definition) => {
+    usage.push(...options.map((definition) => {
       const valPart = definition.type != null
         ? ` <${definition.key}>`
         : ''
@@ -16,7 +16,7 @@ const getUsage = (title, {options, parameters}) => {
   }
 
   if (parameters && parameters.length) {
-    usage = usage.concat(parameters.map((definition) => wrapUsage(`<${definition.key}>`, definition)))
+    usage.push(...parameters.map((definition) => wrapUsage(`<${definition.key}>`, definition)))
   }
 
   return usage.join(' ')
@@ -78,8 +78,10 @@ module.exports = (title, description, {options, parameters, commands}) => {
 
   lines.push('', `${green('Usage:')}${getUsage(title, {options, parameters})}`)
 
-  const longestArg = longest(parameters.map((definition) => `<${definition.key}>`)
-    .concat(options.map((definition) => getOptionSignature(definition))))
+  const longestArg = longest([
+    ...parameters.map((definition) => `<${definition.key}>`),
+    ...options.map((definition) => getOptionSignature(definition))
+  ])
 
   if (parameters.length) {
     lines.push('', green('Parameters:'), '')

@@ -6,7 +6,7 @@ const spaces = (number) => ' '.repeat(number)
 
 const camelCaseFromDash = (key) => {
   const split = key.split('-').filter((part) => part !== '')
-  const property = split[0] + split.slice(1).map((part) => part.substr(0, 1).toUpperCase() + part.substr(1)).join('')
+  const property = split[0] + split.slice(1).map((part) => part.substring(0, 1).toUpperCase() + part.substring(1)).join('')
 
   return property
 }

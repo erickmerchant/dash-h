@@ -39,14 +39,14 @@ module.exports = (argv, {options, parameters}) => {
     argv = argv.reduce((argv, arg) => {
       if (arg !== '-' && arg.startsWith('-') && !arg.startsWith('--')) {
         if (arg.indexOf('=') > -1) {
-          argv.push(`-${arg.substr(arg.indexOf('=') - 1)}`)
+          argv.push(`-${arg.substring(arg.indexOf('=') - 1)}`)
 
           arg = arg.substring(1, arg.indexOf('=') - 1)
         } else {
-          arg = arg.substr(1)
+          arg = arg.substring(1)
         }
 
-        argv = argv.concat(arg.split('').map((arg) => `-${arg}`))
+        argv.push(...arg.split('').map((arg) => `-${arg}`))
       } else {
         argv.push(arg)
       }
@@ -77,7 +77,7 @@ module.exports = (argv, {options, parameters}) => {
 
           toBeDeleted.push(i)
         } else if (isSearchWithValue && !isBoolean) {
-          vals.push(argv[i].substr(argv[i].indexOf('=') + 1))
+          vals.push(argv[i].substring(argv[i].indexOf('=') + 1))
 
           toBeDeleted.push(i)
         } else if (isSearch && !isBoolean) {
@@ -88,7 +88,7 @@ module.exports = (argv, {options, parameters}) => {
 
         if (vals != null && vals.length) {
           if (definition.multiple === true) {
-            args[property] = args[property] != null ? args[property].concat(vals) : vals
+            args[property] = args[property] != null ? [...args[property], ...vals] : vals
           } else if (args[property] != null) {
             throw new Error(`${addDashes(definition.key)} does not accept multiple values`)
           } else {
@@ -134,7 +134,7 @@ module.exports = (argv, {options, parameters}) => {
       }
     }
 
-    const remainder = argv.concat(afterDashDash).filter((arg) => arg !== '')
+    const remainder = [...argv, ...afterDashDash].filter((arg) => arg !== '')
 
     const hasMultiple = parameters.filter((definition) => definition.multiple).length > 0
 
