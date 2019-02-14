@@ -146,7 +146,7 @@ module.exports = (argv, {options, parameters}) => {
 
     for (const definition of parameters) {
       const property = definition.property
-      remainingKeys -= 1
+      remainingKeys--
 
       if (!remainder.length) {
         if (definition.type != null) {
