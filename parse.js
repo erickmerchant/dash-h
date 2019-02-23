@@ -56,7 +56,9 @@ module.exports = (argv, {options, parameters}) => {
 
     const toBeDeleted = []
 
-    for (let i = 0; i < argv.length; i++) {
+    let i = -1
+
+    while (++i < argv.length) {
       for (const definition of options) {
         const search = addDashes(definition.key)
         const property = definition.property
