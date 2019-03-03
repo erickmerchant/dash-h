@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/erickmerchant/sergeant#README",
   "devDependencies": {
-    "@erickmerchant/lint": "^1.10.3",
+    "@erickmerchant/lint": "^2.0.0",
+    "eslint": "^5.15.0",
     "outdent": "^0.7.0",
     "proxyquire": "^2.1.0",
     "tape": "^4.10.0"
