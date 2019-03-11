@@ -1,6 +1,6 @@
 # sergeant
 
-A CLI solution with simple argument parsing and built in help messages.
+A CLI solution with simple argument parsing, sub-commands, and built in help messages.
 
 ## Example
 
@@ -56,4 +56,4 @@ These are the possible properties of options and parameters.
 - description: A short description
 - multiple: Optional. A boolean. If true then multiple values are accepted.
 - required: Optional. A boolean. If true it is required.
-- type: A function that should return the default if no value is given.
+- type: A function that should return the default if no value is given. Can be used to cast the value (always a string) to the type required by your program.
