@@ -1,6 +1,6 @@
-const parse = require('./parse')
-const error = require('./error')
-const help = require('./help')
+const parse = require('./parse.js')
+const error = require('./error.js')
+const help = require('./help.js')
 // const assert = require('assert')
 
 const sergeant = (path, description, define) => {

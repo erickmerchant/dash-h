@@ -1,6 +1,6 @@
 const {green} = require('kleur')
-const {console, process} = require('./src/globals')
-const {addDashes, longest, spaces} = require('./src/helpers')
+const {console, process} = require('./src/globals.js')
+const {addDashes, longest, spaces} = require('./src/helpers.js')
 
 const getUsage = (title, {options, parameters}) => {
   const usage = ['', title]

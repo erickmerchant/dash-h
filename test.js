@@ -3,8 +3,8 @@ const {green, red} = require('kleur')
 const outdent = require('outdent')
 const proxyquire = require('proxyquire').noPreserveCache()
 
-test('test ./parse', (t) => {
-  const parse = require('./parse')
+test('test ./parse.js', (t) => {
+  const parse = require('./parse.js')
 
   t.plan(18)
 
@@ -247,7 +247,7 @@ test('test ./parse', (t) => {
   )
 })
 
-test('test ./parse - with errors', (t) => {
+test('test ./parse.js - with errors', (t) => {
   const messages = []
 
   const globals = {
@@ -261,8 +261,8 @@ test('test ./parse - with errors', (t) => {
     }
   }
 
-  const parse = proxyquire('./parse', {
-    './src/globals': globals
+  const parse = proxyquire('./parse.js', {
+    './src/globals.js': globals
   })
 
   t.plan(2)
@@ -355,7 +355,7 @@ test('test ./parse - with errors', (t) => {
   ], messages)
 })
 
-test('test ./help', (t) => {
+test('test ./help.js', (t) => {
   const messages = []
 
   const globals = {
@@ -369,8 +369,8 @@ test('test ./help', (t) => {
     }
   }
 
-  const help = proxyquire('./help', {
-    './src/globals': globals
+  const help = proxyquire('./help.js', {
+    './src/globals.js': globals
   })
 
   help('test-command', '', {
@@ -532,7 +532,7 @@ test('test ./help', (t) => {
   ], messages)
 })
 
-test('test ./error', (t) => {
+test('test ./error.js', (t) => {
   const messages = []
 
   const globals = {
@@ -546,8 +546,8 @@ test('test ./error', (t) => {
     }
   }
 
-  const error = proxyquire('./error', {
-    './src/globals': globals
+  const error = proxyquire('./error.js', {
+    './src/globals.js': globals
   })
 
   const error1 = new Error('testing errors')
@@ -580,7 +580,7 @@ test('test ./error', (t) => {
   ], messages)
 })
 
-test('test ./command - no help. no errors', (t) => {
+test('test ./command.js - no help. no errors', (t) => {
   const mockedParse = (argv, definitions) => {
     t.deepEquals(['testing'], argv)
 
@@ -605,8 +605,8 @@ test('test ./command - no help. no errors', (t) => {
     return {}
   }
 
-  const command = proxyquire('./', {
-    './parse': mockedParse
+  const command = proxyquire('./main.js', {
+    './parse.js': mockedParse
   })
 
   t.plan(3)
@@ -628,7 +628,7 @@ test('test ./command - no help. no errors', (t) => {
   testCommand(['testing'])
 })
 
-test('test ./command - help', (t) => {
+test('test ./command.js - help', (t) => {
   const mockedParse = (argv, definitions) => {
     return {
       help: true
@@ -658,9 +658,9 @@ test('test ./command - help', (t) => {
     }, definitions)
   }
 
-  const command = proxyquire('./', {
-    './parse': mockedParse,
-    './help': mockedHelp
+  const command = proxyquire('./main.js', {
+    './parse.js': mockedParse,
+    './help.js': mockedHelp
   })
 
   t.plan(2)
@@ -680,16 +680,16 @@ test('test ./command - help', (t) => {
   testCommand(['testing'])
 })
 
-test('test ./command - thrown error', (t) => {
+test('test ./command.js - thrown error', (t) => {
   const mockedParse = () => { return {} }
 
   const mockedError = (error) => {
     t.deepEquals(ourError, error)
   }
 
-  const command = proxyquire('./', {
-    './parse': mockedParse,
-    './error': mockedError
+  const command = proxyquire('./main.js', {
+    './parse.js': mockedParse,
+    './error.js': mockedError
   })
 
   const ourError = new Error('testing errors')
@@ -703,16 +703,16 @@ test('test ./command - thrown error', (t) => {
   testCommand(['testing'])
 })
 
-test('test ./command - rejected promise', (t) => {
+test('test ./command.js - rejected promise', (t) => {
   const mockedParse = () => { return {} }
 
   const mockedError = (error) => {
     t.deepEquals(ourError, error)
   }
 
-  const command = proxyquire('./', {
-    './parse': mockedParse,
-    './error': mockedError
+  const command = proxyquire('./main.js', {
+    './parse.js': mockedParse,
+    './error.js': mockedError
   })
 
   const ourError = new Error('testing errors')
@@ -726,9 +726,9 @@ test('test ./command - rejected promise', (t) => {
   testCommand(['testing'])
 })
 
-test('test ./command - sub commands', (t) => {
-  const command = proxyquire('./', {
-    './parse'() { return {} }
+test('test ./command.js - sub commands', (t) => {
+  const command = proxyquire('./main.js', {
+    './parse.js'() { return {} }
   })
 
   t.plan(2)

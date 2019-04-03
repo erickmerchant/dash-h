@@ -2,7 +2,7 @@
   "name": "sergeant",
   "version": "24.1.4",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "pretest": "lint '**/*.js'",
     "test": "tape test.js"

@@ -1,6 +1,6 @@
 const {red} = require('kleur')
-const {console, process} = require('./src/globals')
-const {addDashes, camelCaseFromDash} = require('./src/helpers')
+const {console, process} = require('./src/globals.js')
+const {addDashes, camelCaseFromDash} = require('./src/helpers.js')
 
 module.exports = (argv, {options, parameters}) => {
   try {
