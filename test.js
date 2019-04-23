@@ -12,7 +12,7 @@ test('test ./parse.js', (t) => {
   t.deepEquals({test: '-a'}, parse(['--', '-a'], {
     options: [],
     parameters: [{
-      key: 'test'
+      name: 'test'
     }]
   }))
 
@@ -21,7 +21,7 @@ test('test ./parse.js', (t) => {
     options: [],
     parameters: [{
       type(val) { return Number(val) },
-      key: 'test'
+      name: 'test'
     }]
   }))
 
@@ -29,7 +29,7 @@ test('test ./parse.js', (t) => {
   t.deepEquals({}, parse([], {
     options: [],
     parameters: [{
-      key: 'test'
+      name: 'test'
     }]
   }))
 
@@ -40,7 +40,7 @@ test('test ./parse.js', (t) => {
   t.deepEquals({aaA: true}, parse(['-a'], {
     parameters: [],
     options: [{
-      key: 'aa-a',
+      name: 'aa-a',
       alias: 'a'
     }]
   }))
@@ -50,7 +50,7 @@ test('test ./parse.js', (t) => {
     parameters: [],
     options: [{
       type(val) { return val },
-      key: 'aa-a',
+      name: 'aa-a',
       alias: 'a'
     }]
   }))
@@ -60,11 +60,11 @@ test('test ./parse.js', (t) => {
     parameters: [],
     options: [{
       type(val) { return val },
-      key: 'aa-a',
+      name: 'aa-a',
       alias: 'a'
     },
     {
-      key: 'b'
+      name: 'b'
     }]
   }))
 
@@ -72,11 +72,11 @@ test('test ./parse.js', (t) => {
   t.deepEquals({aaA: true, b: true}, parse(['-ba'], {
     parameters: [],
     options: [{
-      key: 'aa-a',
+      name: 'aa-a',
       alias: 'a'
     },
     {
-      key: 'b'
+      name: 'b'
     }]
   }))
 
@@ -85,7 +85,7 @@ test('test ./parse.js', (t) => {
     parameters: [],
     options: [{
       type(val) { return val },
-      key: 'aa-a',
+      name: 'aa-a',
       multiple: true,
       alias: 'a'
     }]
@@ -96,7 +96,7 @@ test('test ./parse.js', (t) => {
     parameters: [],
     options: [{
       type(val) { return val },
-      key: 'aa-a',
+      name: 'aa-a',
       alias: 'a'
     }]
   }))
@@ -105,7 +105,7 @@ test('test ./parse.js', (t) => {
   t.deepEquals({aaA: ''}, parse([''], {
     parameters: [],
     options: [{
-      key: 'aa-a',
+      name: 'aa-a',
       alias: 'a',
       type(val) {
         if (val == null) {
@@ -121,7 +121,7 @@ test('test ./parse.js', (t) => {
   t.deepEquals({aaA: false}, parse([''], {
     parameters: [],
     options: [{
-      key: 'aa-a',
+      name: 'aa-a',
       alias: 'a'
     }]
   }))
@@ -130,10 +130,10 @@ test('test ./parse.js', (t) => {
   t.deepEquals({0: 'testing', 1: 'yes'}, parse(['testing'], {
     options: [],
     parameters: [{
-      key: '0'
+      name: '0'
     },
     {
-      key: '1',
+      name: '1',
       type(val) {
         if (val == null) {
           return 'yes'
@@ -151,16 +151,16 @@ test('test ./parse.js', (t) => {
       options: [],
       parameters: [{
         type(val) { return val.map((v) => Number(v)) },
-        key: 'test0',
+        name: 'test0',
         multiple: true
       },
       {
         type(val) { return Number(val) },
-        key: 'test1'
+        name: 'test1'
       },
       {
         type(val) { return Number(val) },
-        key: 'test2'
+        name: 'test2'
       }]
     })
   )
@@ -172,15 +172,15 @@ test('test ./parse.js', (t) => {
       options: [],
       parameters: [{
         type(val) { return Number(val) },
-        key: 'test0'
+        name: 'test0'
       },
       {
-        key: 'test1',
+        name: 'test1',
         multiple: true
       },
       {
         type(val) { return Number(val) },
-        key: 'test2'
+        name: 'test2'
       }]
     })
   )
@@ -192,15 +192,15 @@ test('test ./parse.js', (t) => {
       options: [],
       parameters: [{
         type(val) { return Number(val) },
-        key: 'test0'
+        name: 'test0'
       },
       {
         type(val) { return Number(val) },
-        key: 'test1'
+        name: 'test1'
       },
       {
         type(val) { return val.map((v) => Number(v)) },
-        key: 'test2',
+        name: 'test2',
         multiple: true
       }]
     })
@@ -221,11 +221,11 @@ test('test ./parse.js', (t) => {
     {testOption: DEFAULT, testParameter: DEFAULT},
     parse([], {
       options: [{
-        key: 'test-option',
+        name: 'test-option',
         type: FN_DEFAULT
       }],
       parameters: [{
-        key: 'test-parameter',
+        name: 'test-parameter',
         type: FN_DEFAULT
       }]
     })
@@ -236,11 +236,11 @@ test('test ./parse.js', (t) => {
     {testOption: 'a string', testParameter: 'another string'},
     parse(['--test-option', 'a string', 'another string'], {
       options: [{
-        key: 'test-option',
+        name: 'test-option',
         type(val) { return val }
       }],
       parameters: [{
-        key: 'test-parameter',
+        name: 'test-parameter',
         type(val) { return val }
       }]
     })
@@ -271,7 +271,7 @@ test('test ./parse.js - with errors', (t) => {
   parse(['-a'], {
     parameters: [],
     options: [{
-      key: 'aa-a',
+      name: 'aa-a',
       alias: 'a',
       type(val) { return val },
       multiple: true
@@ -282,7 +282,7 @@ test('test ./parse.js - with errors', (t) => {
   parse(['-a=abc'], {
     parameters: [],
     options: [{
-      key: 'a'
+      name: 'a'
     }]
   })
 
@@ -290,7 +290,7 @@ test('test ./parse.js - with errors', (t) => {
   parse(['--aaa=abc'], {
     parameters: [],
     options: [{
-      key: 'aaa'
+      name: 'aaa'
     }]
   })
 
@@ -304,7 +304,7 @@ test('test ./parse.js - with errors', (t) => {
   parse([''], {
     parameters: [],
     options: [{
-      key: 'a',
+      name: 'a',
       required: true
     }]
   })
@@ -313,7 +313,7 @@ test('test ./parse.js - with errors', (t) => {
   parse([''], {
     parameters: [],
     options: [{
-      key: 'aaa',
+      name: 'aaa',
       required: true
     }]
   })
@@ -323,7 +323,7 @@ test('test ./parse.js - with errors', (t) => {
     parameters: [],
     options: [{
       type(val) { return Number(val) },
-      key: 'aaa'
+      name: 'aaa'
     }]
   })
 
@@ -331,7 +331,7 @@ test('test ./parse.js - with errors', (t) => {
   parse([], {
     options: [],
     parameters: [{
-      key: 'test',
+      name: 'test',
       required: true
     }]
   })
@@ -373,15 +373,15 @@ test('test ./help.js', (t) => {
     './src/globals.js': globals
   })
 
-  help('test-command', '', {
+  help(['test-command'], '', {
     parameters: [
       {
-        key: 'p0',
+        name: 'p0',
         description: 'the description',
         required: true
       },
       {
-        key: 'p1',
+        name: 'p1',
         multiple: true,
         type(val) {
           if (val == null) {
@@ -394,13 +394,13 @@ test('test ./help.js', (t) => {
     ],
     options: [
       {
-        key: 'aaa',
+        name: 'aaa',
         alias: 'a',
         multiple: true,
         description: 'a Boolean'
       },
       {
-        key: 'bbb',
+        name: 'bbb',
         alias: 'b',
         required: true,
         description: 'a Number',
@@ -416,55 +416,38 @@ test('test ./help.js', (t) => {
     commands: []
   })
 
-  help('test-command', 'a test command', {
+  help(['test-command'], 'a test command', {
     parameters: [{
-      key: 'p0',
+      name: 'p0',
       description: 'the description',
       required: true
     }],
     options: [{
-      key: 'aaa',
+      name: 'aaa',
       alias: 'a',
       description: 'a Boolean'
     }],
     commands: [
       {
-        title: 'sub',
+        command: ['test-command', 'sub'],
         description: 'a sub command',
         parameters: [{
-          key: 'p1',
+          name: 'p1',
           description: 'the description',
           required: true
         }],
         options: [{
-          key: 'bbb',
+          name: 'bbb',
           alias: 'b',
           description: 'a Boolean'
-        }],
-        commands: [
-          {
-            title: 'sub-sub',
-            description: 'a sub sub command',
-            commands: [],
-            parameters: [{
-              key: 'p2',
-              description: 'the description',
-              required: true
-            }],
-            options: [{
-              key: 'ccc',
-              alias: 'c',
-              description: 'a Boolean'
-            }]
-          }
-        ]
+        }]
       }
     ]
   })
 
-  help('test-command', 'a test command', {
+  help(['test-command'], 'a test command', {
     options: [{
-      key: 'aaa',
+      name: 'aaa',
       alias: 'a',
       multiple: true,
       description: 'a Boolean'
@@ -473,7 +456,7 @@ test('test ./help.js', (t) => {
     commands: []
   })
 
-  help('test-command', 'a test command'.split(' ').join('\n'), {options: [], parameters: [], commands: []})
+  help(['test-command'], 'a test command'.split(' ').join('\n'), {options: [], parameters: [], commands: []})
 
   t.plan(2)
 
@@ -509,7 +492,6 @@ test('test ./help.js', (t) => {
     ${green('Commands:')}
 
      test-command sub [-b] <p1>
-     test-command sub sub-sub [-c] <p2>
     `,
     outdent`
     ${green('Description:')} a test command
@@ -582,22 +564,22 @@ test('test ./error.js', (t) => {
 
 test('test ./command.js - no help. no errors', (t) => {
   const mockedParse = (argv, definitions) => {
-    t.deepEquals(['testing'], argv)
+    t.deepEquals([], argv)
 
     t.deepEquals({
       options: [
         {
-          key: 'bbb',
+          name: 'bbb',
           testing: true
         },
         {
-          key: 'help',
+          name: 'help',
           alias: 'h',
           description: 'get help'
         }
       ],
       parameters: [{
-        key: 'aaa',
+        name: 'aaa',
         testing: true
       }]
     }, definitions)
@@ -605,18 +587,21 @@ test('test ./command.js - no help. no errors', (t) => {
     return {}
   }
 
-  const command = proxyquire('./main.js', {
-    './parse.js': mockedParse
-  })
+  const {command, start} = proxyquire('./main.js', {
+    './parse.js': mockedParse,
+    './help.js': () => {}
+  })('test')
 
   t.plan(3)
 
-  const testCommand = command('test-command', ({option, parameter}) => {
-    parameter('aaa', {
+  command(['test-command'], ({option, parameter}) => {
+    parameter({
+      name: 'aaa',
       testing: true
     })
 
-    option('bbb', {
+    option({
+      name: 'bbb',
       testing: true
     })
 
@@ -625,7 +610,7 @@ test('test ./command.js - no help. no errors', (t) => {
     }
   })
 
-  testCommand(['testing'])
+  start(['test-command'])
 })
 
 test('test ./command.js - help', (t) => {
@@ -636,48 +621,50 @@ test('test ./command.js - help', (t) => {
   }
 
   const mockedHelp = (name, description, definitions) => {
-    t.equals('test-command', name)
+    t.deepEquals(['test', 'test-command'], name)
 
     t.deepEquals({
       options: [
         {
-          key: 'bbb',
+          name: 'bbb',
           testing: true
         },
         {
-          key: 'help',
+          name: 'help',
           alias: 'h',
           description: 'get help'
         }
       ],
       parameters: [{
-        key: 'aaa',
+        name: 'aaa',
         testing: true
       }],
       commands: []
     }, definitions)
   }
 
-  const command = proxyquire('./main.js', {
+  const {command, start} = proxyquire('./main.js', {
     './parse.js': mockedParse,
     './help.js': mockedHelp
-  })
+  })('test')
 
   t.plan(2)
 
-  const testCommand = command('test-command', ({parameter, option}) => {
-    parameter('aaa', {
+  command(['test-command'], ({parameter, option}) => {
+    parameter({
+      name: 'aaa',
       testing: true
     })
 
-    option('bbb', {
+    option({
+      name: 'bbb',
       testing: true
     })
 
     return () => {}
   })
 
-  testCommand(['testing'])
+  start(['test-command'])
 })
 
 test('test ./command.js - thrown error', (t) => {
@@ -687,20 +674,21 @@ test('test ./command.js - thrown error', (t) => {
     t.deepEquals(ourError, error)
   }
 
-  const command = proxyquire('./main.js', {
+  const {command, start} = proxyquire('./main.js', {
     './parse.js': mockedParse,
-    './error.js': mockedError
-  })
+    './error.js': mockedError,
+    './help.js': () => {}
+  })('test')
 
   const ourError = new Error('testing errors')
 
   t.plan(1)
 
-  const testCommand = command('test-command', () => () => {
+  command(['test-command'], () => () => {
     throw ourError
   })
 
-  testCommand(['testing'])
+  start(['test-command'])
 })
 
 test('test ./command.js - rejected promise', (t) => {
@@ -710,44 +698,44 @@ test('test ./command.js - rejected promise', (t) => {
     t.deepEquals(ourError, error)
   }
 
-  const command = proxyquire('./main.js', {
+  const {command, start} = proxyquire('./main.js', {
     './parse.js': mockedParse,
-    './error.js': mockedError
-  })
+    './error.js': mockedError,
+    './help.js': () => {}
+  })('test')
 
   const ourError = new Error('testing errors')
 
   t.plan(1)
 
-  const testCommand = command('test-command', () => async () => {
+  command(['test-command'], () => async () => {
     throw ourError
   })
 
-  testCommand(['testing'])
+  start(['test-command'])
 })
 
 test('test ./command.js - sub commands', (t) => {
-  const command = proxyquire('./main.js', {
-    './parse.js'() { return {} }
-  })
+  const {command, start} = proxyquire('./main.js', {
+    './parse.js'() { return {} },
+    './help.js': () => {}
+  })('test')
 
   t.plan(2)
 
-  const testCommand = command('test-command', ({option, parameter, command}) => {
-    command('sub-command', 'a sub command', () => () => {
-      t.ok(true)
-    })
-
-    command('sub-command-b', () => () => {
-      t.ok(true)
-    })
-
-    return () => {
-      t.ok(false)
-    }
+  command(['sub-command'], () => () => {
+    t.ok(true)
   })
 
-  testCommand(['sub-command'])
+  command(['sub-command-b'], () => () => {
+    t.ok(true)
+  })
 
-  testCommand(['sub-command-b'])
+  command(() => () => {
+    t.ok(false)
+  })
+
+  start(['sub-command'])
+
+  start(['sub-command-b'])
 })

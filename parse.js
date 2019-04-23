@@ -8,19 +8,19 @@ module.exports = (argv, {options, parameters}) => {
     const args = {}
 
     options = options.reduce((options, definition) => {
-      definition = {...definition, property: camelCaseFromDash(definition.key)}
+      definition = {...definition, property: camelCaseFromDash(definition.name)}
 
       options.push(definition)
 
       if (definition.alias) {
-        options.push({...definition, key: definition.alias, alias: true})
+        options.push({...definition, name: definition.alias, alias: true})
       }
 
       return options
     }, [])
 
     parameters = parameters.reduce((parameters, definition) => {
-      definition = {...definition, property: camelCaseFromDash(definition.key)}
+      definition = {...definition, property: camelCaseFromDash(definition.name)}
 
       parameters.push(definition)
 
@@ -60,7 +60,7 @@ module.exports = (argv, {options, parameters}) => {
 
     while (++i < argv.length) {
       for (const definition of options) {
-        const search = addDashes(definition.key)
+        const search = addDashes(definition.name)
         const property = definition.property
         const vals = []
         const isSearch = argv[i] === search
@@ -83,16 +83,16 @@ module.exports = (argv, {options, parameters}) => {
 
           toBeDeleted.push(i)
         } else if (isSearch && !isBoolean) {
-          throw new Error(`${addDashes(definition.key)} is not a boolean and requires a value`)
+          throw new Error(`${addDashes(definition.name)} is not a boolean and requires a value`)
         } else if (isSearchWithValue && isBoolean) {
-          throw new Error(`${addDashes(definition.key)} is a boolean and does not accept a value`)
+          throw new Error(`${addDashes(definition.name)} is a boolean and does not accept a value`)
         }
 
         if (vals != null && vals.length) {
           if (definition.multiple === true) {
             args[property] = args[property] != null ? [...args[property], ...vals] : vals
           } else if (args[property] != null) {
-            throw new Error(`${addDashes(definition.key)} does not accept multiple values`)
+            throw new Error(`${addDashes(definition.name)} does not accept multiple values`)
           } else {
             args[property] = vals.pop()
           }
@@ -110,12 +110,12 @@ module.exports = (argv, {options, parameters}) => {
           if (_default != null) {
             args[property] = _default
           } else if (definition.required === true && args.help !== true) {
-            throw new Error(`${addDashes(definition.key)} is required`)
+            throw new Error(`${addDashes(definition.name)} is required`)
           }
         } else if (definition.required !== true) {
           args[property] = false
         } else if (definition.required === true && args.help !== true) {
-          throw new Error(`${addDashes(definition.key)} is required`)
+          throw new Error(`${addDashes(definition.name)} is required`)
         }
       } else if (definition.type != null) {
         args[property] = definition.type(args[property])
@@ -144,11 +144,11 @@ module.exports = (argv, {options, parameters}) => {
       throw new Error('too many arguments')
     }
 
-    let remainingKeys = parameters.length
+    let remainingNames = parameters.length
 
     for (const definition of parameters) {
       const property = definition.property
-      remainingKeys--
+      remainingNames--
 
       if (!remainder.length) {
         if (definition.type != null) {
@@ -157,13 +157,13 @@ module.exports = (argv, {options, parameters}) => {
           if (_default != null) {
             args[property] = _default
           } else if (definition.required === true && args.help !== true) {
-            throw new Error(`${definition.key} is required`)
+            throw new Error(`${definition.name} is required`)
           }
         } else if (definition.required === true && args.help !== true) {
-          throw new Error(`${definition.key} is required`)
+          throw new Error(`${definition.name} is required`)
         }
       } else if (definition.multiple === true) {
-        args[property] = remainder.splice(0, remainder.length - remainingKeys)
+        args[property] = remainder.splice(0, remainder.length - remainingNames)
 
         if (definition.type != null) {
           args[property] = definition.type(args[property])

@@ -5,11 +5,13 @@ A CLI solution with simple argument parsing, sub-commands, and built in help mes
 ## Example
 
 ``` javascript
-const command = require('sergeant')
+// example.js
+
+const {command, start} = require('sergeant')('example.js')
 const assert = require('assert')
 
 const say = (name, loud = false) => {
-  let message = `hello ${name}!`
+  let message = `hello ${name}.`
 
   if (loud) {
     message = message.toUpperCase() + '!'
@@ -18,42 +20,46 @@ const say = (name, loud = false) => {
   console.log(message)
 }
 
-command('hello', ({option, parameter, command}) => {
-  parameter('name', {
+const loud = {
+  name: 'loud',
+  description: 'say it loud',
+  alias: 'l'
+}
+
+command(['hello'], 'say hello', ({parameter, option}) => {
+  parameter({
+    name: 'name',
     description: 'the name',
     required: true
   })
 
-  option('loud', {
-    description: 'say it loud',
-    alias: 'l'
-  })
-
-  command('world', ({option}) => {
-    option('loud', {
-      description: 'say it loud',,
-      alias: 'l'
-    })
-
-    return (args) => {
-      say('world', args.loud)
-    }
-  })
+  option(loud)
 
   return (args) => {
     assert.notEqual(args.name, 'world', 'use hello world')
 
     say(args.name, args.loud)
   }
-})(process.argv.slice(2))
+})
+
+command(['hello', '--world'], 'say hello world', ({option}) => {
+  option(loud)
+
+  return (args) => {
+    say('world', args.loud)
+  }
+})
+
+start(process.argv.slice(2))
 ```
 
 ## Options and Parameters
 
 These are the possible properties of options and parameters.
 
-- alias: Optional. A short alias for the option. (options only)
+- name: The name
 - description: A short description
+- alias: Optional. A short alias for the option. (options only)
 - multiple: Optional. A boolean. If true then multiple values are accepted.
 - required: Optional. A boolean. If true it is required.
 - type: A function that should return the default if no value is given. Can be used to cast the value (always a string) to the type required by your program.

@@ -1,86 +1,79 @@
 const parse = require('./parse.js')
 const error = require('./error.js')
 const help = require('./help.js')
-// const assert = require('assert')
+const helpOption = {
+  name: 'help',
+  alias: 'h',
+  description: 'get help'
+}
 
-const sergeant = (path, description, define) => {
-  const title = path.split(' ').reverse()[0]
+module.exports = (name) => {
+  const commands = []
 
-  if (define == null) {
-    define = description
+  return {
+    command(command, define) {
+      if (define == null) {
+        define = command
 
-    description = null
-  }
+        command = []
+      }
 
-  const cli = (argv) => {
-    const filtered = argv.filter((arg) => arg !== '-' && !arg.startsWith('-'))
-    const command = cli.commands.find((command) => command.title === filtered[0])
+      const options = []
+      const parameters = []
+      let description = ''
 
-    if (filtered[0] != null && command != null) {
-      const index0 = argv.indexOf(filtered[0])
-
-      argv.splice(index0, 1)
-
-      command(argv)
-    } else {
-      const args = parse(argv, {options: cli.options, parameters: cli.parameters})
-
-      try {
-        if (args != null) {
-          if (args.help === true || action == null) {
-            help(path, description, {options: cli.options, parameters: cli.parameters, commands: cli.commands})
-          } else if (action != null) {
-            Promise.resolve()
-              .then(() => action(args))
-              .catch(error)
-          }
+      const action = define({
+        parameter(parameter) {
+          parameters.push(parameter)
+        },
+        option(option) {
+          options.push(option)
+        },
+        description(desc) {
+          description = desc
         }
-      } catch (e) {
-        error(e)
+      })
+
+      options.push(helpOption)
+
+      commands.push({
+        command,
+        description,
+        parameters,
+        options,
+        action
+      })
+    },
+    async start(argv) {
+      const command = commands.reduce((acc, command) => {
+        if (acc != null) return acc
+
+        if (command.command.reduce((acc, val, index) => (argv[index] != null && val === argv[index] ? acc + 1 : acc), 0) === command.command.length) {
+          return command
+        }
+
+        return acc
+      }, null)
+
+      if (command != null) {
+        const args = parse(argv.slice(command.command.length), {options: command.options, parameters: command.parameters})
+
+        try {
+          if (args != null) {
+            if (args.help === true || command.action == null) {
+              help([name].concat(command.command), command.description, {commands: [], options: command.options, parameters: command.parameters})
+            } else if (command.action != null) {
+              await command.action(args)
+            }
+          }
+        } catch (e) {
+          error(e)
+        }
+      } else {
+        const rootCommand = commands.find((command) => !command.command.length)
+
+        help([name], rootCommand ? rootCommand.description : '', {commands, options:  rootCommand ? rootCommand.options : [helpOption], parameters: rootCommand ? rootCommand.parameters : []})
       }
     }
   }
-
-  cli.title = title
-
-  cli.description = description
-
-  cli.options = []
-
-  cli.parameters = []
-
-  cli.commands = []
-
-  const command = (subtitle, description, define) => {
-    if (define == null) {
-      define = description
-
-      description = null
-    }
-
-    cli.commands.push(sergeant(`${path} ${subtitle}`, description, define))
-  }
-
-  const option = (key, definition) => {
-    const current = Object.assign(definition, {key})
-
-    cli.options.push(current)
-  }
-
-  const parameter = (key, definition) => {
-    const current = Object.assign(definition, {key})
-
-    cli.parameters.push(current)
-  }
-
-  const action = define({option, parameter, command})
-
-  option('help', {
-    alias: 'h',
-    description: 'get help'
-  })
-
-  return cli
 }
-
-module.exports = sergeant

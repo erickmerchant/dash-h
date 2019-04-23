@@ -8,15 +8,15 @@ const getUsage = (title, {options, parameters}) => {
   if (options && options.length) {
     usage.push(...options.map((definition) => {
       const valPart = definition.type != null
-        ? ` <${definition.key}>`
+        ? ` <${definition.name}>`
         : ''
 
-      return wrapUsage(addDashes(definition.alias != null ? definition.alias : definition.key) + valPart, definition)
+      return wrapUsage(addDashes(definition.alias != null ? definition.alias : definition.name) + valPart, definition)
     }))
   }
 
   if (parameters && parameters.length) {
-    usage.push(...parameters.map((definition) => wrapUsage(`<${definition.key}>`, definition)))
+    usage.push(...parameters.map((definition) => wrapUsage(`<${definition.name}>`, definition)))
   }
 
   return usage.join(' ')
@@ -38,9 +38,9 @@ const wrapUsage = (usage, {required, multiple}) => {
 
 const getOptionSignature = (definition) => {
   const val = definition.type != null
-    ? ` <${definition.key}>`
+    ? ` <${definition.name}>`
     : ''
-  let signature = addDashes(definition.key) + val
+  let signature = addDashes(definition.name) + val
 
   if (definition.alias != null) {
     signature = `${addDashes(definition.alias)}, ${signature}`
@@ -49,13 +49,11 @@ const getOptionSignature = (definition) => {
   return signature
 }
 
-const commandList = (title, commands) => {
+const commandList = (commands) => {
   const lines = []
 
   for (const command of commands) {
-    lines.push(getUsage(`${title} ${command.title}`, command))
-
-    lines.push(...commandList(`${title} ${command.title}`, command.commands))
+    lines.push(getUsage(`${command.command.join(' ')}`, command))
   }
 
   return lines
@@ -76,10 +74,10 @@ module.exports = (title, description, {options, parameters, commands}) => {
     }
   }
 
-  lines.push('', `${green('Usage:')}${getUsage(title, {options, parameters})}`)
+  lines.push('', `${green('Usage:')}${getUsage(title.join(' '), {options, parameters})}`)
 
   const longestArg = longest([
-    ...parameters.map((definition) => `<${definition.key}>`),
+    ...parameters.map((definition) => `<${definition.name}>`),
     ...options.map((definition) => getOptionSignature(definition))
   ])
 
@@ -87,7 +85,7 @@ module.exports = (title, description, {options, parameters, commands}) => {
     lines.push('', green('Parameters:'), '')
 
     for (const definition of parameters) {
-      let line = ` <${definition.key}>${spaces(longestArg - definition.key.length - 2)}  `
+      let line = ` <${definition.name}>${spaces(longestArg - definition.name.length - 2)}  `
 
       if (definition.description) {
         line += `${definition.description} `
@@ -129,7 +127,7 @@ module.exports = (title, description, {options, parameters, commands}) => {
   }
 
   if (commands.length) {
-    lines.push('', green('Commands:'), '', ...commandList(title, commands))
+    lines.push('', green('Commands:'), '', ...commandList(commands))
   }
 
   lines.push('')
