@@ -2,8 +2,8 @@ const {green} = require('kleur')
 const {console, process} = require('./src/globals.js')
 const {addDashes, longest, spaces} = require('./src/helpers.js')
 
-const getUsage = (title, {options, parameters}) => {
-  const usage = ['', title]
+const getUsage = (name, command, {options, parameters}) => {
+  const usage = ['', [name].concat(command).join(' ')]
 
   if (options && options.length) {
     usage.push(...options.map((definition) => {
@@ -49,17 +49,17 @@ const getOptionSignature = (definition) => {
   return signature
 }
 
-const commandList = (commands) => {
+const commandList = (name, commands) => {
   const lines = []
 
   for (const command of commands) {
-    lines.push(getUsage(`${command.command.join(' ')}`, command))
+    lines.push(getUsage(name, command.command, command))
   }
 
   return lines
 }
 
-module.exports = (title, description, {options, parameters, commands}) => {
+module.exports = (name, command, description, {options, parameters, commands}) => {
   process.exitCode = 1
   const lines = []
 
@@ -74,7 +74,7 @@ module.exports = (title, description, {options, parameters, commands}) => {
     }
   }
 
-  lines.push('', `${green('Usage:')}${getUsage(title.join(' '), {options, parameters})}`)
+  lines.push('', `${green('Usage:')}${getUsage(name, command, {options, parameters})}`)
 
   const longestArg = longest([
     ...parameters.map((definition) => `<${definition.name}>`),
@@ -127,7 +127,7 @@ module.exports = (title, description, {options, parameters, commands}) => {
   }
 
   if (commands.length) {
-    lines.push('', green('Commands:'), '', ...commandList(commands))
+    lines.push('', green('Commands:'), '', ...commandList(name, commands))
   }
 
   lines.push('')

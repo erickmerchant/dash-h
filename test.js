@@ -373,7 +373,7 @@ test('test ./help.js', (t) => {
     './src/globals.js': globals
   })
 
-  help(['test-command'], '', {
+  help('testing.js', ['test-command'], '', {
     parameters: [
       {
         name: 'p0',
@@ -416,7 +416,7 @@ test('test ./help.js', (t) => {
     commands: []
   })
 
-  help(['test-command'], 'a test command', {
+  help('testing.js', ['test-command'], 'a test command', {
     parameters: [{
       name: 'p0',
       description: 'the description',
@@ -445,7 +445,7 @@ test('test ./help.js', (t) => {
     ]
   })
 
-  help(['test-command'], 'a test command', {
+  help('testing.js', ['test-command'], 'a test command', {
     options: [{
       name: 'aaa',
       alias: 'a',
@@ -456,7 +456,7 @@ test('test ./help.js', (t) => {
     commands: []
   })
 
-  help(['test-command'], 'a test command'.split(' ').join('\n'), {options: [], parameters: [], commands: []})
+  help('testing.js', ['test-command'], 'a test command'.split(' ').join('\n'), {options: [], parameters: [], commands: []})
 
   t.plan(2)
 
@@ -464,7 +464,7 @@ test('test ./help.js', (t) => {
 
   t.deepEquals([
     outdent`
-    ${green('Usage:')} test-command [-a]... (-b <bbb>) <p0> [<p1>]...
+    ${green('Usage:')} testing.js test-command [-a]... (-b <bbb>) <p0> [<p1>]...
 
     ${green('Parameters:')}
 
@@ -479,7 +479,7 @@ test('test ./help.js', (t) => {
     outdent`
     ${green('Description:')} a test command
 
-    ${green('Usage:')} test-command [-a] <p0>
+    ${green('Usage:')} testing.js test-command [-a] <p0>
 
     ${green('Parameters:')}
 
@@ -491,12 +491,12 @@ test('test ./help.js', (t) => {
 
     ${green('Commands:')}
 
-     test-command sub [-b] <p1>
+     testing.js test-command sub [-b] <p1>
     `,
     outdent`
     ${green('Description:')} a test command
 
-    ${green('Usage:')} test-command [-a]...
+    ${green('Usage:')} testing.js test-command [-a]...
 
     ${green('Options:')}
 
@@ -509,7 +509,7 @@ test('test ./help.js', (t) => {
     test
     command
 
-    ${green('Usage:')} test-command
+    ${green('Usage:')} testing.js test-command
     `
   ], messages)
 })
@@ -620,8 +620,8 @@ test('test ./command.js - help', (t) => {
     }
   }
 
-  const mockedHelp = (name, description, definitions) => {
-    t.deepEquals(['test', 'test-command'], name)
+  const mockedHelp = (name, command, description, definitions) => {
+    t.deepEquals(['test-command'], command)
 
     t.deepEquals({
       options: [
@@ -723,16 +723,16 @@ test('test ./command.js - sub commands', (t) => {
 
   t.plan(2)
 
+  command(() => () => {
+    t.ok(false)
+  })
+
   command(['sub-command'], () => () => {
     t.ok(true)
   })
 
   command(['sub-command-b'], () => () => {
     t.ok(true)
-  })
-
-  command(() => () => {
-    t.ok(false)
   })
 
   start(['sub-command'])

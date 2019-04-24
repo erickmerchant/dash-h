@@ -6,6 +6,15 @@ const helpOption = {
   alias: 'h',
   description: 'get help'
 }
+const defaultRootCommand = {
+  command: [],
+  description: '',
+  parameters: [],
+  options: [
+    helpOption
+  ]
+}
+const commandMatches = (a, b) => a.reduce((acc, val, index) => (b[index] != null && val === b[index] ? acc + 1 : acc), 0) === a.length
 
 module.exports = (name) => {
   const commands = []
@@ -36,7 +45,7 @@ module.exports = (name) => {
 
       options.push(helpOption)
 
-      commands.push({
+      commands.unshift({
         command,
         description,
         parameters,
@@ -45,34 +54,38 @@ module.exports = (name) => {
       })
     },
     async start(argv) {
-      const command = commands.reduce((acc, command) => {
+      let command = commands.reduce((acc, command) => {
         if (acc != null) return acc
 
-        if (command.command.reduce((acc, val, index) => (argv[index] != null && val === argv[index] ? acc + 1 : acc), 0) === command.command.length) {
+        if (commandMatches(command.command, argv)) {
           return command
         }
 
         return acc
       }, null)
 
-      if (command != null) {
+      if (command == null) {
+        command = defaultRootCommand
+      }
+
+      const subCommands = commands.filter((sub) => {
+        if (sub !== command && commandMatches(command.command, sub.command)) {
+          return true
+        }
+
+        return false
+      }, []).reverse()
+
+      try {
         const args = parse(argv.slice(command.command.length), {options: command.options, parameters: command.parameters})
 
-        try {
-          if (args != null) {
-            if (args.help === true || command.action == null) {
-              help([name].concat(command.command), command.description, {commands: [], options: command.options, parameters: command.parameters})
-            } else if (command.action != null) {
-              await command.action(args)
-            }
-          }
-        } catch (e) {
-          error(e)
+        if (args.help === true || command.action == null) {
+          help(name, command.command, command.description, {commands: subCommands, options: command.options, parameters: command.parameters})
+        } else if (command.action != null) {
+          await command.action(args)
         }
-      } else {
-        const rootCommand = commands.find((command) => !command.command.length)
-
-        help([name], rootCommand ? rootCommand.description : '', {commands, options:  rootCommand ? rootCommand.options : [helpOption], parameters: rootCommand ? rootCommand.parameters : []})
+      } catch (e) {
+        error(e)
       }
     }
   }
