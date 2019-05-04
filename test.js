@@ -532,13 +532,13 @@ test('test ./error.js', (t) => {
     './src/globals.js': globals
   })
 
-  const error1 = new Error('testing errors')
+  const error1 = Error('testing errors')
 
   error1.stack = ['Error: testing errors', 'at thing (file.js:123:45)', 'at another'].join('\n')
 
   error(error1)
 
-  const error2 = new Error('testing errors')
+  const error2 = Error('testing errors')
 
   error2.stack = null
 
@@ -680,7 +680,7 @@ test('test ./command.js - thrown error', (t) => {
     './help.js': () => {}
   })('test')
 
-  const ourError = new Error('testing errors')
+  const ourError = Error('testing errors')
 
   t.plan(1)
 
@@ -704,7 +704,7 @@ test('test ./command.js - rejected promise', (t) => {
     './help.js': () => {}
   })('test')
 
-  const ourError = new Error('testing errors')
+  const ourError = Error('testing errors')
 
   t.plan(1)
 

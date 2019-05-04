@@ -83,16 +83,16 @@ module.exports = (argv, {options, parameters}) => {
 
           toBeDeleted.push(i)
         } else if (isSearch && !isBoolean) {
-          throw new Error(`${addDashes(definition.name)} is not a boolean and requires a value`)
+          throw Error(`${addDashes(definition.name)} is not a boolean and requires a value`)
         } else if (isSearchWithValue && isBoolean) {
-          throw new Error(`${addDashes(definition.name)} is a boolean and does not accept a value`)
+          throw Error(`${addDashes(definition.name)} is a boolean and does not accept a value`)
         }
 
         if (vals != null && vals.length) {
           if (definition.multiple === true) {
             args[property] = args[property] != null ? [...args[property], ...vals] : vals
           } else if (args[property] != null) {
-            throw new Error(`${addDashes(definition.name)} does not accept multiple values`)
+            throw Error(`${addDashes(definition.name)} does not accept multiple values`)
           } else {
             args[property] = vals.pop()
           }
@@ -110,12 +110,12 @@ module.exports = (argv, {options, parameters}) => {
           if (_default != null) {
             args[property] = _default
           } else if (definition.required === true && args.help !== true) {
-            throw new Error(`${addDashes(definition.name)} is required`)
+            throw Error(`${addDashes(definition.name)} is required`)
           }
         } else if (definition.required !== true) {
           args[property] = false
         } else if (definition.required === true && args.help !== true) {
-          throw new Error(`${addDashes(definition.name)} is required`)
+          throw Error(`${addDashes(definition.name)} is required`)
         }
       } else if (definition.type != null) {
         args[property] = definition.type(args[property])
@@ -132,7 +132,7 @@ module.exports = (argv, {options, parameters}) => {
 
     for (const arg of argv) {
       if (arg.startsWith('-') && !arg.startsWith('---')) {
-        throw new Error(`unknown option ${arg.split('=')[0]}`)
+        throw Error(`unknown option ${arg.split('=')[0]}`)
       }
     }
 
@@ -141,7 +141,7 @@ module.exports = (argv, {options, parameters}) => {
     const hasMultiple = parameters.filter((definition) => definition.multiple).length > 0
 
     if (!hasMultiple && remainder.length > parameters.length) {
-      throw new Error('too many arguments')
+      throw Error('too many arguments')
     }
 
     let remainingNames = parameters.length
@@ -157,10 +157,10 @@ module.exports = (argv, {options, parameters}) => {
           if (_default != null) {
             args[property] = _default
           } else if (definition.required === true && args.help !== true) {
-            throw new Error(`${definition.name} is required`)
+            throw Error(`${definition.name} is required`)
           }
         } else if (definition.required === true && args.help !== true) {
-          throw new Error(`${definition.name} is required`)
+          throw Error(`${definition.name} is required`)
         }
       } else if (definition.multiple === true) {
         args[property] = remainder.splice(0, remainder.length - remainingNames)
