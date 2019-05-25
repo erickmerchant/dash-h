@@ -22,7 +22,7 @@
     "eslint": "^5.16.0",
     "outdent": "^0.7.0",
     "proxyquire": "^2.1.0",
-    "tape": "^4.10.0"
+    "tape": "^4.10.2"
   },
   "dependencies": {
     "kleur": "^3.0.3"
