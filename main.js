@@ -79,7 +79,7 @@ module.exports = (name) => {
       try {
         const args = parse(argv.slice(command.command.length), {options: command.options, parameters: command.parameters})
 
-        if (args.help === true || command.action == null) {
+        if (args == null || args.help === true || command.action == null) {
           help(name, command.command, command.description, {commands: subCommands, options: command.options, parameters: command.parameters})
         } else if (command.action != null) {
           await command.action(args)
