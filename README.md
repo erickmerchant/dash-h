@@ -14,7 +14,7 @@ const say = (name, loud = false) => {
   let message = `hello ${name}.`
 
   if (loud) {
-    message = message.toUpperCase() + '!'
+    message = `${message.toUpperCase()}!`
   }
 
   console.log(message)
