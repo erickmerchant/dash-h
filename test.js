@@ -6,243 +6,187 @@ const proxyquire = require('proxyquire').noPreserveCache()
 test('test ./parse.js', (t) => {
   const parse = require('./parse.js')
 
-  t.plan(18)
+  t.plan(15)
 
-  // test dashdash and parameter
+  // test dashdash and positional option
   t.deepEquals({test: '-a'}, parse(['--', '-a'], {
-    options: [],
-    parameters: [{
-      name: 'test'
-    }]
+    signature: ['test'],
+    options: {
+      test: {parameter: true}
+    }
   }))
 
-  // test dashdash and parameter with type
-  t.deepEquals({test: 123}, parse(['--', '123'], {
-    options: [],
-    parameters: [{
-      type(val) { return Number(val) },
-      name: 'test'
-    }]
-  }))
-
-  // test non-required parameter
+  // test non-required positional option
   t.deepEquals({}, parse([], {
-    options: [],
-    parameters: [{
-      name: 'test'
-    }]
+    signature: ['test'],
+    options: {
+      test: {parameter: true}
+    }
   }))
 
   // test empty
-  t.deepEquals({}, parse([''], {options: [], parameters: []}))
+  t.deepEquals({}, parse([''], {
+    signature: [],
+    options: {}
+  }))
 
   // test short
-  t.deepEquals({aaA: true}, parse(['-a'], {
-    parameters: [],
-    options: [{
-      name: 'aa-a',
-      alias: 'a'
-    }]
+  t.deepEquals({aaa: true}, parse(['-a'], {
+    signature: [],
+    options: {
+      aaa: {},
+      a: 'aaa'
+    }
   }))
 
   // test short with value
-  t.deepEquals({aaA: 'bcd'}, parse(['-a=bcd'], {
-    parameters: [],
-    options: [{
-      type(val) { return val },
-      name: 'aa-a',
-      alias: 'a'
-    }]
+  t.deepEquals({aaa: 'bcd'}, parse(['-a=bcd'], {
+    signature: [],
+    options: {
+      aaa: {
+        parameter: true
+      },
+      a: 'aaa'
+    }
   }))
 
   // test multiple short with value
-  t.deepEquals({aaA: 'bcd', b: true}, parse(['-ba=bcd'], {
-    parameters: [],
-    options: [{
-      type(val) { return val },
-      name: 'aa-a',
-      alias: 'a'
-    },
-    {
-      name: 'b'
-    }]
+  t.deepEquals({aaa: 'bcd', b: true}, parse(['-ba=bcd'], {
+    signature: [],
+    options: {
+      aaa: {
+        parameter: true
+      },
+      a: 'aaa',
+      b: {}
+    }
   }))
 
   // test multiple short
-  t.deepEquals({aaA: true, b: true}, parse(['-ba'], {
-    parameters: [],
-    options: [{
-      name: 'aa-a',
-      alias: 'a'
-    },
-    {
-      name: 'b'
-    }]
+  t.deepEquals({aaa: true, b: true}, parse(['-ba'], {
+    signature: [],
+    options: {
+      aaa: {},
+      a: 'aaa',
+      b: {}
+    }
   }))
 
   // test multiple, ---, and -
-  t.deepEquals({aaA: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
-    parameters: [],
-    options: [{
-      type(val) { return val },
-      name: 'aa-a',
-      multiple: true,
-      alias: 'a'
-    }]
+  t.deepEquals({aaa: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
+    signature: [],
+    options: {
+      aaa: {
+        parameter: true,
+        multiple: true
+      },
+      a: 'aaa'
+    }
   }))
 
   // test empty with equals
-  t.deepEquals({aaA: ''}, parse(['--aa-a='], {
-    parameters: [],
-    options: [{
-      type(val) { return val },
-      name: 'aa-a',
-      alias: 'a'
-    }]
+  t.deepEquals({aaa: ''}, parse(['--aaa='], {
+    signature: [],
+    options: {
+      aaa: {
+        parameter: true
+      },
+      a: 'aaa'
+    }
   }))
 
   // test default
-  t.deepEquals({aaA: ''}, parse([''], {
-    parameters: [],
-    options: [{
-      name: 'aa-a',
-      alias: 'a',
-      type(val) {
-        if (val == null) {
-          return ''
-        }
-
-        return String(val)
-      }
-    }]
+  t.deepEquals({aaa: ''}, parse([''], {
+    signature: [],
+    options: {
+      aaa: {
+        default: '',
+        parameter: true
+      },
+      a: 'aaa'
+    }
   }))
 
   // test default flag
-  t.deepEquals({aaA: false}, parse([''], {
-    parameters: [],
-    options: [{
-      name: 'aa-a',
-      alias: 'a'
-    }]
+  t.deepEquals({aaa: false}, parse([''], {
+    signature: [],
+    options: {
+      aaa: {
+        default: ''
+      },
+      a: 'aaa'
+    }
   }))
 
-  // test default parameter
+  // test default positional option
   t.deepEquals({0: 'testing', 1: 'yes'}, parse(['testing'], {
-    options: [],
-    parameters: [{
-      name: '0'
-    },
-    {
-      name: '1',
-      type(val) {
-        if (val == null) {
-          return 'yes'
-        }
-
-        return String(val)
+    signature: ['0', '1'],
+    options: {
+      0: {parameter: true},
+      1: {
+        parameter: true,
+        default: 'yes'
       }
-    }]
+    }
   }))
 
   // test multiple param beginning
   t.deepEquals(
-    {test0: [1, 2, 3, 4, 5, 6, 7], test1: 8, test2: 9},
+    {test0: ['1', '2', '3', '4', '5', '6', '7'], test1: '8', test2: '9'},
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
-      options: [],
-      parameters: [{
-        type(val) { return val.map((v) => Number(v)) },
-        name: 'test0',
-        multiple: true
-      },
-      {
-        type(val) { return Number(val) },
-        name: 'test1'
-      },
-      {
-        type(val) { return Number(val) },
-        name: 'test2'
-      }]
+      signature: ['test0', 'test1', 'test2'],
+      options: {
+        test0: {
+          multiple: true,
+          parameter: true
+        },
+        test1: {
+          parameter: true
+        },
+        test2: {
+          parameter: true
+        }
+      }
     })
   )
 
-  // test multiple param middle. No type
+  // test multiple param middle
   t.deepEquals(
-    {test0: 1, test1: ['2', '3', '4', '5', '6', '7', '8'], test2: 9},
+    {test0: '1', test1: ['2', '3', '4', '5', '6', '7', '8'], test2: '9'},
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
-      options: [],
-      parameters: [{
-        type(val) { return Number(val) },
-        name: 'test0'
-      },
-      {
-        name: 'test1',
-        multiple: true
-      },
-      {
-        type(val) { return Number(val) },
-        name: 'test2'
-      }]
+      signature: ['test0', 'test1', 'test2'],
+      options: {
+        test0: {
+          parameter: true
+        },
+        test1: {
+          multiple: true,
+          parameter: true
+        },
+        test2: {
+          parameter: true
+        }
+      }
     })
   )
 
   // test multiple param end
   t.deepEquals(
-    {test0: 1, test1: 2, test2: [3, 4, 5, 6, 7, 8, 9]},
+    {test0: '1', test1: '2', test2: ['3', '4', '5', '6', '7', '8', '9']},
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
-      options: [],
-      parameters: [{
-        type(val) { return Number(val) },
-        name: 'test0'
-      },
-      {
-        type(val) { return Number(val) },
-        name: 'test1'
-      },
-      {
-        type(val) { return val.map((v) => Number(v)) },
-        name: 'test2',
-        multiple: true
-      }]
-    })
-  )
-
-  const DEFAULT = Symbol('DEFAULT')
-
-  const FN_DEFAULT = (val) => {
-    if (val == null) {
-      return DEFAULT
-    }
-
-    return String(val)
-  }
-
-  // test default with type
-  t.deepEquals(
-    {testOption: DEFAULT, testParameter: DEFAULT},
-    parse([], {
-      options: [{
-        name: 'test-option',
-        type: FN_DEFAULT
-      }],
-      parameters: [{
-        name: 'test-parameter',
-        type: FN_DEFAULT
-      }]
-    })
-  )
-
-  // test camel-casing
-  t.deepEquals(
-    {testOption: 'a string', testParameter: 'another string'},
-    parse(['--test-option', 'a string', 'another string'], {
-      options: [{
-        name: 'test-option',
-        type(val) { return val }
-      }],
-      parameters: [{
-        name: 'test-parameter',
-        type(val) { return val }
-      }]
+      signature: ['test0', 'test1', 'test2'],
+      options: {
+        test0: {
+          parameter: true
+        },
+        test1: {
+          parameter: true
+        },
+        test2: {
+          multiple: true,
+          parameter: true
+        }
+      }
     })
   )
 })
@@ -269,80 +213,65 @@ test('test ./parse.js - with errors', (t) => {
 
   // test non-boolean with value
   parse(['-a'], {
-    parameters: [],
-    options: [{
-      name: 'aa-a',
-      alias: 'a',
-      type(val) { return val },
-      multiple: true
-    }]
+    signature: [],
+    options: {
+      aaa: {
+        parameter: true,
+        multiple: true
+      },
+      a: 'aaa'
+    }
   })
 
   // test boolean with value
   parse(['-a=abc'], {
-    parameters: [],
-    options: [{
-      name: 'a'
-    }]
+    signature: [],
+    options: {a: {}}
   })
 
   // test boolean with value
   parse(['--aaa=abc'], {
-    parameters: [],
-    options: [{
-      name: 'aaa'
-    }]
+    signature: [],
+    options: {aaa: {}}
   })
 
   // test unknown
-  parse(['-a'], {options: [], parameters: []})
+  parse(['-a'], {signature: [], options: {}})
 
   // test unknown
-  parse(['--aaa'], {options: [], parameters: []})
+  parse(['--aaa'], {signature: [], options: {}})
 
   // test required
   parse([''], {
-    parameters: [],
-    options: [{
-      name: 'a',
-      required: true
-    }]
+    signature: [],
+    options: {a: {required: true}}
   })
 
   // test required
   parse([''], {
-    parameters: [],
-    options: [{
-      name: 'aaa',
-      required: true
-    }]
+    signature: [],
+    options: {aaa: {required: true}}
   })
 
   // test non multiple multiple
   parse(['--aaa=123', '--aaa=456'], {
-    parameters: [],
-    options: [{
-      type(val) { return Number(val) },
-      name: 'aaa'
-    }]
+    signature: [],
+    options: {aaa: {parameter: true}}
   })
 
   // test required parameter
   parse([], {
-    options: [],
-    parameters: [{
-      name: 'test',
-      required: true
-    }]
+    signature: ['test'],
+    options: {test: {required: true}}
   })
 
   // test too many arguments
-  parse(['--', '-a'], {options: [], parameters: []})
+  parse(['--', '-a'], {signature: [], options: {}})
 
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
-    red('-a is not a boolean and requires a value'),
+    red('--aaa is not a boolean and requires a value'),
     red('-a is a boolean and does not accept a value'),
     red('--aaa is a boolean and does not accept a value'),
     red('unknown option -a'),
@@ -350,7 +279,7 @@ test('test ./parse.js - with errors', (t) => {
     red('-a is required'),
     red('--aaa is required'),
     red('--aaa does not accept multiple values'),
-    red('test is required'),
+    red('--test is required'),
     red('too many arguments')
   ], messages)
 })
@@ -373,90 +302,86 @@ test('test ./help.js', (t) => {
     './src/globals.js': globals
   })
 
-  help('testing.js', ['test-command'], '', {
-    parameters: [
-      {
-        name: 'p0',
+  help('testing.js', {
+    name: 'test-command',
+    description: '',
+    signature: ['p0', 'p1'],
+    options: {
+      p0: {
         description: 'the description',
-        required: true
+        required: true,
+        parameter: true
       },
-      {
-        name: 'p1',
+      p1: {
         multiple: true,
-        type(val) {
-          if (val == null) {
-            return ['a', 'b']
-          }
-
-          return val
-        }
-      }
-    ],
-    options: [
-      {
-        name: 'aaa',
-        alias: 'a',
+        parameter: true,
+        default: ['a', 'b']
+      },
+      aaa: {
         multiple: true,
         description: 'a Boolean'
       },
-      {
-        name: 'bbb',
-        alias: 'b',
+      a: 'aaa',
+      bbb: {
         required: true,
         description: 'a Number',
-        type(val) {
-          if (val == null) {
-            return 100
-          }
-
-          return Number(val)
-        }
-      }
-    ],
+        parameter: true,
+        default: 100
+      },
+      b: 'bbb'
+    },
     commands: []
   })
 
-  help('testing.js', ['test-command'], 'a test command', {
-    parameters: [{
-      name: 'p0',
-      description: 'the description',
-      required: true
-    }],
-    options: [{
-      name: 'aaa',
-      alias: 'a',
-      description: 'a Boolean'
-    }],
+  help('testing.js', {
+    name: 'test-command',
+    description: 'a test command',
+    signature: ['p0'],
+    options: {
+      p0: {
+        description: 'the description',
+        required: true,
+        parameter: true
+      },
+      aaa: {
+        description: 'a Boolean'
+      },
+      a: 'aaa'
+    },
     commands: [
       {
-        command: ['test-command', 'sub'],
+        name: 'test-command:sub',
         description: 'a sub command',
-        parameters: [{
-          name: 'p1',
-          description: 'the description',
-          required: true
-        }],
-        options: [{
-          name: 'bbb',
-          alias: 'b',
-          description: 'a Boolean'
-        }]
+        signature: ['p1'],
+        options: {
+          p1: {
+            description: 'the description',
+            required: true
+          },
+          bbb: {
+            description: 'a Boolean'
+          },
+          b: 'bbb'
+        }
       }
     ]
   })
 
-  help('testing.js', ['test-command'], 'a test command', {
-    options: [{
-      name: 'aaa',
-      alias: 'a',
-      multiple: true,
-      description: 'a Boolean'
-    }],
-    parameters: [],
+  help('testing.js', {
+    name: 'test-command',
+    description: 'a test command',
+    signature: [],
+    options: {
+      aaa: {
+        multiple: true,
+        description: 'a Boolean'
+      },
+      a: 'aaa'
+    },
     commands: []
   })
 
-  help('testing.js', ['test-command'], 'a test command'.split(' ').join('\n'), {options: [], parameters: [], commands: []})
+  help('testing.js', {name: 'test-command', description: 'a test command'.split(' ').join('\n'), signature: [], options: {}, commands: []})
 
   t.plan(2)
 
@@ -464,39 +389,33 @@ test('test ./help.js', (t) => {
 
   t.deepEquals([
     outdent`
-    ${green('Usage:')} testing.js test-command [-a]... (-b <bbb>) <p0> [<p1>]...
-
-    ${green('Parameters:')}
-
-     <p0>             the description
-     <p1>             [default: ["a","b"]]
+    ${green('Usage:')} testing.js test-command --bbb <bbb> <p0> [<p1>]...
 
     ${green('Options:')}
 
+     [--p0] <p0>      the description
+     [--p1] <p1>      [default: ["a","b"]]
      -a, --aaa        a Boolean
      -b, --bbb <bbb>  a Number [default: 100]
     `,
     outdent`
     ${green('Description:')} a test command
 
-    ${green('Usage:')} testing.js test-command [-a] <p0>
-
-    ${green('Parameters:')}
-
-     <p0>       the description
+    ${green('Usage:')} testing.js test-command <p0>
 
     ${green('Options:')}
 
-     -a, --aaa  a Boolean
+     [--p0] <p0>  the description
+     -a, --aaa    a Boolean
 
     ${green('Commands:')}
 
-     testing.js test-command sub [-b] <p1>
+     testing.js test-command:sub <p1>
     `,
     outdent`
     ${green('Description:')} a test command
 
-    ${green('Usage:')} testing.js test-command [-a]...
+    ${green('Usage:')} testing.js test-command
 
     ${green('Options:')}
 
@@ -567,21 +486,33 @@ test('test ./command.js - no help. no errors', (t) => {
     t.deepEquals([], argv)
 
     t.deepEquals({
-      options: [
-        {
-          name: 'bbb',
+      signature: ['aaa'],
+      options: {
+        aaa: {
+          description: '',
+          multiple: false,
+          required: false,
+          parameter: false,
+          default: null,
           testing: true
         },
-        {
-          name: 'help',
-          alias: 'h',
-          description: 'get help'
-        }
-      ],
-      parameters: [{
-        name: 'aaa',
-        testing: true
-      }]
+        bbb: {
+          description: '',
+          multiple: false,
+          required: false,
+          parameter: false,
+          default: null,
+          testing: true
+        },
+        help: {
+          description: 'get help',
+          multiple: false,
+          required: false,
+          parameter: false,
+          default: null
+        },
+        h: 'help'
+      }
     }, definitions)
 
     return {}
@@ -594,18 +525,18 @@ test('test ./command.js - no help. no errors', (t) => {
 
   t.plan(3)
 
-  command(['test-command'], ({option, parameter}) => {
-    parameter({
-      name: 'aaa',
-      testing: true
-    })
-
-    option({
-      name: 'bbb',
-      testing: true
-    })
-
-    return () => {
+  command({
+    name: 'test-command',
+    signature: ['aaa'],
+    options: {
+      aaa: {
+        testing: true
+      },
+      bbb: {
+        testing: true
+      }
+    },
+    action() {
       t.ok(true)
     }
   })
@@ -620,26 +551,38 @@ test('test ./command.js - help', (t) => {
     }
   }
 
-  const mockedHelp = (name, command, description, definitions) => {
-    t.deepEquals(['test-command'], command)
-
+  const mockedHelp = (prefix, definitions) => {
     t.deepEquals({
-      options: [
-        {
-          name: 'bbb',
+      commands: [],
+      name: 'test-command',
+      description: '',
+      signature: ['aaa'],
+      options: {
+        aaa: {
+          description: '',
+          multiple: false,
+          required: false,
+          parameter: false,
+          default: null,
           testing: true
         },
-        {
-          name: 'help',
-          alias: 'h',
-          description: 'get help'
-        }
-      ],
-      parameters: [{
-        name: 'aaa',
-        testing: true
-      }],
-      commands: []
+        bbb: {
+          description: '',
+          multiple: false,
+          required: false,
+          parameter: false,
+          default: null,
+          testing: true
+        },
+        help: {
+          description: 'get help',
+          multiple: false,
+          required: false,
+          parameter: false,
+          default: null
+        },
+        h: 'help'
+      }
     }, definitions)
   }
 
@@ -648,20 +591,20 @@ test('test ./command.js - help', (t) => {
     './help.js': mockedHelp
   })('test')
 
-  t.plan(2)
+  t.plan(1)
 
-  command(['test-command'], ({parameter, option}) => {
-    parameter({
-      name: 'aaa',
-      testing: true
-    })
-
-    option({
-      name: 'bbb',
-      testing: true
-    })
-
-    return () => {}
+  command({
+    name: 'test-command',
+    signature: ['aaa'],
+    options: {
+      aaa: {
+        testing: true
+      },
+      bbb: {
+        testing: true
+      }
+    },
+    action() {}
   })
 
   start(['test-command'])
@@ -684,8 +627,11 @@ test('test ./command.js - thrown error', (t) => {
 
   t.plan(1)
 
-  command(['test-command'], () => () => {
-    throw ourError
+  command({
+    name: 'test-command',
+    action() {
+      throw ourError
+    }
   })
 
   start(['test-command'])
@@ -708,8 +654,11 @@ test('test ./command.js - rejected promise', (t) => {
 
   t.plan(1)
 
-  command(['test-command'], () => async () => {
-    throw ourError
+  command({
+    name: 'test-command',
+    async action() {
+      throw ourError
+    }
   })
 
   start(['test-command'])
@@ -723,16 +672,24 @@ test('test ./command.js - sub commands', (t) => {
 
   t.plan(2)
 
-  command(() => () => {
-    t.ok(false)
+  command({
+    action() {
+      t.ok(false)
+    }
   })
 
-  command(['sub-command'], () => () => {
-    t.ok(true)
+  command({
+    name: 'sub-command',
+    action() {
+      t.ok(true)
+    }
   })
 
-  command(['sub-command-b'], () => () => {
-    t.ok(true)
+  command({
+    name: 'sub-command-b',
+    action() {
+      t.ok(true)
+    }
   })
 
   start(['sub-command'])

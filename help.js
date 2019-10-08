@@ -1,65 +1,76 @@
 const {green} = require('kleur')
 const {console, process} = require('./src/globals.js')
-const {addDashes, longest, spaces} = require('./src/helpers.js')
+const {addDashes, spaces, resolveProperty} = require('./src/helpers.js')
 
-const getUsage = (name, command, {options, parameters}) => {
-  const usage = ['', [name].concat(command).join(' ')]
+const getUsage = (prefix, command) => {
+  const usage = ['', `${prefix} ${command.name}`]
 
-  if (options && options.length) {
-    usage.push(...options.map((definition) => {
-      const valPart = definition.type != null
-        ? ` <${definition.name}>`
+  if (command.options) {
+    usage.push(...Object.keys(command.options).map((key) => {
+      const definition = command.options[key]
+
+      if (typeof definition !== 'object' || !definition.required || command.signature.reduce((acc, k) => (acc ? acc : resolveProperty(command.options, k) === key), false)) {
+        return null
+      }
+
+      const valPart = definition.parameter
+        ? ` <${key}>`
         : ''
 
-      return wrapUsage(addDashes(definition.alias != null ? definition.alias : definition.name) + valPart, definition)
-    }))
+      return wrapUsage(addDashes(key) + valPart, definition)
+    }).filter((result) => result != null))
   }
 
-  if (parameters && parameters.length) {
-    usage.push(...parameters.map((definition) => wrapUsage(`<${definition.name}>`, definition)))
+  if (command.signature.length) {
+    usage.push(...command.signature.map((key) => {
+      const property = resolveProperty(command.options, key)
+      const definition = command.options[property]
+
+      return wrapUsage(`<${key}>`, definition)
+    }))
   }
 
   return usage.join(' ')
 }
 
 const wrapUsage = (usage, {required, multiple}) => {
-  const opt = usage.startsWith('-')
-
   let result = usage
 
   if (!required) {
     result = `[${result}]`
-  } else if (opt) {
-    result = `(${result})`
   }
 
   return multiple === true ? `${result}...` : result
 }
 
-const getOptionSignature = (definition) => {
-  const val = definition.type != null
-    ? ` <${definition.name}>`
-    : ''
-  let signature = addDashes(definition.name) + val
+const getOptionUsage = (property, {options, signature}) => {
+  const definition = options[property]
 
-  if (definition.alias != null) {
-    signature = `${addDashes(definition.alias)}, ${signature}`
+  const val = definition.parameter
+    ? ` <${property}>`
+    : ''
+  let usage = (signature.reduce((acc, k) => (acc ? acc : resolveProperty(options, k) === property), false) ? `[${addDashes(property)}]` : addDashes(property)) + val
+
+  for (const alias of Object.keys(options)) {
+    if (options[alias] !== property) continue
+
+    usage = `${signature.reduce((acc, k) => (acc ? acc : resolveProperty(options, k) === property), false) ? `[${addDashes(alias)}]` : addDashes(alias)}, ${usage}`
   }
 
-  return signature
+  return usage
 }
 
-const commandList = (name, commands) => {
+const commandList = (prefix, commands) => {
   const lines = []
 
   for (const command of commands) {
-    lines.push(getUsage(name, command.command, command))
+    lines.push(getUsage(prefix, command))
   }
 
   return lines
 }
 
-module.exports = (name, command, description, {options, parameters, commands}) => {
+module.exports = (prefix, {description, name, signature, options, commands}) => {
   process.exitCode = 1
   const lines = []
 
@@ -74,60 +85,49 @@ module.exports = (name, command, description, {options, parameters, commands}) =
     }
   }
 
-  lines.push('', `${green('Usage:')}${getUsage(name, command, {options, parameters})}`)
+  lines.push('', `${green('Usage:')}${getUsage(prefix, {name, signature, options})}`)
 
-  const longestArg = longest([
-    ...parameters.map((definition) => `<${definition.name}>`),
-    ...options.map((definition) => getOptionSignature(definition))
-  ])
-
-  if (parameters.length) {
-    lines.push('', green('Parameters:'), '')
-
-    for (const definition of parameters) {
-      let line = ` <${definition.name}>${spaces(longestArg - definition.name.length - 2)}  `
-
-      if (definition.description) {
-        line += `${definition.description} `
-      }
-
-      if (definition.type != null) {
-        const _default = definition.type()
-
-        if (_default != null) {
-          line += `[default: ${JSON.stringify(_default)}]`
-        }
-      }
-
-      lines.push(line.trimRight())
-    }
-  }
-
-  if (options.length) {
+  if (Object.keys(options).length) {
     lines.push('', green('Options:'), '')
 
-    for (const definition of options) {
-      const signature = getOptionSignature(definition)
-      let line = ` ${signature + spaces(longestArg - signature.length)}  `
+    const optionLines = []
+    let longest = 0
 
-      if (definition.description) {
-        line += `${definition.description} `
+    for (const key of Object.keys(options)) {
+      const property = resolveProperty(options, key)
+
+      if (property !== key) continue
+
+      const definition = options[property]
+
+      const usage = getOptionUsage(property, {options, signature})
+
+      if (usage.length > longest) {
+        longest = usage.length
       }
 
-      if (definition.type != null) {
-        const _default = definition.type()
+      const line = [usage]
 
-        if (_default != null) {
-          line += `[default: ${JSON.stringify(_default)}]`
+      if (definition.description) {
+        line.push(`${definition.description} `)
+      }
+
+      if (definition.parameter) {
+        if (definition.default != null) {
+          line.push(`[default: ${JSON.stringify(definition.default)}]`)
         }
       }
 
-      lines.push(line.trimRight())
+      optionLines.push(line)
+    }
+
+    for (const optionLine of optionLines) {
+      lines.push(` ${optionLine[0]}  ${spaces(longest - optionLine[0].length)}${optionLine.slice(1).join('').trim()}`)
     }
   }
 
   if (commands.length) {
-    lines.push('', green('Commands:'), '', ...commandList(name, commands))
+    lines.push('', green('Commands:'), '', ...commandList(prefix, commands))
   }
 
   lines.push('')
