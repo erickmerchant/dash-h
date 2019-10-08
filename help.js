@@ -1,33 +1,34 @@
 const {green} = require('kleur')
 const {console, process} = require('./src/globals.js')
-const {addDashes, spaces, resolveProperty} = require('./src/helpers.js')
+const {addDashes, resolveProperty} = require('./src/helpers.js')
 
 const getUsage = (prefix, command) => {
   const usage = ['', `${prefix} ${command.name}`]
+  const resolvedSignature = command.signature.map((key) => resolveProperty(command.options, key))
 
   if (command.options) {
-    usage.push(...Object.keys(command.options).map((key) => {
+    for (const key of Object.keys(command.options)) {
       const definition = command.options[key]
 
-      if (typeof definition !== 'object' || !definition.required || command.signature.reduce((acc, k) => (acc ? acc : resolveProperty(command.options, k) === key), false)) {
-        return null
+      if (typeof definition !== 'object' || !definition.required || resolvedSignature.includes(key)) {
+        continue
       }
 
       const valPart = definition.parameter
         ? ` <${key}>`
         : ''
 
-      return wrapUsage(addDashes(key) + valPart, definition)
-    }).filter((result) => result != null))
+      usage.push(wrapUsage(addDashes(key) + valPart, definition))
+    }
   }
 
   if (command.signature.length) {
-    usage.push(...command.signature.map((key) => {
+    for (const key of command.signature) {
       const property = resolveProperty(command.options, key)
       const definition = command.options[property]
 
-      return wrapUsage(`<${key}>`, definition)
-    }))
+      usage.push(wrapUsage(`<${key}>`, definition))
+    }
   }
 
   return usage.join(' ')
@@ -43,18 +44,18 @@ const wrapUsage = (usage, {required, multiple}) => {
   return multiple === true ? `${result}...` : result
 }
 
-const getOptionUsage = (property, {options, signature}) => {
+const getOptionUsage = (property, inSignature, {options, signature}) => {
   const definition = options[property]
 
   const val = definition.parameter
     ? ` <${property}>`
     : ''
-  let usage = (signature.reduce((acc, k) => (acc ? acc : resolveProperty(options, k) === property), false) ? `[${addDashes(property)}]` : addDashes(property)) + val
+  let usage = (inSignature ? `[${addDashes(property)}]` : addDashes(property)) + val
 
   for (const alias of Object.keys(options)) {
     if (options[alias] !== property) continue
 
-    usage = `${signature.reduce((acc, k) => (acc ? acc : resolveProperty(options, k) === property), false) ? `[${addDashes(alias)}]` : addDashes(alias)}, ${usage}`
+    usage = `${inSignature ? `[${addDashes(alias)}]` : addDashes(alias)}, ${usage}`
   }
 
   return usage
@@ -92,6 +93,7 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
 
     const optionLines = []
     let longest = 0
+    const resolvedSignature = signature.map((key) => resolveProperty(options, key))
 
     for (const key of Object.keys(options)) {
       const property = resolveProperty(options, key)
@@ -100,7 +102,9 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
 
       const definition = options[property]
 
-      const usage = getOptionUsage(property, {options, signature})
+      const inSignature = resolvedSignature.includes(property)
+
+      const usage = getOptionUsage(property, inSignature, {options, signature})
 
       if (usage.length > longest) {
         longest = usage.length
@@ -122,7 +126,7 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
     }
 
     for (const optionLine of optionLines) {
-      lines.push(` ${optionLine[0]}  ${spaces(longest - optionLine[0].length)}${optionLine.slice(1).join('').trim()}`)
+      lines.push(` ${optionLine[0]}  ${' '.repeat(longest - optionLine[0].length)}${optionLine.slice(1).join('').trim()}`)
     }
   }
 

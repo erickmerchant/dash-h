@@ -38,6 +38,8 @@ module.exports = (argv, {signature, options}) => {
 
     let i = -1
 
+    const resolvedSignature = signature.map((key) => resolveProperty(options, key))
+
     while (++i < argv.length) {
       for (const key of Object.keys(options)) {
         const property = resolveProperty(options, key)
@@ -93,7 +95,7 @@ module.exports = (argv, {signature, options}) => {
           if (definition.parameter) {
             if (definition.default != null) {
               args[property] = definition.default
-            } else if (definition.required && !signature.reduce((acc, k) => (acc ? acc : resolveProperty(options, k) === property), false)) {
+            } else if (definition.required && !resolvedSignature.includes(property)) {
               throw Error(`${addDashes(property)} is required`)
             }
           } else if (definition.required !== true) {

@@ -42,15 +42,17 @@ module.exports = (prefix) => {
       commands.unshift(definition)
     },
     async start(argv) {
-      let command = commands.reduce((acc, command) => {
-        if (acc != null && acc.name !== '') return acc
+      let command
 
-        if (command.name === argv[0] || command.name === '') {
-          return command
+      for (const definition of commands) {
+        if (definition.name === argv[0] || definition.name === '') {
+          command = definition
+
+          if (command.name !== '') {
+            break
+          }
         }
-
-        return acc
-      }, null)
+      }
 
       if (command == null) {
         command = defaultCommand
