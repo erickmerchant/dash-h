@@ -41,7 +41,7 @@ const wrapUsage = (usage, {required, multiple}) => {
     result = `[${result}]`
   }
 
-  return multiple === true ? `${result}...` : result
+  return multiple ? `${result}...` : result
 }
 
 const getOptionUsage = (property, inSignature, {options, signature}) => {

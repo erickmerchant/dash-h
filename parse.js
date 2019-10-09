@@ -90,7 +90,7 @@ module.exports = (argv, {signature, options}) => {
 
       const definition = options[property]
 
-      if (args.help !== true) {
+      if (!args.help) {
         if (args[property] == null) {
           if (definition.parameter) {
             if (definition.default != null) {
@@ -98,7 +98,7 @@ module.exports = (argv, {signature, options}) => {
             } else if (definition.required && !resolvedSignature.includes(property)) {
               throw Error(`${addDashes(property)} is required`)
             }
-          } else if (definition.required !== true) {
+          } else if (!definition.required) {
             args[property] = false
           } else if (definition.required) {
             throw Error(`${addDashes(property)} is required`)
@@ -135,10 +135,10 @@ module.exports = (argv, {signature, options}) => {
         if (definition.parameter) {
           if (definition.default != null) {
             args[property] = definition.default
-          } else if (definition.required && args.help !== true) {
+          } else if (definition.required && !args.help) {
             throw Error(`${addDashes(property)} is required`)
           }
-        } else if (definition.required && args.help !== true) {
+        } else if (definition.required && !args.help) {
           throw Error(`${addDashes(property)} is required`)
         }
       } else if (definition.multiple) {
