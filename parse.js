@@ -143,8 +143,6 @@ module.exports = (argv, {signature, options}) => {
         }
       } else if (definition.multiple) {
         args[property] = remainder.splice(0, remainder.length - remainingNames)
-      } else if (definition.parameter) {
-        args[property] = remainder.shift()
       } else {
         args[property] = remainder.shift()
       }

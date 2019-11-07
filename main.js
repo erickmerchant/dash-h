@@ -58,7 +58,7 @@ module.exports = (prefix) => {
         command = defaultCommand
       }
 
-      const subCommands = command.name === '' && commands.length > 1 ? commands : []
+      const subCommands = command.name === '' ? commands : []
 
       try {
         const args = parse(command.name === '' ? argv : argv.slice(1), {signature: command.signature, options: command.options})

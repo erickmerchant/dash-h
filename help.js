@@ -6,29 +6,25 @@ const getUsage = (prefix, command) => {
   const usage = ['', `${prefix} ${command.name}`]
   const resolvedSignature = command.signature.map((key) => resolveProperty(command.options, key))
 
-  if (command.options) {
-    for (const key of Object.keys(command.options)) {
-      const definition = command.options[key]
+  for (const key of Object.keys(command.options)) {
+    const definition = command.options[key]
 
-      if (typeof definition !== 'object' || !definition.required || resolvedSignature.includes(key)) {
-        continue
-      }
-
-      const valPart = definition.parameter
-        ? ` <${key}>`
-        : ''
-
-      usage.push(wrapUsage(addDashes(key) + valPart, definition))
+    if (typeof definition !== 'object' || !definition.required || resolvedSignature.includes(key)) {
+      continue
     }
+
+    const valPart = definition.parameter
+      ? ` <${key}>`
+      : ''
+
+    usage.push(wrapUsage(addDashes(key) + valPart, definition))
   }
 
-  if (command.signature.length) {
-    for (const key of command.signature) {
-      const property = resolveProperty(command.options, key)
-      const definition = command.options[property]
+  for (const key of command.signature) {
+    const property = resolveProperty(command.options, key)
+    const definition = command.options[property]
 
-      usage.push(wrapUsage(`<${key}>`, definition))
-    }
+    usage.push(wrapUsage(`<${key}>`, definition))
   }
 
   return usage.join(' ')
@@ -42,33 +38,6 @@ const wrapUsage = (usage, {required, multiple}) => {
   }
 
   return multiple ? `${result}...` : result
-}
-
-const getOptionUsage = (property, inSignature, {options, signature}) => {
-  const definition = options[property]
-
-  const val = definition.parameter
-    ? ` <${property}>`
-    : ''
-  let usage = (inSignature ? `[${addDashes(property)}]` : addDashes(property)) + val
-
-  for (const alias of Object.keys(options)) {
-    if (options[alias] !== property) continue
-
-    usage = `${inSignature ? `[${addDashes(alias)}]` : addDashes(alias)}, ${usage}`
-  }
-
-  return usage
-}
-
-const commandList = (prefix, commands) => {
-  const lines = []
-
-  for (const command of commands) {
-    lines.push(getUsage(prefix, command))
-  }
-
-  return lines
 }
 
 module.exports = (prefix, {description, name, signature, options, commands}) => {
@@ -104,7 +73,16 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
 
       const inSignature = resolvedSignature.includes(property)
 
-      const usage = getOptionUsage(property, inSignature, {options, signature})
+      const val = definition.parameter
+        ? ` <${property}>`
+        : ''
+      let usage = (inSignature ? `[${addDashes(property)}]` : addDashes(property)) + val
+
+      for (const alias of Object.keys(options)) {
+        if (options[alias] !== property) continue
+
+        usage = `${inSignature ? `[${addDashes(alias)}]` : addDashes(alias)}, ${usage}`
+      }
 
       if (usage.length > longest) {
         longest = usage.length
@@ -116,10 +94,8 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
         line.push(`${definition.description} `)
       }
 
-      if (definition.parameter) {
-        if (definition.default != null) {
-          line.push(`[default: ${JSON.stringify(definition.default)}]`)
-        }
+      if (definition.parameter && definition.default != null) {
+        line.push(`[default: ${JSON.stringify(definition.default)}]`)
       }
 
       optionLines.push(line)
@@ -131,7 +107,11 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
   }
 
   if (commands.length) {
-    lines.push('', green('Commands:'), '', ...commandList(prefix, commands))
+    lines.push('', green('Commands:'), '')
+
+    for (const command of commands) {
+      lines.push(getUsage(prefix, command))
+    }
   }
 
   lines.push('')
