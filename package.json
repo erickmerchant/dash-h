@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/erickmerchant/sergeant#README",
   "devDependencies": {
-    "@erickmerchant/lint": "^3.3.0",
+    "@erickmerchant/lint": "^3.4.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.7.1",
     "outdent": "^0.7.0",
