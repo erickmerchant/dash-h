@@ -6,9 +6,7 @@ const getUsage = (prefix, command) => {
   const usage = ['', `${prefix} ${command.name}`]
   const resolvedSignature = command.signature.map((key) => resolveProperty(command.options, key))
 
-  for (const key of Object.keys(command.options)) {
-    const definition = command.options[key]
-
+  for (const [key, definition] of Object.entries(command.options)) {
     if (typeof definition !== 'object' || !definition.required || resolvedSignature.includes(key)) {
       continue
     }
@@ -64,12 +62,10 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
     let longest = 0
     const resolvedSignature = signature.map((key) => resolveProperty(options, key))
 
-    for (const key of Object.keys(options)) {
+    for (const [key, definition] of Object.entries(options)) {
       const property = resolveProperty(options, key)
 
       if (property !== key) continue
-
-      const definition = options[property]
 
       const inSignature = resolvedSignature.includes(property)
 
@@ -78,10 +74,10 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
         : ''
       let usage = (inSignature ? `[${addDashes(property)}]` : addDashes(property)) + val
 
-      for (const alias of Object.keys(options)) {
-        if (options[alias] !== property) continue
+      for (const [key, alias] of Object.entries(options)) {
+        if (alias !== property) continue
 
-        usage = `${inSignature ? `[${addDashes(alias)}]` : addDashes(alias)}, ${usage}`
+        usage = `${inSignature ? `[${addDashes(key)}]` : addDashes(key)}, ${usage}`
       }
 
       if (usage.length > longest) {

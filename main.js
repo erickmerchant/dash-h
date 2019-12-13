@@ -31,9 +31,7 @@ module.exports = (prefix) => {
 
       definition.options = {...definition.options, ...helpOptions}
 
-      for (const key of Object.keys(definition.options)) {
-        const option = definition.options[key]
-
+      for (const [key, option] of Object.entries(definition.options)) {
         if (typeof option !== 'object') continue
 
         definition.options[key] = {...defaultOption, ...option}
