@@ -7,6 +7,15 @@
     "pretest": "lint '**/*.js'",
     "test": "tape test.js"
   },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "error.js",
+    "help.js",
+    "main.js",
+    "parse.js",
+    "src/"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://erickmerchant@github.com/erickmerchant/sergeant.git"
