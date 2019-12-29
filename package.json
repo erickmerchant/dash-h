@@ -1,9 +1,29 @@
 {
   "name": "sergeant",
   "version": "27.2.1",
-  "author": "Erick Merchant <erickmerchant@gmail.com>",
+  "homepage": "https://github.com/erickmerchant/sergeant#README",
   "bugs": {
     "url": "https://github.com/erickmerchant/sergeant/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://erickmerchant@github.com/erickmerchant/sergeant.git"
+  },
+  "license": "ISC",
+  "author": "Erick Merchant <erickmerchant@gmail.com>",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "error.js",
+    "help.js",
+    "main.js",
+    "parse.js",
+    "src/"
+  ],
+  "main": "main.js",
+  "scripts": {
+    "pretest": "lint '**/*.js'",
+    "test": "tape test.js"
   },
   "dependencies": {
     "kleur": "^3.0.3"
@@ -18,25 +38,5 @@
   },
   "engines": {
     "node": ">=12"
-  },
-  "files": [
-    "LICENSE",
-    "README.md",
-    "error.js",
-    "help.js",
-    "main.js",
-    "parse.js",
-    "src/"
-  ],
-  "homepage": "https://github.com/erickmerchant/sergeant#README",
-  "license": "ISC",
-  "main": "main.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://erickmerchant@github.com/erickmerchant/sergeant.git"
-  },
-  "scripts": {
-    "pretest": "lint '**/*.js'",
-    "test": "tape test.js"
   }
 }
