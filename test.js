@@ -520,7 +520,7 @@ test('test ./command.js - no help. no errors', (t) => {
 
   const {command, start} = proxyquire('./main.js', {
     './parse.js': mockedParse,
-    './help.js': () => {}
+    './help.js'() {}
   })('test')
 
   t.plan(3)
@@ -620,7 +620,7 @@ test('test ./command.js - thrown error', (t) => {
   const {command, start} = proxyquire('./main.js', {
     './parse.js': mockedParse,
     './error.js': mockedError,
-    './help.js': () => {}
+    './help.js'() {}
   })('test')
 
   const ourError = Error('testing errors')
@@ -647,7 +647,7 @@ test('test ./command.js - rejected promise', (t) => {
   const {command, start} = proxyquire('./main.js', {
     './parse.js': mockedParse,
     './error.js': mockedError,
-    './help.js': () => {}
+    './help.js'() {}
   })('test')
 
   const ourError = Error('testing errors')
@@ -667,7 +667,7 @@ test('test ./command.js - rejected promise', (t) => {
 test('test ./command.js - sub commands', (t) => {
   const {command, start} = proxyquire('./main.js', {
     './parse.js'() { return {} },
-    './help.js': () => {}
+    './help.js'() {}
   })('test')
 
   t.plan(2)
