@@ -18,7 +18,7 @@
     "help.js",
     "main.js",
     "parse.js",
-    "src/"
+    "lib/"
   ],
   "main": "main.js",
   "scripts": {

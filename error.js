@@ -1,5 +1,5 @@
 const {red} = require('kleur')
-const {process, console} = require('./src/globals.js')
+const {process, console} = require('./lib/globals.js')
 
 module.exports = (error) => {
   process.exitCode = 1

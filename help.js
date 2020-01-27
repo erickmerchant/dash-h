@@ -1,6 +1,6 @@
 const {green} = require('kleur')
-const {console, process} = require('./src/globals.js')
-const {addDashes, resolveProperty} = require('./src/helpers.js')
+const {console, process} = require('./lib/globals.js')
+const {addDashes, resolveProperty} = require('./lib/helpers.js')
 
 const getUsage = (prefix, command) => {
   const usage = ['', `${prefix} ${command.name}`]

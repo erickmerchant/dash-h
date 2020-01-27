@@ -206,7 +206,7 @@ test('test ./parse.js - with errors', (t) => {
   }
 
   const parse = proxyquire('./parse.js', {
-    './src/globals.js': globals
+    './lib/globals.js': globals
   })
 
   t.plan(2)
@@ -299,7 +299,7 @@ test('test ./help.js', (t) => {
   }
 
   const help = proxyquire('./help.js', {
-    './src/globals.js': globals
+    './lib/globals.js': globals
   })
 
   help('testing.js', {
@@ -448,7 +448,7 @@ test('test ./error.js', (t) => {
   }
 
   const error = proxyquire('./error.js', {
-    './src/globals.js': globals
+    './lib/globals.js': globals
   })
 
   const error1 = Error('testing errors')
