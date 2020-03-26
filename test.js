@@ -6,8 +6,6 @@ const proxyquire = require('proxyquire').noPreserveCache()
 test('test ./parse.js', (t) => {
   const parse = require('./parse.js')
 
-  t.plan(15)
-
   // test dashdash and positional option
   t.deepEquals({test: '-a'}, parse(['--', '-a'], {
     signature: ['test'],
@@ -189,6 +187,8 @@ test('test ./parse.js', (t) => {
       }
     })
   )
+
+  t.end()
 })
 
 test('test ./parse.js - with errors', (t) => {
@@ -208,8 +208,6 @@ test('test ./parse.js - with errors', (t) => {
   const parse = proxyquire('./parse.js', {
     './lib/globals.js': globals
   })
-
-  t.plan(2)
 
   // test non-boolean with value
   parse(['-a'], {
@@ -282,6 +280,8 @@ test('test ./parse.js - with errors', (t) => {
     red('--test is required'),
     red('too many arguments')
   ], messages)
+
+  t.end()
 })
 
 test('test ./help.js', (t) => {
@@ -383,8 +383,6 @@ test('test ./help.js', (t) => {
 
   help('testing.js', {name: 'test-command', description: 'a test command'.split(' ').join('\n'), signature: [], options: {}, commands: []})
 
-  t.plan(2)
-
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
@@ -431,6 +429,8 @@ test('test ./help.js', (t) => {
     ${green('Usage:')} testing.js test-command
     `
   ], messages)
+
+  t.end()
 })
 
 test('test ./error.js', (t) => {
@@ -465,8 +465,6 @@ test('test ./error.js', (t) => {
 
   error()
 
-  t.plan(2)
-
   t.equals(globals.process.exitCode, 1)
 
   t.deepEquals([
@@ -479,6 +477,8 @@ test('test ./error.js', (t) => {
     ${red('Error: testing errors')}
     `
   ], messages)
+
+  t.end()
 })
 
 test('test ./command.js - no help. no errors', (t) => {
@@ -523,8 +523,6 @@ test('test ./command.js - no help. no errors', (t) => {
     './help.js'() {}
   })('test')
 
-  t.plan(3)
-
   command({
     name: 'test-command',
     signature: ['aaa'],
@@ -542,6 +540,8 @@ test('test ./command.js - no help. no errors', (t) => {
   })
 
   start(['test-command'])
+
+  t.end()
 })
 
 test('test ./command.js - help', (t) => {
@@ -591,8 +591,6 @@ test('test ./command.js - help', (t) => {
     './help.js': mockedHelp
   })('test')
 
-  t.plan(1)
-
   command({
     name: 'test-command',
     signature: ['aaa'],
@@ -608,6 +606,8 @@ test('test ./command.js - help', (t) => {
   })
 
   start(['test-command'])
+
+  t.end()
 })
 
 test('test ./command.js - thrown error', (t) => {
@@ -625,8 +625,6 @@ test('test ./command.js - thrown error', (t) => {
 
   const ourError = Error('testing errors')
 
-  t.plan(1)
-
   command({
     name: 'test-command',
     action() {
@@ -635,6 +633,8 @@ test('test ./command.js - thrown error', (t) => {
   })
 
   start(['test-command'])
+
+  t.end()
 })
 
 test('test ./command.js - rejected promise', (t) => {
@@ -652,8 +652,6 @@ test('test ./command.js - rejected promise', (t) => {
 
   const ourError = Error('testing errors')
 
-  t.plan(1)
-
   command({
     name: 'test-command',
     async action() {
@@ -662,6 +660,8 @@ test('test ./command.js - rejected promise', (t) => {
   })
 
   start(['test-command'])
+
+  t.end()
 })
 
 test('test ./command.js - sub commands', (t) => {
@@ -669,8 +669,6 @@ test('test ./command.js - sub commands', (t) => {
     './parse.js'() { return {} },
     './help.js'() {}
   })('test')
-
-  t.plan(2)
 
   command({
     action() {
@@ -695,4 +693,6 @@ test('test ./command.js - sub commands', (t) => {
   start(['sub-command'])
 
   start(['sub-command-b'])
+
+  t.end()
 })
