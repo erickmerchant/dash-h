@@ -2,6 +2,7 @@ const test = require('tape')
 const {green, red} = require('kleur')
 const outdent = require('outdent')
 const proxyquire = require('proxyquire').noPreserveCache()
+const delay = require('delay')
 
 test('test ./parse.js', (t) => {
   const parse = require('./parse.js')
@@ -481,7 +482,7 @@ test('test ./error.js', (t) => {
   t.end()
 })
 
-test('test ./command.js - no help. no errors', (t) => {
+test('test ./command.js - no help. no errors', async (t) => {
   const mockedParse = (argv, definitions) => {
     t.deepEquals([], argv)
 
@@ -541,10 +542,12 @@ test('test ./command.js - no help. no errors', (t) => {
 
   start(['test-command'])
 
+  await delay(0)
+
   t.end()
 })
 
-test('test ./command.js - help', (t) => {
+test('test ./command.js - help', async (t) => {
   const mockedParse = (argv, definitions) => {
     return {
       help: true
@@ -607,10 +610,12 @@ test('test ./command.js - help', (t) => {
 
   start(['test-command'])
 
+  await delay(0)
+
   t.end()
 })
 
-test('test ./command.js - thrown error', (t) => {
+test('test ./command.js - thrown error', async (t) => {
   const mockedParse = () => { return {} }
 
   const mockedError = (error) => {
@@ -634,10 +639,12 @@ test('test ./command.js - thrown error', (t) => {
 
   start(['test-command'])
 
+  await delay(0)
+
   t.end()
 })
 
-test('test ./command.js - rejected promise', (t) => {
+test('test ./command.js - rejected promise', async (t) => {
   const mockedParse = () => { return {} }
 
   const mockedError = (error) => {
@@ -661,10 +668,12 @@ test('test ./command.js - rejected promise', (t) => {
 
   start(['test-command'])
 
+  await delay(0)
+
   t.end()
 })
 
-test('test ./command.js - sub commands', (t) => {
+test('test ./command.js - sub commands', async (t) => {
   const {command, start} = proxyquire('./main.js', {
     './parse.js'() { return {} },
     './help.js'() {}
@@ -693,6 +702,8 @@ test('test ./command.js - sub commands', (t) => {
   start(['sub-command'])
 
   start(['sub-command-b'])
+
+  await delay(0)
 
   t.end()
 })
