@@ -72,13 +72,16 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
       const val = definition.parameter
         ? ` <${property}>`
         : ''
-      let usage = (inSignature ? `[${addDashes(property)}]` : addDashes(property)) + val
+
+      let usage = inSignature ? '[' : ''
 
       for (const [key, alias] of Object.entries(options)) {
         if (alias !== property) continue
 
-        usage = `${inSignature ? `[${addDashes(key)}]` : addDashes(key)}, ${usage}`
+        usage += `${addDashes(key)}, `
       }
+
+      usage += `${addDashes(property)}${inSignature ? ']' : ''}${val}`
 
       if (usage.length > longest) {
         longest = usage.length

@@ -71,7 +71,7 @@ module.exports = (argv, {signature, options}) => {
           throw Error(`${addDashes(property)} is a boolean and does not accept a value`)
         }
 
-        if (vals != null && vals.length) {
+        if (vals?.length) {
           if (definition.multiple) {
             args[property] = args[property] != null ? [...args[property], ...vals] : vals
           } else if (args[property] != null) {
@@ -151,7 +151,7 @@ module.exports = (argv, {signature, options}) => {
     const hasMultiple = signature.filter((key) => {
       const definition = options[resolveProperty(options, key)]
 
-      return definition != null && definition.multiple
+      return definition?.multiple ?? false
     }).length > 0
 
     if (!hasMultiple && remainder.length > signature.length) {

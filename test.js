@@ -313,6 +313,7 @@ test('test ./help.js', (t) => {
         required: true,
         parameter: true
       },
+      p: 'p0',
       p1: {
         multiple: true,
         parameter: true,
@@ -392,7 +393,7 @@ test('test ./help.js', (t) => {
 
     ${green('Options:')}
 
-     [--p0] <p0>      the description
+     [-p, --p0] <p0>  the description
      [--p1] <p1>      [default: ["a","b"]]
      -a, --aaa        a Boolean
      -b, --bbb <bbb>  a Number [default: 100]
