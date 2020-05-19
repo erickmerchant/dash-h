@@ -1,4 +1,4 @@
-const test = require('tape')
+const test = require('ava')
 const {green, red} = require('kleur')
 const outdent = require('outdent')
 const proxyquire = require('proxyquire').noPreserveCache()
@@ -8,7 +8,7 @@ test('test ./parse.js', (t) => {
   const parse = require('./parse.js')
 
   // test dashdash and positional option
-  t.deepEquals({test: '-a'}, parse(['--', '-a'], {
+  t.deepEqual({test: '-a'}, parse(['--', '-a'], {
     signature: ['test'],
     options: {
       test: {parameter: true}
@@ -16,7 +16,7 @@ test('test ./parse.js', (t) => {
   }))
 
   // test non-required positional option
-  t.deepEquals({}, parse([], {
+  t.deepEqual({}, parse([], {
     signature: ['test'],
     options: {
       test: {parameter: true}
@@ -24,13 +24,13 @@ test('test ./parse.js', (t) => {
   }))
 
   // test empty
-  t.deepEquals({}, parse([''], {
+  t.deepEqual({}, parse([''], {
     signature: [],
     options: {}
   }))
 
   // test short
-  t.deepEquals({aaa: true}, parse(['-a'], {
+  t.deepEqual({aaa: true}, parse(['-a'], {
     signature: [],
     options: {
       aaa: {},
@@ -39,7 +39,7 @@ test('test ./parse.js', (t) => {
   }))
 
   // test short with value
-  t.deepEquals({aaa: 'bcd'}, parse(['-a=bcd'], {
+  t.deepEqual({aaa: 'bcd'}, parse(['-a=bcd'], {
     signature: [],
     options: {
       aaa: {
@@ -50,7 +50,7 @@ test('test ./parse.js', (t) => {
   }))
 
   // test multiple short with value
-  t.deepEquals({aaa: 'bcd', b: true}, parse(['-ba=bcd'], {
+  t.deepEqual({aaa: 'bcd', b: true}, parse(['-ba=bcd'], {
     signature: [],
     options: {
       aaa: {
@@ -62,7 +62,7 @@ test('test ./parse.js', (t) => {
   }))
 
   // test multiple short
-  t.deepEquals({aaa: true, b: true}, parse(['-ba'], {
+  t.deepEqual({aaa: true, b: true}, parse(['-ba'], {
     signature: [],
     options: {
       aaa: {},
@@ -72,7 +72,7 @@ test('test ./parse.js', (t) => {
   }))
 
   // test multiple, ---, and -
-  t.deepEquals({aaa: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
+  t.deepEqual({aaa: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
     signature: [],
     options: {
       aaa: {
@@ -83,8 +83,8 @@ test('test ./parse.js', (t) => {
     }
   }))
 
-  // test empty with equals
-  t.deepEquals({aaa: ''}, parse(['--aaa='], {
+  // test empty with deepEqual
+  t.deepEqual({aaa: ''}, parse(['--aaa='], {
     signature: [],
     options: {
       aaa: {
@@ -95,7 +95,7 @@ test('test ./parse.js', (t) => {
   }))
 
   // test default
-  t.deepEquals({aaa: ''}, parse([''], {
+  t.deepEqual({aaa: ''}, parse([''], {
     signature: [],
     options: {
       aaa: {
@@ -107,7 +107,7 @@ test('test ./parse.js', (t) => {
   }))
 
   // test default flag
-  t.deepEquals({aaa: false}, parse([''], {
+  t.deepEqual({aaa: false}, parse([''], {
     signature: [],
     options: {
       aaa: {
@@ -118,7 +118,7 @@ test('test ./parse.js', (t) => {
   }))
 
   // test default positional option
-  t.deepEquals({0: 'testing', 1: 'yes'}, parse(['testing'], {
+  t.deepEqual({0: 'testing', 1: 'yes'}, parse(['testing'], {
     signature: ['0', '1'],
     options: {
       0: {parameter: true},
@@ -130,7 +130,7 @@ test('test ./parse.js', (t) => {
   }))
 
   // test multiple param beginning
-  t.deepEquals(
+  t.deepEqual(
     {test0: ['1', '2', '3', '4', '5', '6', '7'], test1: '8', test2: '9'},
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       signature: ['test0', 'test1', 'test2'],
@@ -150,7 +150,7 @@ test('test ./parse.js', (t) => {
   )
 
   // test multiple param middle
-  t.deepEquals(
+  t.deepEqual(
     {test0: '1', test1: ['2', '3', '4', '5', '6', '7', '8'], test2: '9'},
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       signature: ['test0', 'test1', 'test2'],
@@ -170,7 +170,7 @@ test('test ./parse.js', (t) => {
   )
 
   // test multiple param end
-  t.deepEquals(
+  t.deepEqual(
     {test0: '1', test1: '2', test2: ['3', '4', '5', '6', '7', '8', '9']},
     parse(['1', '2', '3', '4', '5', '6', '7', '8', '9'], {
       signature: ['test0', 'test1', 'test2'],
@@ -188,8 +188,6 @@ test('test ./parse.js', (t) => {
       }
     })
   )
-
-  t.end()
 })
 
 test('test ./parse.js - with errors', (t) => {
@@ -267,9 +265,9 @@ test('test ./parse.js - with errors', (t) => {
   // test too many arguments
   parse(['--', '-a'], {signature: [], options: {}})
 
-  t.equals(globals.process.exitCode, 1)
+  t.deepEqual(globals.process.exitCode, 1)
 
-  t.deepEquals([
+  t.deepEqual([
     red('--aaa is not a boolean and requires a value'),
     red('-a is a boolean and does not accept a value'),
     red('--aaa is a boolean and does not accept a value'),
@@ -281,8 +279,6 @@ test('test ./parse.js - with errors', (t) => {
     red('--test is required'),
     red('too many arguments')
   ], messages)
-
-  t.end()
 })
 
 test('test ./help.js', (t) => {
@@ -385,9 +381,9 @@ test('test ./help.js', (t) => {
 
   help('testing.js', {name: 'test-command', description: 'a test command'.split(' ').join('\n'), signature: [], options: {}, commands: []})
 
-  t.equals(globals.process.exitCode, 1)
+  t.deepEqual(globals.process.exitCode, 1)
 
-  t.deepEquals([
+  t.deepEqual([
     outdent`
     ${green('Usage:')} testing.js test-command --bbb <bbb> <p0> [<p1>]...
 
@@ -431,8 +427,6 @@ test('test ./help.js', (t) => {
     ${green('Usage:')} testing.js test-command
     `
   ], messages)
-
-  t.end()
 })
 
 test('test ./error.js', (t) => {
@@ -467,9 +461,9 @@ test('test ./error.js', (t) => {
 
   error()
 
-  t.equals(globals.process.exitCode, 1)
+  t.deepEqual(globals.process.exitCode, 1)
 
-  t.deepEquals([
+  t.deepEqual([
     outdent`
     ${red('Error: testing errors')}
     at thing (file.js:123:45)
@@ -479,15 +473,13 @@ test('test ./error.js', (t) => {
     ${red('Error: testing errors')}
     `
   ], messages)
-
-  t.end()
 })
 
 test('test ./command.js - no help. no errors', async (t) => {
   const mockedParse = (argv, definitions) => {
-    t.deepEquals([], argv)
+    t.deepEqual([], argv)
 
-    t.deepEquals({
+    t.deepEqual({
       signature: ['aaa'],
       options: {
         aaa: {
@@ -537,15 +529,13 @@ test('test ./command.js - no help. no errors', async (t) => {
       }
     },
     action() {
-      t.ok(true)
+      t.pass()
     }
   })
 
   start(['test-command'])
 
   await delay(0)
-
-  t.end()
 })
 
 test('test ./command.js - help', async (t) => {
@@ -556,7 +546,7 @@ test('test ./command.js - help', async (t) => {
   }
 
   const mockedHelp = (prefix, definitions) => {
-    t.deepEquals({
+    t.deepEqual({
       commands: [],
       name: 'test-command',
       description: '',
@@ -612,15 +602,13 @@ test('test ./command.js - help', async (t) => {
   start(['test-command'])
 
   await delay(0)
-
-  t.end()
 })
 
 test('test ./command.js - thrown error', async (t) => {
   const mockedParse = () => { return {} }
 
   const mockedError = (error) => {
-    t.deepEquals(ourError, error)
+    t.deepEqual(ourError, error)
   }
 
   const {command, start} = proxyquire('./main.js', {
@@ -641,15 +629,13 @@ test('test ./command.js - thrown error', async (t) => {
   start(['test-command'])
 
   await delay(0)
-
-  t.end()
 })
 
 test('test ./command.js - rejected promise', async (t) => {
   const mockedParse = () => { return {} }
 
   const mockedError = (error) => {
-    t.deepEquals(ourError, error)
+    t.deepEqual(ourError, error)
   }
 
   const {command, start} = proxyquire('./main.js', {
@@ -670,8 +656,6 @@ test('test ./command.js - rejected promise', async (t) => {
   start(['test-command'])
 
   await delay(0)
-
-  t.end()
 })
 
 test('test ./command.js - sub commands', async (t) => {
@@ -682,21 +666,21 @@ test('test ./command.js - sub commands', async (t) => {
 
   command({
     action() {
-      t.ok(false)
+      t.fail()
     }
   })
 
   command({
     name: 'sub-command',
     action() {
-      t.ok(true)
+      t.pass()
     }
   })
 
   command({
     name: 'sub-command-b',
     action() {
-      t.ok(true)
+      t.pass()
     }
   })
 
@@ -705,6 +689,4 @@ test('test ./command.js - sub commands', async (t) => {
   start(['sub-command-b'])
 
   await delay(0)
-
-  t.end()
 })
