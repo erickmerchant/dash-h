@@ -1,12 +1,14 @@
 const parse = require('./parse.js')
 const error = require('./error.js')
 const help = require('./help.js')
+
 const helpOptions = {
   help: {
     description: 'get help'
   },
   h: 'help'
 }
+
 const defaultOption = {
   description: '',
   multiple: false,
@@ -14,6 +16,7 @@ const defaultOption = {
   parameter: false,
   default: null
 }
+
 const defaultCommand = {
   name: '',
   description: '',
