@@ -22,14 +22,12 @@
   ],
   "main": "main.js",
   "scripts": {
-    "pretest": "lint '**/*.js'",
     "test": "ava test.js"
   },
   "dependencies": {
     "kleur": "^3.0.3"
   },
   "devDependencies": {
-    "@erickmerchant/lint": "^5.1.0",
     "ava": "^3.8.2",
     "delay": "^4.3.0",
     "outdent": "^0.7.1",
