@@ -62,10 +62,19 @@ module.exports = (prefix) => {
       const subCommands = command.name === '' ? commands : []
 
       try {
-        const args = parse(command.name === '' ? argv : argv.slice(1), {signature: command.signature, options: command.options})
+        const args = parse(command.name === '' ? argv : argv.slice(1), {
+          signature: command.signature,
+          options: command.options
+        })
 
         if (args == null || args.help || command.action == null) {
-          help(prefix, {commands: subCommands, name: command.name, description: command.description, signature: command.signature, options: command.options})
+          help(prefix, {
+            commands: subCommands,
+            name: command.name,
+            description: command.description,
+            signature: command.signature,
+            options: command.options
+          })
         } else if (command.action != null) {
           await command.action(args)
         }

@@ -8,126 +8,162 @@ test('test ./parse.js', (t) => {
   const parse = require('./parse.js')
 
   // test dashdash and positional option
-  t.deepEqual({test: '-a'}, parse(['--', '-a'], {
-    signature: ['test'],
-    options: {
-      test: {parameter: true}
-    }
-  }))
+  t.deepEqual(
+    {test: '-a'},
+    parse(['--', '-a'], {
+      signature: ['test'],
+      options: {
+        test: {parameter: true}
+      }
+    })
+  )
 
   // test non-required positional option
-  t.deepEqual({}, parse([], {
-    signature: ['test'],
-    options: {
-      test: {parameter: true}
-    }
-  }))
+  t.deepEqual(
+    {},
+    parse([], {
+      signature: ['test'],
+      options: {
+        test: {parameter: true}
+      }
+    })
+  )
 
   // test empty
-  t.deepEqual({}, parse([''], {
-    signature: [],
-    options: {}
-  }))
+  t.deepEqual(
+    {},
+    parse([''], {
+      signature: [],
+      options: {}
+    })
+  )
 
   // test short
-  t.deepEqual({aaa: true}, parse(['-a'], {
-    signature: [],
-    options: {
-      aaa: {},
-      a: 'aaa'
-    }
-  }))
+  t.deepEqual(
+    {aaa: true},
+    parse(['-a'], {
+      signature: [],
+      options: {
+        aaa: {},
+        a: 'aaa'
+      }
+    })
+  )
 
   // test short with value
-  t.deepEqual({aaa: 'bcd'}, parse(['-a=bcd'], {
-    signature: [],
-    options: {
-      aaa: {
-        parameter: true
-      },
-      a: 'aaa'
-    }
-  }))
+  t.deepEqual(
+    {aaa: 'bcd'},
+    parse(['-a=bcd'], {
+      signature: [],
+      options: {
+        aaa: {
+          parameter: true
+        },
+        a: 'aaa'
+      }
+    })
+  )
 
   // test multiple short with value
-  t.deepEqual({aaa: 'bcd', b: true}, parse(['-ba=bcd'], {
-    signature: [],
-    options: {
-      aaa: {
-        parameter: true
-      },
-      a: 'aaa',
-      b: {}
-    }
-  }))
+  t.deepEqual(
+    {aaa: 'bcd', b: true},
+    parse(['-ba=bcd'], {
+      signature: [],
+      options: {
+        aaa: {
+          parameter: true
+        },
+        a: 'aaa',
+        b: {}
+      }
+    })
+  )
 
   // test multiple short
-  t.deepEqual({aaa: true, b: true}, parse(['-ba'], {
-    signature: [],
-    options: {
-      aaa: {},
-      a: 'aaa',
-      b: {}
-    }
-  }))
+  t.deepEqual(
+    {aaa: true, b: true},
+    parse(['-ba'], {
+      signature: [],
+      options: {
+        aaa: {},
+        a: 'aaa',
+        b: {}
+      }
+    })
+  )
 
   // test multiple, ---, and -
-  t.deepEqual({aaa: ['bcd', '---', '-']}, parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
-    signature: [],
-    options: {
-      aaa: {
-        parameter: true,
-        multiple: true
-      },
-      a: 'aaa'
-    }
-  }))
+  t.deepEqual(
+    {aaa: ['bcd', '---', '-']},
+    parse(['-a', 'bcd', '-a', '---', '-a', '-'], {
+      signature: [],
+      options: {
+        aaa: {
+          parameter: true,
+          multiple: true
+        },
+        a: 'aaa'
+      }
+    })
+  )
 
   // test empty with deepEqual
-  t.deepEqual({aaa: ''}, parse(['--aaa='], {
-    signature: [],
-    options: {
-      aaa: {
-        parameter: true
-      },
-      a: 'aaa'
-    }
-  }))
+  t.deepEqual(
+    {aaa: ''},
+    parse(['--aaa='], {
+      signature: [],
+      options: {
+        aaa: {
+          parameter: true
+        },
+        a: 'aaa'
+      }
+    })
+  )
 
   // test default
-  t.deepEqual({aaa: ''}, parse([''], {
-    signature: [],
-    options: {
-      aaa: {
-        default: '',
-        parameter: true
-      },
-      a: 'aaa'
-    }
-  }))
+  t.deepEqual(
+    {aaa: ''},
+    parse([''], {
+      signature: [],
+      options: {
+        aaa: {
+          default: '',
+          parameter: true
+        },
+        a: 'aaa'
+      }
+    })
+  )
 
   // test default flag
-  t.deepEqual({aaa: false}, parse([''], {
-    signature: [],
-    options: {
-      aaa: {
-        default: ''
-      },
-      a: 'aaa'
-    }
-  }))
+  t.deepEqual(
+    {aaa: false},
+    parse([''], {
+      signature: [],
+      options: {
+        aaa: {
+          default: ''
+        },
+        a: 'aaa'
+      }
+    })
+  )
 
   // test default positional option
-  t.deepEqual({0: 'testing', 1: 'yes'}, parse(['testing'], {
-    signature: ['0', '1'],
-    options: {
-      0: {parameter: true},
-      1: {
-        parameter: true,
-        default: 'yes'
+  t.deepEqual(
+    {0: 'testing', 1: 'yes'},
+    parse(['testing'], {
+      signature: ['0', '1'],
+      options: {
+        0: {parameter: true},
+        1: {
+          parameter: true,
+          default: 'yes'
+        }
       }
-    }
-  }))
+    })
+  )
 
   // test multiple param beginning
   t.deepEqual(
@@ -267,18 +303,21 @@ test('test ./parse.js - with errors', (t) => {
 
   t.deepEqual(globals.process.exitCode, 1)
 
-  t.deepEqual([
-    red('--aaa is not a boolean and requires a value'),
-    red('-a is a boolean and does not accept a value'),
-    red('--aaa is a boolean and does not accept a value'),
-    red('unknown option -a'),
-    red('unknown option --aaa'),
-    red('-a is required'),
-    red('--aaa is required'),
-    red('--aaa does not accept multiple values'),
-    red('--test is required'),
-    red('too many arguments')
-  ], messages)
+  t.deepEqual(
+    [
+      red('--aaa is not a boolean and requires a value'),
+      red('-a is a boolean and does not accept a value'),
+      red('--aaa is a boolean and does not accept a value'),
+      red('unknown option -a'),
+      red('unknown option --aaa'),
+      red('-a is required'),
+      red('--aaa is required'),
+      red('--aaa does not accept multiple values'),
+      red('--test is required'),
+      red('too many arguments')
+    ],
+    messages
+  )
 })
 
 test('test ./help.js', (t) => {
@@ -379,12 +418,19 @@ test('test ./help.js', (t) => {
     commands: []
   })
 
-  help('testing.js', {name: 'test-command', description: 'a test command'.split(' ').join('\n'), signature: [], options: {}, commands: []})
+  help('testing.js', {
+    name: 'test-command',
+    description: 'a test command'.split(' ').join('\n'),
+    signature: [],
+    options: {},
+    commands: []
+  })
 
   t.deepEqual(globals.process.exitCode, 1)
 
-  t.deepEqual([
-    outdent`
+  t.deepEqual(
+    [
+      outdent`
     ${green('Usage:')} testing.js test-command --bbb <bbb> <p0> [<p1>]...
 
     ${green('Options:')}
@@ -394,7 +440,7 @@ test('test ./help.js', (t) => {
      -a, --aaa        a Boolean
      -b, --bbb <bbb>  a Number [default: 100]
     `,
-    outdent`
+      outdent`
     ${green('Description:')} a test command
 
     ${green('Usage:')} testing.js test-command <p0>
@@ -408,7 +454,7 @@ test('test ./help.js', (t) => {
 
      testing.js test-command:sub <p1>
     `,
-    outdent`
+      outdent`
     ${green('Description:')} a test command
 
     ${green('Usage:')} testing.js test-command
@@ -417,7 +463,7 @@ test('test ./help.js', (t) => {
 
      -a, --aaa  a Boolean
     `,
-    outdent`
+      outdent`
     ${green('Description:')}
 
     a
@@ -426,7 +472,9 @@ test('test ./help.js', (t) => {
 
     ${green('Usage:')} testing.js test-command
     `
-  ], messages)
+    ],
+    messages
+  )
 })
 
 test('test ./error.js', (t) => {
@@ -449,7 +497,11 @@ test('test ./error.js', (t) => {
 
   const error1 = Error('testing errors')
 
-  error1.stack = ['Error: testing errors', 'at thing (file.js:123:45)', 'at another'].join('\n')
+  error1.stack = [
+    'Error: testing errors',
+    'at thing (file.js:123:45)',
+    'at another'
+  ].join('\n')
 
   error(error1)
 
@@ -463,51 +515,57 @@ test('test ./error.js', (t) => {
 
   t.deepEqual(globals.process.exitCode, 1)
 
-  t.deepEqual([
-    outdent`
+  t.deepEqual(
+    [
+      outdent`
     ${red('Error: testing errors')}
     at thing (file.js:123:45)
     at another
     `,
-    outdent`
+      outdent`
     ${red('Error: testing errors')}
     `
-  ], messages)
+    ],
+    messages
+  )
 })
 
 test('test ./command.js - no help. no errors', async (t) => {
   const mockedParse = (argv, definitions) => {
     t.deepEqual([], argv)
 
-    t.deepEqual({
-      signature: ['aaa'],
-      options: {
-        aaa: {
-          description: '',
-          multiple: false,
-          required: false,
-          parameter: false,
-          default: null,
-          testing: true
-        },
-        bbb: {
-          description: '',
-          multiple: false,
-          required: false,
-          parameter: false,
-          default: null,
-          testing: true
-        },
-        help: {
-          description: 'get help',
-          multiple: false,
-          required: false,
-          parameter: false,
-          default: null
-        },
-        h: 'help'
-      }
-    }, definitions)
+    t.deepEqual(
+      {
+        signature: ['aaa'],
+        options: {
+          aaa: {
+            description: '',
+            multiple: false,
+            required: false,
+            parameter: false,
+            default: null,
+            testing: true
+          },
+          bbb: {
+            description: '',
+            multiple: false,
+            required: false,
+            parameter: false,
+            default: null,
+            testing: true
+          },
+          help: {
+            description: 'get help',
+            multiple: false,
+            required: false,
+            parameter: false,
+            default: null
+          },
+          h: 'help'
+        }
+      },
+      definitions
+    )
 
     return {}
   }
@@ -546,38 +604,41 @@ test('test ./command.js - help', async (t) => {
   }
 
   const mockedHelp = (prefix, definitions) => {
-    t.deepEqual({
-      commands: [],
-      name: 'test-command',
-      description: '',
-      signature: ['aaa'],
-      options: {
-        aaa: {
-          description: '',
-          multiple: false,
-          required: false,
-          parameter: false,
-          default: null,
-          testing: true
-        },
-        bbb: {
-          description: '',
-          multiple: false,
-          required: false,
-          parameter: false,
-          default: null,
-          testing: true
-        },
-        help: {
-          description: 'get help',
-          multiple: false,
-          required: false,
-          parameter: false,
-          default: null
-        },
-        h: 'help'
-      }
-    }, definitions)
+    t.deepEqual(
+      {
+        commands: [],
+        name: 'test-command',
+        description: '',
+        signature: ['aaa'],
+        options: {
+          aaa: {
+            description: '',
+            multiple: false,
+            required: false,
+            parameter: false,
+            default: null,
+            testing: true
+          },
+          bbb: {
+            description: '',
+            multiple: false,
+            required: false,
+            parameter: false,
+            default: null,
+            testing: true
+          },
+          help: {
+            description: 'get help',
+            multiple: false,
+            required: false,
+            parameter: false,
+            default: null
+          },
+          h: 'help'
+        }
+      },
+      definitions
+    )
   }
 
   const {command, start} = proxyquire('./main.js', {
@@ -605,7 +666,9 @@ test('test ./command.js - help', async (t) => {
 })
 
 test('test ./command.js - thrown error', async (t) => {
-  const mockedParse = () => { return {} }
+  const mockedParse = () => {
+    return {}
+  }
 
   const mockedError = (error) => {
     t.deepEqual(ourError, error)
@@ -632,7 +695,9 @@ test('test ./command.js - thrown error', async (t) => {
 })
 
 test('test ./command.js - rejected promise', async (t) => {
-  const mockedParse = () => { return {} }
+  const mockedParse = () => {
+    return {}
+  }
 
   const mockedError = (error) => {
     t.deepEqual(ourError, error)
@@ -660,7 +725,9 @@ test('test ./command.js - rejected promise', async (t) => {
 
 test('test ./command.js - sub commands', async (t) => {
   const {command, start} = proxyquire('./main.js', {
-    './parse.js'() { return {} },
+    './parse.js'() {
+      return {}
+    },
     './help.js'() {}
   })('test')
 

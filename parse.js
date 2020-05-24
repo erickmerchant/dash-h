@@ -38,7 +38,9 @@ module.exports = (argv, {signature, options}) => {
 
     let i = -1
 
-    const resolvedSignature = signature.map((key) => resolveProperty(options, key))
+    const resolvedSignature = signature.map((key) =>
+      resolveProperty(options, key)
+    )
 
     while (++i < argv.length) {
       for (const key of Object.keys(options)) {
@@ -48,7 +50,11 @@ module.exports = (argv, {signature, options}) => {
         const vals = []
         const isSearch = argv[i] === search
         const isSearchWithValue = argv[i].startsWith(`${search}=`)
-        const nextIsValid = argv[i + 1] != null && (!argv[i + 1].startsWith('-') || argv[i + 1].startsWith('---') || argv[i + 1] === '-')
+        const nextIsValid =
+          argv[i + 1] != null &&
+          (!argv[i + 1].startsWith('-') ||
+            argv[i + 1].startsWith('---') ||
+            argv[i + 1] === '-')
         const isBoolean = !definition.parameter
 
         if (isSearch && isBoolean) {
@@ -66,16 +72,23 @@ module.exports = (argv, {signature, options}) => {
 
           toBeDeleted.push(i)
         } else if (isSearch && !isBoolean) {
-          throw Error(`${addDashes(property)} is not a boolean and requires a value`)
+          throw Error(
+            `${addDashes(property)} is not a boolean and requires a value`
+          )
         } else if (isSearchWithValue && isBoolean) {
-          throw Error(`${addDashes(property)} is a boolean and does not accept a value`)
+          throw Error(
+            `${addDashes(property)} is a boolean and does not accept a value`
+          )
         }
 
         if (vals?.length) {
           if (definition.multiple) {
-            args[property] = args[property] != null ? [...args[property], ...vals] : vals
+            args[property] =
+              args[property] != null ? [...args[property], ...vals] : vals
           } else if (args[property] != null) {
-            throw Error(`${addDashes(property)} does not accept multiple values`)
+            throw Error(
+              `${addDashes(property)} does not accept multiple values`
+            )
           } else {
             args[property] = vals.pop()
           }
@@ -95,7 +108,10 @@ module.exports = (argv, {signature, options}) => {
           if (definition.parameter) {
             if (definition.default != null) {
               args[property] = definition.default
-            } else if (definition.required && !resolvedSignature.includes(property)) {
+            } else if (
+              definition.required &&
+              !resolvedSignature.includes(property)
+            ) {
               throw Error(`${addDashes(property)} is required`)
             }
           } else if (!definition.required) {
@@ -148,11 +164,12 @@ module.exports = (argv, {signature, options}) => {
       }
     }
 
-    const hasMultiple = signature.filter((key) => {
-      const definition = options[resolveProperty(options, key)]
+    const hasMultiple =
+      signature.filter((key) => {
+        const definition = options[resolveProperty(options, key)]
 
-      return definition?.multiple ?? false
-    }).length > 0
+        return definition?.multiple ?? false
+      }).length > 0
 
     if (!hasMultiple && remainder.length > signature.length) {
       throw Error('too many arguments')

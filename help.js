@@ -4,16 +4,20 @@ const {addDashes, resolveProperty} = require('./lib/helpers.js')
 
 const getUsage = (prefix, command) => {
   const usage = ['', `${prefix} ${command.name}`]
-  const resolvedSignature = command.signature.map((key) => resolveProperty(command.options, key))
+  const resolvedSignature = command.signature.map((key) =>
+    resolveProperty(command.options, key)
+  )
 
   for (const [key, definition] of Object.entries(command.options)) {
-    if (typeof definition !== 'object' || !definition.required || resolvedSignature.includes(key)) {
+    if (
+      typeof definition !== 'object' ||
+      !definition.required ||
+      resolvedSignature.includes(key)
+    ) {
       continue
     }
 
-    const valPart = definition.parameter
-      ? ` <${key}>`
-      : ''
+    const valPart = definition.parameter ? ` <${key}>` : ''
 
     usage.push(wrapUsage(addDashes(key) + valPart, definition))
   }
@@ -38,7 +42,10 @@ const wrapUsage = (usage, {required, multiple}) => {
   return multiple ? `${result}...` : result
 }
 
-module.exports = (prefix, {description, name, signature, options, commands}) => {
+module.exports = (
+  prefix,
+  {description, name, signature, options, commands}
+) => {
   process.exitCode = 1
   const lines = []
 
@@ -53,14 +60,19 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
     }
   }
 
-  lines.push('', `${green('Usage:')}${getUsage(prefix, {name, signature, options})}`)
+  lines.push(
+    '',
+    `${green('Usage:')}${getUsage(prefix, {name, signature, options})}`
+  )
 
   if (Object.keys(options).length) {
     lines.push('', green('Options:'), '')
 
     const optionLines = []
     let longest = 0
-    const resolvedSignature = signature.map((key) => resolveProperty(options, key))
+    const resolvedSignature = signature.map((key) =>
+      resolveProperty(options, key)
+    )
 
     for (const [key, definition] of Object.entries(options)) {
       const property = resolveProperty(options, key)
@@ -69,9 +81,7 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
 
       const inSignature = resolvedSignature.includes(property)
 
-      const val = definition.parameter
-        ? ` <${property}>`
-        : ''
+      const val = definition.parameter ? ` <${property}>` : ''
 
       let usage = inSignature ? '[' : ''
 
@@ -101,7 +111,11 @@ module.exports = (prefix, {description, name, signature, options, commands}) => 
     }
 
     for (const optionLine of optionLines) {
-      lines.push(` ${optionLine[0]}  ${' '.repeat(longest - optionLine[0].length)}${optionLine.slice(1).join('').trim()}`)
+      lines.push(
+        ` ${optionLine[0]}  ${' '.repeat(
+          longest - optionLine[0].length
+        )}${optionLine.slice(1).join('').trim()}`
+      )
     }
   }
 
