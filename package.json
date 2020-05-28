@@ -22,7 +22,8 @@
   ],
   "main": "main.js",
   "scripts": {
-    "pretest": "eslint '*.js' 'lib/*.js'",
+    "lint": "eslint '*.js' 'lib/*.js'",
+    "pretest": "npm run lint",
     "test": "ava test.js"
   },
   "dependencies": {
