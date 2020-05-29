@@ -4,7 +4,7 @@ A CLI solution with simple argument parsing, sub-commands, and built in help mes
 
 ## Example
 
-``` javascript
+```javascript
 // example.js
 
 const {command, start} = require('sergeant')('example.js')
@@ -22,7 +22,7 @@ const say = (name, loud = false) => {
 
 const load = {
   loud: {
-    description: 'say it loud',
+    description: 'say it loud'
   },
   l: 'loud'
 }
@@ -35,7 +35,7 @@ command({
     name: {
       description: 'the name',
       required: true
-    },
+    }
   },
   action(args) {
     assert.notEqual(args.name, 'world', 'use hello world')
