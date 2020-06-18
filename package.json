@@ -27,7 +27,7 @@
     "test": "ava test.js"
   },
   "dependencies": {
-    "kleur": "^3.0.3"
+    "kleur": "^4.0.0"
   },
   "devDependencies": {
     "@erickmerchant/eslint-config": "^1.1.1",
