@@ -1,4 +1,5 @@
 import childProcess from 'child_process'
+import path from 'path'
 
 export {default as arg} from 'arg'
 
@@ -16,8 +17,17 @@ export const spawn = (strs, ...quoted) =>
       }
     }
 
+    const env = Object.assign({}, process.env, {
+      PATH: `${process.env.PATH}${path.delimiter}${path.join(
+        process.cwd(),
+        'node_modules/.bin'
+      )}`
+    })
+
     const spawned = childProcess.spawn(args[0], args.slice(1), {
-      stdio: 'inherit'
+      stdio: 'inherit',
+      cwd: process.cwd(),
+      env
     })
 
     spawned.on('exit', () => {
