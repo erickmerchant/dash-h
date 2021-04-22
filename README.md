@@ -1,3 +1,3 @@
 # sergeant
 
-Exports arg and kleur/colors.
+A wrapper for things I use when writing cli modules.
