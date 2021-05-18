@@ -17,12 +17,13 @@ export const spawn = (strs, ...quoted) =>
       }
     }
 
-    const env = Object.assign({}, process.env, {
+    const env = {
+      ...process.env,
       PATH: `${process.env.PATH}${path.delimiter}${path.join(
         process.cwd(),
         'node_modules/.bin'
       )}`
-    })
+    }
 
     const spawned = childProcess.spawn(args[0], args.slice(1), {
       stdio: 'inherit',
